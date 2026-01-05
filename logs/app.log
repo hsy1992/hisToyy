@@ -1,0 +1,98 @@
+2026-01-01 13:35:11,236 - INFO - sqlserver_db_connect - sqlserver 连接成功, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-01-01 22:51:51,022 - INFO - orcale_db_connect - 获取数据失败:: ORA-00936: missing expression
+2026-01-01 22:52:31,435 - INFO - orcale_db_connect - 获取数据失败:: ORA-00942: table or view does not exist
+2026-01-01 22:53:14,523 - INFO - orcale_db_connect - 获取数据失败:: ORA-00942: table or view does not exist
+2026-01-01 22:54:35,068 - INFO - orcale_db_connect - 获取数据失败:: ORA-00903: invalid table name
+2026-01-01 22:55:33,967 - INFO - orcale_db_connect - 获取数据失败:: ORA-00942: table or view does not exist
+2026-01-01 22:56:10,963 - INFO - orcale_db_connect - 获取数据失败:: ORA-00942: table or view does not exist
+2026-01-01 22:59:10,234 - INFO - orcale_db_connect - 获取数据失败:: ORA-00942: table or view does not exist
+2026-01-01 23:00:15,626 - INFO - orcale_db_connect - 获取数据失败:: ORA-00942: table or view does not exist
+2026-01-01 23:02:25,318 - INFO - orcale_db_connect - 获取数据失败:: ORA-00942: table or view does not exist
+2026-01-01 23:03:07,572 - INFO - orcale_db_connect - 获取数据失败:: ORA-00942: table or view does not exist
+2026-01-01 23:08:16,263 - INFO - orcale_db_connect - 获取数据失败:: ORA-00942: table or view does not exist
+2026-01-02 14:20:43,494 - INFO - utils - Note: NumExpr detected 12 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
+2026-01-02 14:20:43,494 - INFO - utils - NumExpr defaulting to 8 threads.
+2026-01-02 14:20:44,923 - INFO - orcale_db_connect - 文件已保存至: 住院数据导出.xlsx
+2026-01-02 14:28:56,512 - INFO - utils - Note: NumExpr detected 12 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
+2026-01-02 14:28:56,512 - INFO - utils - NumExpr defaulting to 8 threads.
+2026-01-02 14:29:22,084 - INFO - utils - Note: NumExpr detected 12 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
+2026-01-02 14:29:22,084 - INFO - utils - NumExpr defaulting to 8 threads.
+2026-01-02 14:30:56,430 - INFO - utils - Note: NumExpr detected 12 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
+2026-01-02 14:30:56,430 - INFO - utils - NumExpr defaulting to 8 threads.
+2026-01-02 14:30:57,402 - INFO - orcale_db_connect - 文件已保存至: 住院数据导出.xlsx
+2026-01-02 14:31:22,541 - INFO - utils - Note: NumExpr detected 12 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
+2026-01-02 14:31:22,541 - INFO - utils - NumExpr defaulting to 8 threads.
+2026-01-02 14:31:42,305 - INFO - utils - Note: NumExpr detected 12 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
+2026-01-02 14:31:42,305 - INFO - utils - NumExpr defaulting to 8 threads.
+2026-01-02 14:32:06,449 - INFO - utils - Note: NumExpr detected 12 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
+2026-01-02 14:32:06,449 - INFO - utils - NumExpr defaulting to 8 threads.
+2026-01-02 14:33:00,240 - INFO - utils - Note: NumExpr detected 12 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
+2026-01-02 14:33:00,240 - INFO - utils - NumExpr defaulting to 8 threads.
+2026-01-02 14:33:49,151 - INFO - utils - Note: NumExpr detected 12 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
+2026-01-02 14:33:49,151 - INFO - utils - NumExpr defaulting to 8 threads.
+2026-01-02 14:34:20,620 - INFO - utils - Note: NumExpr detected 12 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
+2026-01-02 14:34:20,620 - INFO - utils - NumExpr defaulting to 8 threads.
+2026-01-02 14:35:08,687 - INFO - utils - Note: NumExpr detected 12 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
+2026-01-02 14:35:08,687 - INFO - utils - NumExpr defaulting to 8 threads.
+2026-01-02 14:35:09,634 - INFO - orcale_db_connect - 文件已保存至: G:\pythonProject\hisToyy\export_data\123-123住院数据导出2026-01-02 14_35_09.xlsx
+2026-01-02 14:48:56,093 - INFO - test - 开始his导出: 2026-01-02 00:00:00, 2026-01-02 23:59:59
+2026-01-02 14:50:40,366 - INFO - test - 开始his导出: 2026-01-02 00:00:00, 2026-01-02 23:59:59
+2026-01-02 14:51:21,904 - INFO - test - 开始his导出: 2026-01-02 00:00:00, 2026-01-02 23:59:59
+2026-01-02 14:53:35,611 - INFO - test - 开始his导出: 2026-01-02 00:00:00, 2026-01-02 23:59:59
+2026-01-02 14:54:00,750 - INFO - utils - Note: NumExpr detected 12 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
+2026-01-02 14:54:00,750 - INFO - utils - NumExpr defaulting to 8 threads.
+2026-01-02 14:54:01,737 - INFO - orcale_db_connect - 文件已保存至: G:\pythonProject\hisToyy\export_data\123-123住院数据导出2026-01-02 14_54_01.xlsx
+2026-01-02 14:57:34,060 - INFO - utils - Note: NumExpr detected 12 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
+2026-01-02 14:57:34,061 - INFO - utils - NumExpr defaulting to 8 threads.
+2026-01-02 14:57:35,083 - INFO - orcale_db_connect - 文件已保存至: G:\pythonProject\hisToyy\export_data\123-123住院数据导出2026-01-02 14_57_34.xlsx
+2026-01-02 14:57:59,001 - INFO - test - 开始his导出: 2026-01-02 00:00:00, 2026-01-02 23:59:59
+2026-01-02 14:59:38,868 - INFO - test - 开始his导出: 2026-01-02 00:00:00, 2026-01-02 23:59:59
+2026-01-02 14:59:39,473 - INFO - orcale_db_connect - 文件已保存至: G:\pythonProject\hisToyy\export_data\2026-01-02 00_00_00-2026-01-02 23_59_59住院数据导出2026-01-02 14_59_39.xlsx
+2026-01-02 14:59:39,595 - INFO - test - 导出地址：G:\pythonProject\hisToyy\export_data\2026-01-02 00_00_00-2026-01-02 23_59_59住院数据导出2026-01-02 14_59_39.xlsx
+2026-01-02 15:22:42,818 - INFO - test - 开始his导出: 2026-01-02 00:00:00, 2026-01-02 23:59:59
+2026-01-02 15:26:56,736 - INFO - test - 开始his导出: 2026-01-02 00:00:00, 2026-01-02 23:59:59
+2026-01-02 15:27:29,259 - INFO - test - 开始his导出: 2026-01-02 00:00:00, 2026-01-02 23:59:59
+2026-01-02 15:27:29,767 - INFO - orcale_db_connect - 文件已保存至: G:\pythonProject\hisToyy\export_data\2026-01-02 00_00_00-2026-01-02 23_59_59住院数据导出2026-01-02 15_27_29.xlsx, 已成功导出 1 条数据！
+2026-01-02 15:27:29,867 - INFO - test - 导出地址：G:\pythonProject\hisToyy\export_data\2026-01-02 00_00_00-2026-01-02 23_59_59住院数据导出2026-01-02 15_27_29.xlsx, 1
+2026-01-02 15:31:26,027 - INFO - test - 开始his导出: 2026-01-02 00:00:00, 2026-01-02 23:59:59
+2026-01-02 15:31:26,495 - INFO - orcale_db_connect - 文件已保存至: G:\pythonProject\hisToyy\export_data\2026-01-02 00_00_00-2026-01-02 23_59_59住院数据导出2026-01-02 15_31_26.xlsx, 已成功导出 1 条数据！
+2026-01-02 15:31:26,584 - INFO - test - 导出地址：G:\pythonProject\hisToyy\export_data\2026-01-02 00_00_00-2026-01-02 23_59_59住院数据导出2026-01-02 15_31_26.xlsx, 1
+2026-01-02 15:58:18,935 - INFO - test - start_yy_import用户点击了‘否’
+2026-01-05 21:54:22,551 - INFO - test - 开始his导出: 2026-01-05 00:00:00, 2026-01-05 23:59:59
+2026-01-05 21:55:37,010 - INFO - test - 开始his导出: 2026-01-05 00:00:00, 2026-01-05 23:59:59
+2026-01-05 21:55:37,043 - INFO - scroll_window - SQLite 查询错误: 'SqlInfiniteTableWidget' object has no attribute 'STATUS_COLOR'
+2026-01-05 21:55:37,818 - INFO - orcale_db_connect - 文件已保存至: G:\pythonProject\hisToyy\export_data\2026-01-05 00_00_00-2026-01-05 23_59_59住院数据导出2026-01-05 21_55_37.xlsx, 已成功导出 1 条数据！
+2026-01-05 21:55:37,957 - INFO - test - 导出地址：G:\pythonProject\hisToyy\export_data\2026-01-05 00_00_00-2026-01-05 23_59_59住院数据导出2026-01-05 21_55_37.xlsx, 1
+2026-01-05 21:55:43,209 - INFO - test - start_his_export用户点击了‘否’
+2026-01-05 21:56:07,781 - INFO - scroll_window - SQLite 查询错误: 'SqlInfiniteTableWidget' object has no attribute 'STATUS_COLOR'
+2026-01-05 21:56:46,814 - INFO - scroll_window - SQLite 查询错误: index 7 has type 'QPushButton' but 'QStandardItem' is expected
+2026-01-05 22:02:44,665 - INFO - test - 开始his导出: 2026-01-05 00:00:00, 2026-01-05 23:59:59
+2026-01-05 22:02:45,211 - INFO - orcale_db_connect - 文件已保存至: G:\pythonProject\hisToyy\export_data\2026-01-05 00_00_00-2026-01-05 23_59_59住院数据导出2026-01-05 22_02_45.xlsx, 已成功导出 1 条数据！
+2026-01-05 22:02:45,320 - INFO - test - 导出地址：G:\pythonProject\hisToyy\export_data\2026-01-05 00_00_00-2026-01-05 23_59_59住院数据导出2026-01-05 22_02_45.xlsx, 1
+2026-01-05 22:02:46,784 - INFO - test - start_his_export用户点击了‘否’
+2026-01-05 22:02:50,914 - INFO - test - 开始his导出: 2026-01-05 00:00:00, 2026-01-05 23:59:59
+2026-01-05 22:02:51,315 - INFO - orcale_db_connect - 文件已保存至: G:\pythonProject\hisToyy\export_data\2026-01-05 00_00_00-2026-01-05 23_59_59住院数据导出2026-01-05 22_02_51.xlsx, 已成功导出 1 条数据！
+2026-01-05 22:02:51,420 - INFO - test - 导出地址：G:\pythonProject\hisToyy\export_data\2026-01-05 00_00_00-2026-01-05 23_59_59住院数据导出2026-01-05 22_02_51.xlsx, 1
+2026-01-05 22:02:52,387 - INFO - test - start_his_export用户点击了‘否’
+2026-01-05 22:02:53,741 - INFO - test - 开始his导出: 2026-01-05 00:00:00, 2026-01-05 23:59:59
+2026-01-05 22:02:54,138 - INFO - orcale_db_connect - 文件已保存至: G:\pythonProject\hisToyy\export_data\2026-01-05 00_00_00-2026-01-05 23_59_59住院数据导出2026-01-05 22_02_54.xlsx, 已成功导出 1 条数据！
+2026-01-05 22:02:54,244 - INFO - test - 导出地址：G:\pythonProject\hisToyy\export_data\2026-01-05 00_00_00-2026-01-05 23_59_59住院数据导出2026-01-05 22_02_54.xlsx, 1
+2026-01-05 22:02:54,979 - INFO - test - start_his_export用户点击了‘否’
+2026-01-05 22:02:55,823 - INFO - test - 开始his导出: 2026-01-05 00:00:00, 2026-01-05 23:59:59
+2026-01-05 22:02:56,175 - INFO - orcale_db_connect - 文件已保存至: G:\pythonProject\hisToyy\export_data\2026-01-05 00_00_00-2026-01-05 23_59_59住院数据导出2026-01-05 22_02_56.xlsx, 已成功导出 1 条数据！
+2026-01-05 22:02:56,265 - INFO - test - 导出地址：G:\pythonProject\hisToyy\export_data\2026-01-05 00_00_00-2026-01-05 23_59_59住院数据导出2026-01-05 22_02_56.xlsx, 1
+2026-01-05 22:02:57,045 - INFO - test - start_his_export用户点击了‘否’
+2026-01-05 22:02:58,022 - INFO - test - 开始his导出: 2026-01-05 00:00:00, 2026-01-05 23:59:59
+2026-01-05 22:02:58,491 - INFO - orcale_db_connect - 文件已保存至: G:\pythonProject\hisToyy\export_data\2026-01-05 00_00_00-2026-01-05 23_59_59住院数据导出2026-01-05 22_02_58.xlsx, 已成功导出 1 条数据！
+2026-01-05 22:02:58,615 - INFO - test - 导出地址：G:\pythonProject\hisToyy\export_data\2026-01-05 00_00_00-2026-01-05 23_59_59住院数据导出2026-01-05 22_02_58.xlsx, 1
+2026-01-05 22:02:59,467 - INFO - test - start_his_export用户点击了‘否’
+2026-01-05 22:03:00,484 - INFO - test - 开始his导出: 2026-01-05 00:00:00, 2026-01-05 23:59:59
+2026-01-05 22:03:00,883 - INFO - orcale_db_connect - 文件已保存至: G:\pythonProject\hisToyy\export_data\2026-01-05 00_00_00-2026-01-05 23_59_59住院数据导出2026-01-05 22_03_00.xlsx, 已成功导出 1 条数据！
+2026-01-05 22:03:00,987 - INFO - test - 导出地址：G:\pythonProject\hisToyy\export_data\2026-01-05 00_00_00-2026-01-05 23_59_59住院数据导出2026-01-05 22_03_00.xlsx, 1
+2026-01-05 22:03:01,647 - INFO - test - start_his_export用户点击了‘否’
+2026-01-05 22:20:13,531 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：[{'id': 7, 'start_time': '2026-01-05 00:00:00', 'end_time': '2026-01-05 23:59:59', 'create_time': '2026-01-05 22:03:00', 'export_time': None, 'data_type': None, 'export_num': None, 'export_file_name': None, 'export_file_path': None, 'import_yy_start': None, 'import_yy_num': None, 'status': 1}, {'id': 6, 'start_time': '2026-01-05 00:00:00', 'end_time': '2026-01-05 23:59:59', 'create_time': '2026-01-05 22:02:58', 'export_time': None, 'data_type': None, 'export_num': None, 'export_file_name': None, 'export_file_path': None, 'import_yy_start': None, 'import_yy_num': None, 'status': 1}, {'id': 5, 'start_time': '2026-01-05 00:00:00', 'end_time': '2026-01-05 23:59:59', 'create_time': '2026-01-05 22:02:55', 'export_time': None, 'data_type': None, 'export_num': None, 'export_file_name': None, 'export_file_path': None, 'import_yy_start': None, 'import_yy_num': None, 'status': 1}, {'id': 4, 'start_time': '2026-01-05 00:00:00', 'end_time': '2026-01-05 23:59:59', 'create_time': '2026-01-05 22:02:53', 'export_time': None, 'data_type': None, 'export_num': None, 'export_file_name': None, 'export_file_path': None, 'import_yy_start': None, 'import_yy_num': None, 'status': 1}, {'id': 3, 'start_time': '2026-01-05 00:00:00', 'end_time': '2026-01-05 23:59:59', 'create_time': '2026-01-05 22:02:50', 'export_time': None, 'data_type': None, 'export_num': None, 'export_file_name': None, 'export_file_path': None, 'import_yy_start': None, 'import_yy_num': None, 'status': 1}, {'id': 2, 'start_time': '2026-01-05 00:00:00', 'end_time': '2026-01-05 23:59:59', 'create_time': '2026-01-05 22:02:44', 'export_time': None, 'data_type': None, 'export_num': None, 'export_file_name': None, 'export_file_path': None, 'import_yy_start': None, 'import_yy_num': None, 'status': 1}, {'id': 1, 'start_time': '2026-01-05 00:00:00', 'end_time': '2026-01-05 23:59:59', 'create_time': '2026-01-05 21:55:37', 'export_time': None, 'data_type': None, 'export_num': None, 'export_file_name': None, 'export_file_path': None, 'import_yy_start': None, 'import_yy_num': None, 'status': 1}]
+2026-01-05 22:20:51,371 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：[{'id': 7, 'start_time': '2026-01-05 00:00:00', 'end_time': '2026-01-05 23:59:59', 'create_time': '2026-01-05 22:03:00', 'export_time': None, 'data_type': None, 'export_num': None, 'export_file_name': None, 'export_file_path': None, 'import_yy_start': None, 'import_yy_num': None, 'status': 1}, {'id': 6, 'start_time': '2026-01-05 00:00:00', 'end_time': '2026-01-05 23:59:59', 'create_time': '2026-01-05 22:02:58', 'export_time': None, 'data_type': None, 'export_num': None, 'export_file_name': None, 'export_file_path': None, 'import_yy_start': None, 'import_yy_num': None, 'status': 1}, {'id': 5, 'start_time': '2026-01-05 00:00:00', 'end_time': '2026-01-05 23:59:59', 'create_time': '2026-01-05 22:02:55', 'export_time': None, 'data_type': None, 'export_num': None, 'export_file_name': None, 'export_file_path': None, 'import_yy_start': None, 'import_yy_num': None, 'status': 1}, {'id': 4, 'start_time': '2026-01-05 00:00:00', 'end_time': '2026-01-05 23:59:59', 'create_time': '2026-01-05 22:02:53', 'export_time': None, 'data_type': None, 'export_num': None, 'export_file_name': None, 'export_file_path': None, 'import_yy_start': None, 'import_yy_num': None, 'status': 1}, {'id': 3, 'start_time': '2026-01-05 00:00:00', 'end_time': '2026-01-05 23:59:59', 'create_time': '2026-01-05 22:02:50', 'export_time': None, 'data_type': None, 'export_num': None, 'export_file_name': None, 'export_file_path': None, 'import_yy_start': None, 'import_yy_num': None, 'status': 1}, {'id': 2, 'start_time': '2026-01-05 00:00:00', 'end_time': '2026-01-05 23:59:59', 'create_time': '2026-01-05 22:02:44', 'export_time': None, 'data_type': None, 'export_num': None, 'export_file_name': None, 'export_file_path': None, 'import_yy_start': None, 'import_yy_num': None, 'status': 1}, {'id': 1, 'start_time': '2026-01-05 00:00:00', 'end_time': '2026-01-05 23:59:59', 'create_time': '2026-01-05 21:55:37', 'export_time': None, 'data_type': None, 'export_num': None, 'export_file_name': None, 'export_file_path': None, 'import_yy_start': None, 'import_yy_num': None, 'status': 1}]
+2026-01-05 22:21:41,316 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：7
+2026-01-05 22:25:58,969 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：7
+2026-01-05 22:27:03,037 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：7
+2026-01-05 22:27:19,477 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：7
