@@ -267,7 +267,21 @@ class ExcelMerger(QMainWindow):
         """
         公共用友导入方法
         """
-        import_data_to_yy(self.config_manager.get_db_config('sqlserver'), record)
+        logger.info(f"开始用友导入: {record}")
+        progress = QProgressDialog("系统正在处理中，请稍候...", None, 0, 0)
+        progress.setWindowTitle("请等待")
+        progress.setWindowModality(Qt.WindowModal)
+        progress.setCancelButton(None)
+        progress.show()
+
+        # 强制刷新界面渲染加载窗
+        QApplication.processEvents()
+        QTest.qWait(3000)
+        # 如果 task_func 是 df.to_excel，则这里实际执行 df.to_excel(*args, **kwargs)
+        # import_data_to_yy(self.config_manager.get_db_config('sqlserver'), record)
+        # 3. 关闭加载窗
+        progress.close()
+
 
 
 
