@@ -16,6 +16,7 @@ import traceback
 import sys
 from scroll_window import SqlInfiniteTableWidget
 from py_sqlite import SQLiteHelper
+from pathlib import Path
 
 format_pattern = "yyyy-MM-dd HH:mm:ss"
 class ExcelMerger(QMainWindow):
@@ -142,6 +143,7 @@ class ExcelMerger(QMainWindow):
         layout.addStretch(1)
 
         self.sqlite_helper = SQLiteHelper()
+        self.record_id = -1
         
 
     def show_config_dialog(self):
@@ -206,7 +208,7 @@ class ExcelMerger(QMainWindow):
 
             # 强制刷新界面渲染加载窗
             QApplication.processEvents()
-            self.sqlite_helper.insert_record({
+            record_id = self.sqlite_helper.insert_record({
                 "start_time": self.start_str,
                 "end_time": self.end_str,
                 "export_num": ""
@@ -221,6 +223,11 @@ class ExcelMerger(QMainWindow):
             logger.info(f"导出地址：{self.full_path}, {self.full_path_num}")
             if self.full_path:
                 # 参数说明：父窗口, 标题, 内容, 按钮组合, 默认选中的按钮
+                # 更新数据库
+                self.record_id = record_id
+                file_name = Path(self.full_path).name
+                self.sqlite_helper.export_his_success(self.record_id, self.full_path_num, file_name, self.full_path)
+                self.table.refresh_data()
                 reply = QMessageBox.question(self, '确认', 'HIS数据导出成功，是否立即打开查看？',
                                              QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
                 if reply == QMessageBox.Yes:
@@ -235,18 +242,34 @@ class ExcelMerger(QMainWindow):
 
     def start_yy_import(self):
         """ 导入用友数据 """
-        if self.full_path:
+        if self.full_path and self.record_id > 0:
             # 参数说明：父窗口, 标题, 内容, 按钮组合, 默认选中的按钮
-            reply = QMessageBox.question(self, '确认', f"是否将该'{self.full_path}'HIS数据导入用友？",
-                                         QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
-            if reply == QMessageBox.Yes:
-                import_data_to_yy(self.config_manager.get_db_config('sqlserver'), self.full_path)
-                # open_with_default_app(self.full_path)
+            record = self.sqlite_helper.get_record_by_id(self.record_id)
+            if record['status'] == 4:
+                # 已经导出成功得数据
+                reply =QMessageBox.question(self, "提示", "该条数据已经成功导入到用友，请确认再次导入？",
+                                     QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
+                if reply == QMessageBox.Yes:
+                    self._start_import_data_to_yy(record)
+                else:
+                    logger.info(f"start_yy_import用户点击了‘否’{record}")
             else:
-                print("start_yy_import用户点击了‘否’")
-                logger.info("start_yy_import用户点击了‘否’")
+                reply = QMessageBox.question(self, '确认', f"是否将该'{self.full_path}'HIS数据导入用友？",
+                                             QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
+                if reply == QMessageBox.Yes:
+                    self._start_import_data_to_yy(record)
+                else:
+                    logger.info("start_yy_import用户点击了‘否’")
         else:
             QMessageBox.warning(self, "失败", "请点击导出HIS数据后进行导入")
+
+    def _start_import_data_to_yy(self, record):
+        """
+        公共用友导入方法
+        """
+        import_data_to_yy(self.config_manager.get_db_config('sqlserver'), record)
+
+
 
     def run_with_loading(parent, task_func):
         """

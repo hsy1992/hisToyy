@@ -96,3 +96,34 @@
 2026-01-05 22:25:58,969 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：7
 2026-01-05 22:27:03,037 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：7
 2026-01-05 22:27:19,477 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：7
+2026-01-06 10:24:27,206 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：7
+2026-01-06 10:26:46,656 - INFO - test - 开始his导出: 2026-01-06 00:00:00, 2026-01-06 23:59:59
+2026-01-06 10:26:51,207 - INFO - orcale_db_connect - 文件已保存至: D:\project\hisToyy\export_data\2026-01-06 00_00_00-2026-01-06 23_59_59住院数据导出2026-01-06 10_26_51.xlsx, 已成功导出 1 条数据！
+2026-01-06 10:26:51,328 - INFO - test - 导出地址：D:\project\hisToyy\export_data\2026-01-06 00_00_00-2026-01-06 23_59_59住院数据导出2026-01-06 10_26_51.xlsx, 1
+2026-01-06 10:26:55,209 - INFO - test - start_his_export用户点击了‘否’
+2026-01-06 10:27:11,830 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：8
+2026-01-06 10:29:16,970 - INFO - test - 开始his导出: 2026-01-06 00:00:00, 2026-01-06 23:59:59
+2026-01-06 10:29:17,611 - INFO - orcale_db_connect - 文件已保存至: D:\project\hisToyy\export_data\2026-01-06 00_00_00-2026-01-06 23_59_59住院数据导出2026-01-06 10_29_17.xlsx, 已成功导出 1 条数据！
+2026-01-06 10:29:17,750 - INFO - test - 导出地址：D:\project\hisToyy\export_data\2026-01-06 00_00_00-2026-01-06 23_59_59住院数据导出2026-01-06 10_29_17.xlsx, 1
+2026-01-06 10:29:19,017 - INFO - test - start_his_export用户点击了‘否’
+2026-01-06 10:31:36,852 - INFO - test - 开始his导出: 2026-01-06 00:00:00, 2026-01-06 23:59:59
+2026-01-06 10:31:37,298 - INFO - orcale_db_connect - 文件已保存至: D:\project\hisToyy\export_data\2026-01-06 00_00_00-2026-01-06 23_59_59住院数据导出2026-01-06 10_31_37.xlsx, 已成功导出 1 条数据！
+2026-01-06 10:31:37,396 - INFO - test - 导出地址：D:\project\hisToyy\export_data\2026-01-06 00_00_00-2026-01-06 23_59_59住院数据导出2026-01-06 10_31_37.xlsx, 1
+2026-01-06 10:31:38,368 - INFO - test - start_his_export用户点击了‘否’
+2026-01-06 11:30:05,317 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-06 11:30:09,615 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 10，list：0
+2026-01-06 11:30:13,102 - INFO - test - 开始his导出: 2026-01-06 00:00:00, 2026-01-06 23:59:59
+2026-01-06 11:30:13,147 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-06 11:30:13,622 - INFO - orcale_db_connect - 文件已保存至: D:\project\hisToyy\export_data\2026-01-06 00_00_00-2026-01-06 23_59_59住院数据导出2026-01-06 11_30_13.xlsx, 已成功导出 1 条数据！
+2026-01-06 11:30:13,743 - INFO - test - 导出地址：D:\project\hisToyy\export_data\2026-01-06 00_00_00-2026-01-06 23_59_59住院数据导出2026-01-06 11_30_13.xlsx, 1
+2026-01-06 11:30:15,324 - INFO - test - start_his_export用户点击了‘否’
+2026-01-06 11:30:20,315 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 10，list：1
+2026-01-06 11:49:38,504 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-06 11:49:45,107 - INFO - test - 开始his导出: 2026-01-06 00:00:00, 2026-01-06 23:59:59
+2026-01-06 11:49:45,159 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-06 11:49:45,833 - INFO - orcale_db_connect - 文件已保存至: D:\project\hisToyy\export_data\2026-01-06 00_00_00-2026-01-06 23_59_59住院数据导出2026-01-06 11_49_45.xlsx, 已成功导出 1 条数据！
+2026-01-06 11:49:46,006 - INFO - test - 导出地址：D:\project\hisToyy\export_data\2026-01-06 00_00_00-2026-01-06 23_59_59住院数据导出2026-01-06 11_49_45.xlsx, 1
+2026-01-06 11:49:47,817 - INFO - test - start_his_export用户点击了‘否’
+2026-01-06 11:49:49,327 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 10，list：2
+2026-01-06 13:44:46,760 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-06 13:47:54,639 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 10，list：2

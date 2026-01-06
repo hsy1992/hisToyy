@@ -7,6 +7,7 @@ from config import ConfigManager
 import pandas as pd
 from path_util import resource_path
 from datetime import datetime, time
+from pathlib import Path
 
 
 def init_oracle():
@@ -82,6 +83,7 @@ def get_his_data(oracle_config, start_str, end_str):
         # 获取行数
         row_count = len(df)
         # 导出到 Excel
+        Path("export_data").mkdir(parents=True, exist_ok=True)
         full_path = os.path.join(resource_path("export_data"), f"{start_str}-{end_str}住院数据导出{datetime.now().strftime('%Y-%m-%d %H_%M_%S')}.xlsx".replace(":", "_"))
         column_map = {
             'id': 'id',

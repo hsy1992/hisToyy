@@ -1,8 +1,0 @@
-# 告诉客户端不要尝试发送 Windows 用户凭据
-SQLNET.AUTHENTICATION_SERVICES = (NONE)
-
-# 解决 11g 常见的握手中断
-DISABLE_OOB = ON
-
-# 提高连接兼容性
-SQLNET.ALLOWED_LOGON_VERSION_CLIENT = 8

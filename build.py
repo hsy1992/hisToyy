@@ -89,11 +89,16 @@ def build_windows_exe():
     """构建Windows可执行文件"""
     print("开始构建Windows可执行文件...")
     try:
-        # 使用Wine运行PyInstaller
-        params = [
-            'wine', 'python', '-m', 'PyInstaller',
+        # 准备命令行参数
+        if platform.system() == 'Windows':
+            base_cmd = [sys.executable]
+        else:
+            base_cmd = ['wine', 'python']
+            
+        params = base_cmd + [
+            '-m', 'PyInstaller',
             'test.py',
-            '--name=Excel合并工具',
+            '--name=HIS导出到用友工具',
             '--windowed',
             '--onefile',
             '--clean',
@@ -102,6 +107,7 @@ def build_windows_exe():
             '--target-arch=x64',
             '--uac-admin',
             '--noconsole',
+            '--add-data=lib;lib',
         ]
 
         # 添加隐藏导入

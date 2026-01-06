@@ -1,10 +1,9 @@
-import sys
 from PyQt5.QtWidgets import QTableView, QHeaderView, QAbstractItemView, QPushButton, QHBoxLayout, QAction, QMenu
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
 from PyQt5.QtCore import Qt, pyqtSignal
 from py_sqlite import SQLiteHelper
 from log_util import logger
-
+from path_util import open_with_default_app
 
 class SqlInfiniteTableWidget(QTableView):
     """
@@ -19,6 +18,8 @@ class SqlInfiniteTableWidget(QTableView):
         self.limit = 10  # 每次加载数量
         self.offset = 0  # 当前偏移
         self.is_loading = False
+        # 是否有更多
+        self.has_more_data = True
 
         self._init_db()
         self._init_ui()
@@ -27,8 +28,7 @@ class SqlInfiniteTableWidget(QTableView):
     def _init_db(self):
         # 建立数据库连接（使用唯一连接名防止冲突）
         self.db = SQLiteHelper()
-        # 是否有更多
-        self.has_more_data = True
+
         # 状态定义映射
         self.STATUS_MAP = {
             1: "初始状态",
@@ -106,6 +106,7 @@ class SqlInfiniteTableWidget(QTableView):
     def refresh_data(self):
         """重新加载数据"""
         self.model.removeRows(0, self.model.rowCount())
+        self.has_more_data = True
         self.offset = 0
         self.list_data.clear()
         self.load_more_data()
@@ -117,7 +118,7 @@ class SqlInfiniteTableWidget(QTableView):
             return
 
         row = index.row()
-        print(self.list_data[row])
+        item = self.list_data[row]
         # 1. 创建菜单对象
         menu = QMenu(self)
         # 2. 定义各种动作
@@ -134,6 +135,6 @@ class SqlInfiniteTableWidget(QTableView):
 
         # 5. 处理点击事件
         if action == action_open:
-            print("action_open")
+            open_with_default_app(item['export_file_path'])
         elif action == action_retry:
             print("action_retry")
