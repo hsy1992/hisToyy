@@ -28,7 +28,7 @@ def connect_to_sqlserver_test(host, port, db_name, user, password):
         logger.info(f"sqlserver 连接失败: {e}, {conn_str}")
         return False
 
-def import_data_to_yy(sqlserver_config, full_path):
+def import_data_to_yy(sqlserver_config, record):
     """ 导入数据导用友 """
     conn_str = (
         "DRIVER={SQL Server};"  # 使用系统自带驱动
@@ -44,11 +44,12 @@ def import_data_to_yy(sqlserver_config, full_path):
         conn = pyodbc.connect(conn_str)
         logger.info(f"sqlserver 连接成功, {conn_str}")
         # 1. 读取 Excel 文件
+        full_path = record['export_file_path']
         df = pd.read_excel(full_path)
-        return True
+
+        conn.close()
     except Exception as e:
         logger.info(f"sqlserver 导出失败: {e}, {conn_str}")
-        return False
 
 
 def transform_to_yonyou(df, start_vouch_id, period, user_name):

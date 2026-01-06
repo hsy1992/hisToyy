@@ -2,6 +2,7 @@
 import sqlite3
 import os
 from datetime import datetime, time
+from pathlib import Path
 
 class SQLiteHelper:
     def __init__(self, db_name="app_config.db"):
@@ -48,6 +49,8 @@ class SQLiteHelper:
         """
 
         self.execute_non_query(sql_create_config)
+        Path("db").mkdir(parents=True, exist_ok=True)
+
 
     def execute_non_query(self, sql, params=None):
         """
@@ -136,6 +139,14 @@ class SQLiteHelper:
             "export_file_name": export_file_name,
             "export_file_path": export_file_path
         })
+
+    def get_record_by_id(self, record_id):
+        """根据ID查询记录"""
+        return self.fetch_one("SELECT * FROM sys_export_record WHERE id = ?", (record_id))
+
+
+
+
 
 if __name__ == '__main__':
     db = SQLiteHelper()
