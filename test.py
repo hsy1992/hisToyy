@@ -4,7 +4,7 @@ from openpyxl import load_workbook
 from openpyxl.utils.dataframe import dataframe_to_rows
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, 
                            QHBoxLayout, QPushButton, QLabel, QFileDialog, QDialog, QDateTimeEdit, QMessageBox, QProgressDialog, QTableView)
-from PyQt5.QtCore import QDateTime, Qt
+from PyQt5.QtCore import QDateTime, Qt, QThread, pyqtSignal
 from sql_setting_dialog import ConfigDialog
 from config import ConfigManager
 from datetime import datetime, time
@@ -268,21 +268,15 @@ class ExcelMerger(QMainWindow):
         公共用友导入方法
         """
         logger.info(f"开始用友导入: {record}")
-        progress = QProgressDialog("系统正在处理中，请稍候...", None, 0, 0)
-        progress.setWindowTitle("请等待")
-        progress.setWindowModality(Qt.WindowModal)
-        progress.setCancelButton(None)
-        progress.show()
+        
+        def on_complete(success, message):
+            if success:
+                logger.info("导入成功，刷新列表")
+                self.table.refresh_data()
+            else:
+                 logger.error(f"导入失败: {message}")
 
-        # 强制刷新界面渲染加载窗
-        QApplication.processEvents()
-        QTest.qWait(3000)
-        # 如果 task_func 是 df.to_excel，则这里实际执行 df.to_excel(*args, **kwargs)
-        # import_data_to_yy(self.config_manager.get_db_config('sqlserver'), record)
-        # 3. 关闭加载窗
-        progress.close()
-
-
+        sqlserver_start_import(self, self.config_manager.get_db_config('sqlserver'), record, on_complete)
 
 
     def run_with_loading(parent, task_func):

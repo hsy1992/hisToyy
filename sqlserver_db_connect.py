@@ -2,6 +2,8 @@
 import pyodbc
 from log_util import logger
 import pandas as pd
+from PyQt5.QtCore import QThread, pyqtSignal
+from PyQt5.QtWidgets import (QMessageBox, QProgressDialog)
 
 
 def connect_to_sqlserver_test(host, port, db_name, user, password):
@@ -197,6 +199,60 @@ def transform_to_yonyou(df, start_vouch_id, period, user_name):
 
     return new_df
 
+
+class ImportWorker(QThread):
+    finished_signal = pyqtSignal(bool, str)
+
+    def __init__(self, config, record):
+        super().__init__()
+        self.config = config
+        self.record = record
+
+    def run(self):
+        try:
+            # 这里是真正的耗时操作，在子线程运行，不影响界面
+            import_data_to_yy(self.config, self.record)
+            self.finished_signal.emit(True, "导入成功")
+        except Exception as e:
+            self.finished_signal.emit(False, str(e))
+
+# --- 在主界面调用 ---
+def sqlserver_start_import(parent, config, record, callback=None):
+    """
+    开始导入用友
+    :param parent: 父窗口
+    :param config: 数据库配置
+    :param record: 记录
+    :param callback: 回调函数，接受两个参数 (success, message)
+    """
+    progress = QProgressDialog("正在写入用友系统...", None, 0, 0, parent)
+    progress.setWindowTitle("请等待")
+    progress.setWindowModality(2)  # Qt.WindowModal
+    progress.setCancelButton(None)
+    progress.show()
+
+    # 创建并启动线程
+    worker = ImportWorker(config, record)
+    
+    # 将worker绑定到parent上，防止被垃圾回收
+    parent._import_worker = worker
+
+    def on_import_finished(success, message):
+        progress.close()
+        if callback:
+            callback(success, message)
+        
+        # 清理 worker 引用
+        if hasattr(parent, '_import_worker'):
+            del parent._import_worker
+
+        if success:
+            QMessageBox.information(parent, "完成", message)
+        else:
+            QMessageBox.critical(parent, "错误", message)
+
+    worker.finished_signal.connect(on_import_finished)
+    worker.start()
 
 if __name__ == '__main__':
     connect_to_sqlserver_test('127.0.0.1', '1433', 'master', 'sa', '123456')
