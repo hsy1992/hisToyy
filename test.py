@@ -9,7 +9,7 @@ from sql_setting_dialog import ConfigDialog
 from config import ConfigManager
 from datetime import datetime, time
 from orcale_db_connect import connect_to_oracle_test, get_his_data
-from sqlserver_db_connect import connect_to_sqlserver_test, import_data_to_yy
+from sqlserver_db_connect import connect_to_sqlserver_test, import_data_to_yy, sqlserver_start_import
 from log_util import logger
 from path_util import open_with_default_app
 import traceback
@@ -268,13 +268,14 @@ class ExcelMerger(QMainWindow):
         公共用友导入方法
         """
         logger.info(f"开始用友导入: {record}")
-        
         def on_complete(success, message):
             if success:
                 logger.info("导入成功，刷新列表")
-                self.table.refresh_data()
+                QMessageBox.information(self, "成功", "导入数据成功")
             else:
-                 logger.error(f"导入失败: {message}")
+                logger.info("导入失败，刷新列表")
+                QMessageBox.critical(self, "失败", f"导入失败{message}")
+            self.table.refresh_data()
 
         sqlserver_start_import(self, self.config_manager.get_db_config('sqlserver'), record, on_complete)
 

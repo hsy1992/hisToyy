@@ -30,7 +30,7 @@ def connect_to_sqlserver_test(host, port, db_name, user, password):
         logger.info(f"sqlserver 连接失败: {e}, {conn_str}")
         return False
 
-def import_data_to_yy(sqlserver_config, record):
+def import_data_to_yy(sqlserver_config, record, finished_signal):
     """ 导入数据导用友 """
     conn_str = (
         "DRIVER={SQL Server};"  # 使用系统自带驱动
@@ -50,8 +50,10 @@ def import_data_to_yy(sqlserver_config, record):
         df = pd.read_excel(full_path)
 
         conn.close()
+        finished_signal.emit(True, "成功")
     except Exception as e:
         logger.info(f"sqlserver 导出失败: {e}, {conn_str}")
+        finished_signal.emit(False, f"失败{e}")
 
 
 def transform_to_yonyou(df, start_vouch_id, period, user_name):
@@ -211,8 +213,7 @@ class ImportWorker(QThread):
     def run(self):
         try:
             # 这里是真正的耗时操作，在子线程运行，不影响界面
-            import_data_to_yy(self.config, self.record)
-            self.finished_signal.emit(True, "导入成功")
+            import_data_to_yy(self.config, self.record, self.finished_signal)
         except Exception as e:
             self.finished_signal.emit(False, str(e))
 
@@ -245,11 +246,6 @@ def sqlserver_start_import(parent, config, record, callback=None):
         # 清理 worker 引用
         if hasattr(parent, '_import_worker'):
             del parent._import_worker
-
-        if success:
-            QMessageBox.information(parent, "完成", message)
-        else:
-            QMessageBox.critical(parent, "错误", message)
 
     worker.finished_signal.connect(on_import_finished)
     worker.start()
