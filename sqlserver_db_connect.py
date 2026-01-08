@@ -4,7 +4,7 @@ from log_util import logger
 import pandas as pd
 from PyQt5.QtCore import QThread, pyqtSignal
 from PyQt5.QtWidgets import (QMessageBox, QProgressDialog)
-
+import os
 
 def connect_to_sqlserver_test(host, port, db_name, user, password):
     # 查看你电脑上已有的驱动，选一个填入下面的 DRIVER
@@ -34,12 +34,13 @@ def import_data_to_yy(sqlserver_config, record, finished_signal):
     """ 导入数据导用友 """
     conn_str = (
         "DRIVER={SQL Server};"  # 使用系统自带驱动
-        f"SERVER={sqlserver_config.get.get('host')},{sqlserver_config.get.get('port')};"
-        f"DATABASE={sqlserver_config.get.get('db_name')};"
-        f"UID={sqlserver_config.get.get('user')};"
-        f"PWD={sqlserver_config.get.get('password')};"
+        f"SERVER={sqlserver_config.get('ip')},{sqlserver_config.get('port')};"
+        f"DATABASE={sqlserver_config.get('database')};"
+        f"UID={sqlserver_config.get('user')};"
+        f"PWD={sqlserver_config.get('password')};"
         "Connect Timeout=5;"
     )
+    logger.info(conn_str)
     # 针对 SQL 2008 的特殊处理
     try:
         # 1. 建立连接
@@ -49,12 +50,54 @@ def import_data_to_yy(sqlserver_config, record, finished_signal):
         full_path = record['export_file_path']
         df = pd.read_excel(full_path)
 
+
+
         conn.close()
         finished_signal.emit(True, "成功")
     except Exception as e:
         logger.info(f"sqlserver 导出失败: {e}, {conn_str}")
         finished_signal.emit(False, f"失败{e}")
 
+def read_excel():
+    path = os.path.join(os.path.join(os.path.abspath("."), "export_data"), "2026-01-08 00_00_00-2026-01-08 23_59_59住院数据导出2026-01-08 20_47_05.xlsx")
+    df = pd.read_excel(path)
+    # 仅查看所有列名
+    print(df.columns.tolist())
+
+    conn_str = (
+        "DRIVER={SQL Server};"  # 使用系统自带驱动
+        f"SERVER=127.0.0.1,1433;"
+        f"DATABASE=master;"
+        f"UID=sa;"
+        f"PWD=123456;"
+        "Connect Timeout=5;"
+    )
+    conn = pyodbc.connect(conn_str)
+    ino_id = get_next_ino_id(conn)
+    print(f"ino_id:{ino_id}")
+    # 获取日期
+    for idx, date_val in df['日期（按天到出）'].items():
+        if pd.notnull(date_val):
+            period = date_val.month  # 返回整数，例如 1
+            inid = idx + 1
+            print(f"period是: {period}")
+            print(f"inid是: {inid}")
+    conn.close()
+
+def get_next_ino_id(conn):
+    """
+    获取下一个可用的凭证号
+    :param engine: SQLAlchemy engine
+    :param period: 会计期间 (int)
+    :param csign: 凭证类别 (str)
+    """
+    sql = f"""
+        SELECT MAX(ino_id) FROM [UFDATA_999_2012].[dbo].[GL_accvouch];
+    """
+    result = conn.execute(sql).fetchone()
+    max_id = result[0] if result and result[0] is not None else 1
+    # 如果结果为 None (新月份第一张单)，则返回 1，否则返回 最大值 + 1
+    return (max_id if max_id else 0) + 1
 
 def transform_to_yonyou(df, start_vouch_id, period, user_name):
     """
@@ -234,7 +277,7 @@ def sqlserver_start_import(parent, config, record, callback=None):
 
     # 创建并启动线程
     worker = ImportWorker(config, record)
-    
+
     # 将worker绑定到parent上，防止被垃圾回收
     parent._import_worker = worker
 
@@ -242,7 +285,7 @@ def sqlserver_start_import(parent, config, record, callback=None):
         progress.close()
         if callback:
             callback(success, message)
-        
+
         # 清理 worker 引用
         if hasattr(parent, '_import_worker'):
             del parent._import_worker
@@ -251,4 +294,6 @@ def sqlserver_start_import(parent, config, record, callback=None):
     worker.start()
 
 if __name__ == '__main__':
-    connect_to_sqlserver_test('127.0.0.1', '1433', 'master', 'sa', '123456')
+    # connect_to_sqlserver_test('127.0.0.1', '1433', 'master', 'sa', '123456')
+    read_excel()
+

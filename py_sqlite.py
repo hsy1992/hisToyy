@@ -142,7 +142,7 @@ class SQLiteHelper:
 
     def get_record_by_id(self, record_id):
         """根据ID查询记录"""
-        return self.fetch_one("SELECT * FROM sys_export_record WHERE id = ?", (record_id))
+        return self.fetch_one("SELECT * FROM sys_export_record WHERE id = :record_id", {"record_id": record_id})
 
 
 

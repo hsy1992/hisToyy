@@ -1,6 +1,8 @@
 # 资源路径工具类
 import sys
 import os
+from log_util import logger
+from PyQt5.QtWidgets import QMessageBox
 
 def resource_path(relative_path):
     """ 获取资源绝对路径，兼容开发环境和打包后的环境 """
@@ -16,5 +18,6 @@ def open_with_default_app(full_path):
         # 仅限 Windows，相当于双击文件
         os.startfile(full_path)
     except Exception as e:
-        print(f"打开文件失败: {e}")
+        QMessageBox.warning(None, "警告", f"打开文件失败: {e}")
+        logger.error(f"打开文件失败: {e}")
 

@@ -12,7 +12,7 @@ class SqlInfiniteTableWidget(QTableView):
     # 定义一个信号，当用户点击某行时，向外传递该行的数据字典
     rowClickedData = pyqtSignal(dict)
 
-    def __init__(self, parent=None):
+    def __init__(self, main_view, parent=None):
         super().__init__(parent)
 
         self.limit = 10  # 每次加载数量
@@ -24,6 +24,7 @@ class SqlInfiniteTableWidget(QTableView):
         self._init_db()
         self._init_ui()
         self.load_more_data()
+        self.main_view = main_view
 
     def _init_db(self):
         # 建立数据库连接（使用唯一连接名防止冲突）
@@ -137,4 +138,4 @@ class SqlInfiniteTableWidget(QTableView):
         if action == action_open:
             open_with_default_app(item['export_file_path'])
         elif action == action_retry:
-            print("action_retry")
+            self.main_view.start_yy_import(item)

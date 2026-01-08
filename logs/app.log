@@ -127,3 +127,83 @@
 2026-01-06 11:49:49,327 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 10，list：2
 2026-01-06 13:44:46,760 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
 2026-01-06 13:47:54,639 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 10，list：2
+2026-01-08 20:22:51,992 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-08 20:27:30,300 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-08 20:27:38,444 - ERROR - path_util - 打开文件失败: [WinError 2] 系统找不到指定的文件。: 'D:\\project\\hisToyy\\export_data\\2026-01-06 00_00_00-2026-01-06 23_59_59住院数据导出2026-01-06 11_49_45.xlsx'
+2026-01-08 20:34:39,132 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-08 20:35:40,446 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-08 20:35:44,551 - ERROR - test - None
+2026-01-08 20:38:20,240 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-08 20:38:41,309 - ERROR - test - {'id': 12, 'start_time': '2026-01-06 00:00:00', 'end_time': '2026-01-06 23:59:59', 'create_time': '2026-01-06 11:49:45', 'export_time': '2026-01-06 11:49:46', 'data_type': None, 'export_num': '1', 'export_file_name': '2026-01-06 00_00_00-2026-01-06 23_59_59住院数据导出2026-01-06 11_49_45.xlsx', 'export_file_path': 'D:\\project\\hisToyy\\export_data\\2026-01-06 00_00_00-2026-01-06 23_59_59住院数据导出2026-01-06 11_49_45.xlsx', 'import_yy_start': None, 'import_yy_num': None, 'status': 2}
+2026-01-08 20:39:01,264 - INFO - test - 开始用友导入: {'id': 12, 'start_time': '2026-01-06 00:00:00', 'end_time': '2026-01-06 23:59:59', 'create_time': '2026-01-06 11:49:45', 'export_time': '2026-01-06 11:49:46', 'data_type': None, 'export_num': '1', 'export_file_name': '2026-01-06 00_00_00-2026-01-06 23_59_59住院数据导出2026-01-06 11_49_45.xlsx', 'export_file_path': 'D:\\project\\hisToyy\\export_data\\2026-01-06 00_00_00-2026-01-06 23_59_59住院数据导出2026-01-06 11_49_45.xlsx', 'import_yy_start': None, 'import_yy_num': None, 'status': 2}
+2026-01-08 20:39:01,277 - INFO - test - 导入失败，刷新列表
+2026-01-08 20:40:44,728 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-08 20:40:48,018 - INFO - test - 开始用友导入: {'id': 12, 'start_time': '2026-01-06 00:00:00', 'end_time': '2026-01-06 23:59:59', 'create_time': '2026-01-06 11:49:45', 'export_time': '2026-01-06 11:49:46', 'data_type': None, 'export_num': '1', 'export_file_name': '2026-01-06 00_00_00-2026-01-06 23_59_59住院数据导出2026-01-06 11_49_45.xlsx', 'export_file_path': 'D:\\project\\hisToyy\\export_data\\2026-01-06 00_00_00-2026-01-06 23_59_59住院数据导出2026-01-06 11_49_45.xlsx', 'import_yy_start': None, 'import_yy_num': None, 'status': 2}
+2026-01-08 20:41:06,722 - INFO - sqlserver_db_connect - sqlserver 导出失败: ('08001', '[08001] [Microsoft][ODBC SQL Server Driver][DBNETLIB]SQL Server 不存在或访问被拒绝 (17) (SQLDriverConnect); [08001] [Microsoft][ODBC SQL Server Driver][DBNETLIB]ConnectionOpen (Connect()). (53); [08001] [Microsoft][ODBC SQL Server Driver]无效的连接字符串属性 (0)'), DRIVER={SQL Server};SERVER=None,1433;DATABASE=None;UID=sa;PWD=123456;Connect Timeout=5;
+2026-01-08 20:41:06,723 - INFO - test - 导入失败，刷新列表
+2026-01-08 20:42:14,342 - INFO - utils - Note: NumExpr detected 12 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
+2026-01-08 20:42:14,342 - INFO - utils - NumExpr defaulting to 8 threads.
+2026-01-08 20:42:14,645 - INFO - sqlserver_db_connect - sqlserver 连接成功, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-01-08 20:42:24,943 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-08 20:42:49,292 - INFO - sqlserver_db_connect - sqlserver 连接成功, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-01-08 20:43:18,623 - INFO - utils - Note: NumExpr detected 12 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
+2026-01-08 20:43:18,623 - INFO - utils - NumExpr defaulting to 8 threads.
+2026-01-08 20:43:18,911 - INFO - sqlserver_db_connect - sqlserver 连接成功, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-01-08 20:43:25,016 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-08 20:43:29,829 - INFO - test - 开始用友导入: {'id': 12, 'start_time': '2026-01-06 00:00:00', 'end_time': '2026-01-06 23:59:59', 'create_time': '2026-01-06 11:49:45', 'export_time': '2026-01-06 11:49:46', 'data_type': None, 'export_num': '1', 'export_file_name': '2026-01-06 00_00_00-2026-01-06 23_59_59住院数据导出2026-01-06 11_49_45.xlsx', 'export_file_path': 'D:\\project\\hisToyy\\export_data\\2026-01-06 00_00_00-2026-01-06 23_59_59住院数据导出2026-01-06 11_49_45.xlsx', 'import_yy_start': None, 'import_yy_num': None, 'status': 2}
+2026-01-08 20:43:29,895 - INFO - sqlserver_db_connect - sqlserver 导出失败: ('42000', '[42000] [Microsoft][ODBC SQL Server Driver][SQL Server]无法打开登录所请求的数据库 "None"。登录失败。 (4060) (SQLDriverConnect); [42000] [Microsoft][ODBC SQL Server Driver]无效的连接字符串属性 (0); [42000] [Microsoft][ODBC SQL Server Driver][SQL Server]无法打开登录所请求的数据库 "None"。登录失败。 (4060); [42000] [Microsoft][ODBC SQL Server Driver]无效的连接字符串属性 (0)'), DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=None;UID=sa;PWD=123456;Connect Timeout=5;
+2026-01-08 20:43:29,900 - INFO - test - 导入失败，刷新列表
+2026-01-08 20:44:07,588 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-08 20:44:11,290 - INFO - test - 开始用友导入: {'id': 12, 'start_time': '2026-01-06 00:00:00', 'end_time': '2026-01-06 23:59:59', 'create_time': '2026-01-06 11:49:45', 'export_time': '2026-01-06 11:49:46', 'data_type': None, 'export_num': '1', 'export_file_name': '2026-01-06 00_00_00-2026-01-06 23_59_59住院数据导出2026-01-06 11_49_45.xlsx', 'export_file_path': 'D:\\project\\hisToyy\\export_data\\2026-01-06 00_00_00-2026-01-06 23_59_59住院数据导出2026-01-06 11_49_45.xlsx', 'import_yy_start': None, 'import_yy_num': None, 'status': 2}
+2026-01-08 20:44:11,299 - INFO - sqlserver_db_connect - DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=None;UID=sa;PWD=123456;Connect Timeout=5;
+2026-01-08 20:44:11,318 - INFO - sqlserver_db_connect - sqlserver 导出失败: ('42000', '[42000] [Microsoft][ODBC SQL Server Driver][SQL Server]无法打开登录所请求的数据库 "None"。登录失败。 (4060) (SQLDriverConnect); [42000] [Microsoft][ODBC SQL Server Driver]无效的连接字符串属性 (0); [42000] [Microsoft][ODBC SQL Server Driver][SQL Server]无法打开登录所请求的数据库 "None"。登录失败。 (4060); [42000] [Microsoft][ODBC SQL Server Driver]无效的连接字符串属性 (0)'), DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=None;UID=sa;PWD=123456;Connect Timeout=5;
+2026-01-08 20:44:11,323 - INFO - test - 导入失败，刷新列表
+2026-01-08 20:45:02,171 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-08 20:45:05,451 - INFO - test - 开始用友导入: {'id': 12, 'start_time': '2026-01-06 00:00:00', 'end_time': '2026-01-06 23:59:59', 'create_time': '2026-01-06 11:49:45', 'export_time': '2026-01-06 11:49:46', 'data_type': None, 'export_num': '1', 'export_file_name': '2026-01-06 00_00_00-2026-01-06 23_59_59住院数据导出2026-01-06 11_49_45.xlsx', 'export_file_path': 'D:\\project\\hisToyy\\export_data\\2026-01-06 00_00_00-2026-01-06 23_59_59住院数据导出2026-01-06 11_49_45.xlsx', 'import_yy_start': None, 'import_yy_num': None, 'status': 2}
+2026-01-08 20:45:05,460 - INFO - sqlserver_db_connect - DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-01-08 20:45:05,480 - INFO - sqlserver_db_connect - sqlserver 连接成功, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-01-08 20:45:05,495 - INFO - sqlserver_db_connect - sqlserver 导出失败: [Errno 2] No such file or directory: 'D:\\project\\hisToyy\\export_data\\2026-01-06 00_00_00-2026-01-06 23_59_59住院数据导出2026-01-06 11_49_45.xlsx', DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-01-08 20:45:05,499 - INFO - test - 导入失败，刷新列表
+2026-01-08 20:45:08,542 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-08 20:45:19,683 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 10，list：2
+2026-01-08 20:47:04,497 - INFO - test - 开始his导出: 2026-01-08 00:00:00, 2026-01-08 23:59:59
+2026-01-08 20:47:04,521 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-08 20:47:05,264 - INFO - orcale_db_connect - 文件已保存至: G:\pythonProject\hisToyy\export_data\2026-01-08 00_00_00-2026-01-08 23_59_59住院数据导出2026-01-08 20_47_05.xlsx, 已成功导出 1 条数据！
+2026-01-08 20:47:05,369 - INFO - test - 导出地址：G:\pythonProject\hisToyy\export_data\2026-01-08 00_00_00-2026-01-08 23_59_59住院数据导出2026-01-08 20_47_05.xlsx, 1
+2026-01-08 20:47:05,382 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-08 20:47:06,884 - INFO - test - start_his_export用户点击了‘否’
+2026-01-08 20:47:09,512 - INFO - test - 开始用友导入: {'id': 13, 'start_time': '2026-01-08 00:00:00', 'end_time': '2026-01-08 23:59:59', 'create_time': '2026-01-08 20:47:04', 'export_time': '2026-01-08 20:47:05', 'data_type': None, 'export_num': '1', 'export_file_name': '2026-01-08 00_00_00-2026-01-08 23_59_59住院数据导出2026-01-08 20_47_05.xlsx', 'export_file_path': 'G:\\pythonProject\\hisToyy\\export_data\\2026-01-08 00_00_00-2026-01-08 23_59_59住院数据导出2026-01-08 20_47_05.xlsx', 'import_yy_start': None, 'import_yy_num': None, 'status': 2}
+2026-01-08 20:47:09,521 - INFO - sqlserver_db_connect - DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-01-08 20:47:09,533 - INFO - sqlserver_db_connect - sqlserver 连接成功, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-01-08 20:47:09,544 - INFO - test - 导入成功，刷新列表
+2026-01-08 20:47:10,609 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-08 20:57:18,628 - INFO - utils - Note: NumExpr detected 12 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
+2026-01-08 20:57:18,628 - INFO - utils - NumExpr defaulting to 8 threads.
+2026-01-08 21:00:00,493 - INFO - utils - Note: NumExpr detected 12 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
+2026-01-08 21:00:00,493 - INFO - utils - NumExpr defaulting to 8 threads.
+2026-01-08 21:04:07,817 - INFO - utils - Note: NumExpr detected 12 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
+2026-01-08 21:04:07,817 - INFO - utils - NumExpr defaulting to 8 threads.
+2026-01-08 21:07:19,648 - INFO - utils - Note: NumExpr detected 12 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
+2026-01-08 21:07:19,648 - INFO - utils - NumExpr defaulting to 8 threads.
+2026-01-08 21:14:09,977 - INFO - utils - Note: NumExpr detected 12 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
+2026-01-08 21:14:09,978 - INFO - utils - NumExpr defaulting to 8 threads.
+2026-01-08 21:14:25,897 - INFO - utils - Note: NumExpr detected 12 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
+2026-01-08 21:14:25,897 - INFO - utils - NumExpr defaulting to 8 threads.
+2026-01-08 21:19:27,121 - INFO - utils - Note: NumExpr detected 12 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
+2026-01-08 21:19:27,121 - INFO - utils - NumExpr defaulting to 8 threads.
+2026-01-08 21:27:40,812 - INFO - utils - Note: NumExpr detected 12 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
+2026-01-08 21:27:40,812 - INFO - utils - NumExpr defaulting to 8 threads.
+2026-01-08 21:28:25,870 - INFO - utils - Note: NumExpr detected 12 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
+2026-01-08 21:28:25,870 - INFO - utils - NumExpr defaulting to 8 threads.
+2026-01-08 21:29:32,413 - INFO - utils - Note: NumExpr detected 12 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
+2026-01-08 21:29:32,413 - INFO - utils - NumExpr defaulting to 8 threads.
+2026-01-08 21:30:28,017 - INFO - utils - Note: NumExpr detected 12 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
+2026-01-08 21:30:28,017 - INFO - utils - NumExpr defaulting to 8 threads.
+2026-01-08 21:34:04,788 - INFO - utils - Note: NumExpr detected 12 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
+2026-01-08 21:34:04,788 - INFO - utils - NumExpr defaulting to 8 threads.
+2026-01-08 21:35:33,886 - INFO - utils - Note: NumExpr detected 12 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
+2026-01-08 21:35:33,886 - INFO - utils - NumExpr defaulting to 8 threads.
+2026-01-08 21:37:01,820 - INFO - utils - Note: NumExpr detected 12 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
+2026-01-08 21:37:01,820 - INFO - utils - NumExpr defaulting to 8 threads.
+2026-01-08 21:40:07,859 - INFO - utils - Note: NumExpr detected 12 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
+2026-01-08 21:40:07,859 - INFO - utils - NumExpr defaulting to 8 threads.

@@ -134,7 +134,7 @@ class ExcelMerger(QMainWindow):
 
         layout.addLayout(start_layout)
 
-        self.table = SqlInfiniteTableWidget()
+        self.table = SqlInfiniteTableWidget(main_view=self)
         self.table.setFixedHeight(400)
         layout_sql = QVBoxLayout()
         layout_sql.addWidget(QLabel("操作记录"))
@@ -240,11 +240,20 @@ class ExcelMerger(QMainWindow):
             QMessageBox.warning(self, "错误", "请选择导出的时间")
             logger.info(f"开始his导出: 请选择导出的时间")
 
-    def start_yy_import(self):
+    def start_yy_import(self, item=None):
         """ 导入用友数据 """
-        if self.full_path and self.record_id > 0:
+        this_record_id = -1
+        this_full_path = None
+        if item:
+            this_record_id = item['id']
+            this_full_path = item['export_file_path']
+        else:
+            this_record_id = self.record_id
+            this_full_path = self.full_path
+
+        if this_full_path and this_record_id > 0:
             # 参数说明：父窗口, 标题, 内容, 按钮组合, 默认选中的按钮
-            record = self.sqlite_helper.get_record_by_id(self.record_id)
+            record = self.sqlite_helper.get_record_by_id(this_record_id)
             if record['status'] == 4:
                 # 已经导出成功得数据
                 reply =QMessageBox.question(self, "提示", "该条数据已经成功导入到用友，请确认再次导入？",
@@ -254,7 +263,7 @@ class ExcelMerger(QMainWindow):
                 else:
                     logger.info(f"start_yy_import用户点击了‘否’{record}")
             else:
-                reply = QMessageBox.question(self, '确认', f"是否将该'{self.full_path}'HIS数据导入用友？",
+                reply = QMessageBox.question(self, '确认', f"是否将该'{this_full_path}'HIS数据导入用友？",
                                              QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
                 if reply == QMessageBox.Yes:
                     self._start_import_data_to_yy(record)
