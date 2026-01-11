@@ -5,6 +5,8 @@ import pandas as pd
 from PyQt5.QtCore import QThread, pyqtSignal
 from PyQt5.QtWidgets import (QMessageBox, QProgressDialog)
 import os
+from yongyou_coe import get_dept_id, get_ccode
+
 
 def connect_to_sqlserver_test(host, port, db_name, user, password):
     # 查看你电脑上已有的驱动，选一个填入下面的 DRIVER
@@ -30,6 +32,7 @@ def connect_to_sqlserver_test(host, port, db_name, user, password):
         logger.info(f"sqlserver 连接失败: {e}, {conn_str}")
         return False
 
+
 def import_data_to_yy(sqlserver_config, record, finished_signal):
     """ 导入数据导用友 """
     conn_str = (
@@ -50,16 +53,16 @@ def import_data_to_yy(sqlserver_config, record, finished_signal):
         full_path = record['export_file_path']
         df = pd.read_excel(full_path)
 
-
-
         conn.close()
         finished_signal.emit(True, "成功")
     except Exception as e:
         logger.info(f"sqlserver 导出失败: {e}, {conn_str}")
         finished_signal.emit(False, f"失败{e}")
 
+
 def read_excel():
-    path = os.path.join(os.path.join(os.path.abspath("."), "export_data"), "2026-01-08 00_00_00-2026-01-08 23_59_59住院数据导出2026-01-08 20_47_05.xlsx")
+    path = os.path.join(os.path.join(os.path.abspath("."), "export_data"),
+                        "2026-01-08 00_00_00-2026-01-08 23_59_59住院数据导出2026-01-08 20_47_05.xlsx")
     df = pd.read_excel(path)
     # 仅查看所有列名
     print(df.columns.tolist())
@@ -74,15 +77,58 @@ def read_excel():
     )
     conn = pyodbc.connect(conn_str)
     ino_id = get_next_ino_id(conn)
-    print(f"ino_id:{ino_id}")
-    # 获取日期
-    for idx, date_val in df['日期（按天到出）'].items():
+    # 将日期列转为日期格式（确保排序逻辑正确）
+    df['日期（按天到出）'] = pd.to_datetime(df['日期（按天到出）'])
+    # 按照日期降序排列 (ascending=False 表示从大到小)
+    df_sorted = df.sort_values(by='日期（按天到出）', ascending=False)
+    # 分组并保持排序后的顺序 (sort=False 是关键)
+    # 创建一个完全空的
+    df_empty = pd.DataFrame()
+    for date_val, group in df_sorted.groupby('日期（按天到出）', sort=False):
         if pd.notnull(date_val):
-            period = date_val.month  # 返回整数，例如 1
-            inid = idx + 1
-            print(f"period是: {period}")
-            print(f"inid是: {inid}")
+            # 贷方对方科目
+            mc_ccode_equal = set()
+            # 借方对方科目
+            md_ccode_equal = set()
+            row_list = []
+            for idx, row in group.iterrows():
+                period = date_val.month  # 返回整数，例如 1
+                inid = idx + 1
+                dbill_date = date_val
+                # 摘要
+                cdigest = f"门诊收入{'' if pd.isna(row['收银员（一个业务员一个表）']) else row['收银员（一个业务员一个表）']}"
+                # 制单人
+                user_name = "测试"
+                # 收款金额
+                # 借方
+                md_v = pd.to_numeric(row.get('收款金额', 0))
+                md = 0.0 if pd.isna(md_v) else float(md_v)
+                # 贷方
+                mc_v = pd.to_numeric(row.get('金额', 0))
+                mc = 0.0 if pd.isna(mc_v) else float(mc_v)
+                # 部门
+                cdept_id = get_dept_id(row)
+                # 科目
+                ccode = get_ccode(row, 2)
+                #  对方科目  121102010205,121102010235,121102010219  410101010801,410101010802,410101010803,4101010101
+                if md > 0:
+                    md_ccode_equal.add(ccode)
+                else:
+                    mc_ccode_equal.add(ccode)
+                row_list.append(transform_to_yonyou(period, ino_id, inid, dbill_date, user_name, md, mc, cdept_id, ccode, cdigest))
+
+
+                print(f"period是: {period},inid是: {inid},dbill_date: {dbill_date}, cdigest: {cdigest}, user_name: {user_name}, 借方: {md}, 贷方: {mc}, cdept_id: {cdept_id}, ccode:{ccode}")
+            for yongyou_row in row_list:
+                if yongyou_row["md"] > 0:
+                    yongyou_row["ccode_equal"] = ",".join(md_ccode_equal)
+                else:
+                    yongyou_row["ccode_equal"] = ",".join(mc_ccode_equal)
+            new_row = pd.DataFrame(row_list)
+            df_empty = pd.concat([df_empty, new_row], ignore_index=True)
+    print(df_empty)
     conn.close()
+
 
 def get_next_ino_id(conn):
     """
@@ -99,7 +145,8 @@ def get_next_ino_id(conn):
     # 如果结果为 None (新月份第一张单)，则返回 1，否则返回 最大值 + 1
     return (max_id if max_id else 0) + 1
 
-def transform_to_yonyou(df, start_vouch_id, period, user_name):
+
+def transform_to_yonyou(period, ino_id, inid, dbill_date, user_name, md, mc, cdept_id, ccode, cdigest):
     """
     将HIS数据转换为用友GL_accvouch格式
     :param df: 原始DataFrame
@@ -115,7 +162,7 @@ def transform_to_yonyou(df, start_vouch_id, period, user_name):
     544 凭证住院收入
     """
     # 建立副本，避免影响原始数据
-    new_df = pd.DataFrame()
+    new_df = {}
 
     # --- 1. 必填基础字段 (NOT NULL) ---
     # 会计期间 0为期初往来明细帐,21为期初待核银行帐,20为银行帐科目调整前余额,1-12为凭证及明细	UA_Period.iId
@@ -125,32 +172,33 @@ def transform_to_yonyou(df, start_vouch_id, period, user_name):
     new_df['csign'] = '记'
     new_df['isignseq'] = 1  # 凭证类别排序，通常记账为1  dsign.isignseq F53类别顺序号
     # 凭证序号 由系统分配凭证号,期初时可为null F3凭证号 取最大值+1 F82唯一标识
-    new_df['ino_id'] = int(start_vouch_id)
+    new_df['ino_id'] = ino_id
     # inid 分录行号：从1开始递增 F59行号
-    new_df['inid'] = range(1, len(df) + 1)
+    new_df['inid'] = inid
 
     # dbill_date 凭证日期：确保是datetime类型
     # 假设原df中有'date'列，如果没有则取当前日期 凭证日期 F1日期  yy-MM-dd
-    new_df['dbill_date'] = pd.to_datetime(df['date'])
+    new_df['dbill_date'] = dbill_date
 
     # --- 2. 核心财务字段 (NOT NULL / money) ---
     # 映射摘要 (从原df的'summary'取，最大60个字符)   F5摘要
-    new_df['cdigest'] = df['summary'].astype(str).str.slice(0, 60)
+    new_df['cdigest'] = cdigest
     # 映射科目编码 (从原df的'subject_code'取) code.ccode  F6科目编码
-    new_df['ccode'] = None
+    new_df['ccode'] = ccode
     new_df['cbill'] = user_name  # 制单人 (varchar 20) F12制单人
     # 金额处理 (money类型)
-    new_df['md'] = pd.to_numeric(df.get('debit', 0)).fillna(0.0)  # 借方  F7借方
-    new_df['mc'] = pd.to_numeric(df.get('credit', 0)).fillna(0.0)  # 贷方  F8贷方
+    new_df['md'] = md  # 借方  F7借方
+    new_df['mc'] = mc  # 贷方  F8贷方
 
-    new_df['cdept_id'] = df.get('dept_id', None)  # 部门  Department.cDepCode 外键    todo 需要 F16部门编码
-    new_df['ccode_equal'] = df.get('ccode_equal', None)  # 对方科目编码 code.ccode todo 需要解决 F70对方科目
+    new_df['cdept_id'] = cdept_id  # 部门  Department.cDepCode 外键    todo 需要 F16部门编码
+    # new_df['ccode_equal'] = df.get('ccode_equal', None)  # 对方科目编码 code.ccode todo 需要解决 F70对方科目
+    new_df['ccust_id'] = None  # F50核算单位
 
     # 附件数 -1 0
     new_df['idoc'] = 1  # 附件数 (smallint, NOT NULL) F4附单据数
     new_df['ccheck'] = None  # 审核人 (varchar 20)  F55审核人
     new_df['cbook'] = None  # 记账人 (varchar 20)   F56记账人
-    new_df['ibook'] = 1  # 记账标志 (tinyint, 默认0未记账) 记账标志	1_已记账 0_未记账（建索引用） F57是否记账
+    new_df['ibook'] = 0  # 记账标志 (tinyint, 默认0未记账) 记账标志	1_已记账 0_未记账（建索引用） F57是否记账
     new_df['ccashier'] = None  # 出纳签字人 F58出纳人
     new_df['iflag'] = None  # null_有效凭证,1_作废凭证,2_有错凭证(作废凭证可取消作废/进行凭证整理)
     # 外币相关字段 (根据DDL要求，通常补0)
@@ -260,6 +308,7 @@ class ImportWorker(QThread):
         except Exception as e:
             self.finished_signal.emit(False, str(e))
 
+
 # --- 在主界面调用 ---
 def sqlserver_start_import(parent, config, record, callback=None):
     """
@@ -293,7 +342,7 @@ def sqlserver_start_import(parent, config, record, callback=None):
     worker.finished_signal.connect(on_import_finished)
     worker.start()
 
+
 if __name__ == '__main__':
     # connect_to_sqlserver_test('127.0.0.1', '1433', 'master', 'sa', '123456')
     read_excel()
-

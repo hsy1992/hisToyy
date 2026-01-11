@@ -1,5 +1,7 @@
 # 用友医保科目映射字典 (名称 -> 编码)
 # 建议在 transform_to_yonyou 逻辑中使用
+import pandas as pd
+
 yonyou_yibao_code_map = {
     "1211020102": "应收住院医保费",
     "121102010201": "公补支付",
@@ -43,7 +45,8 @@ yonyou_yibao_code_map = {
     "121102010240": "医疗救助",
     "121102010242": "新冠住院",
     "121102010243": "哈尔滨中铁局医保",
-    "121102010244": "华油医保"
+    "121102010244": "华油医保",
+    "1001": "库存现金",
 }
 
 # F6科目编码
@@ -88,5 +91,40 @@ advance_receipt_dict = {
 }
 
 """
-缺少部门编码
+缺少部门编码 cdept_id
 """
+dept_code_dict = {
+    "内二科门诊": "4",
+    "内一科门诊": "5"
+}
+
+def get_dept_id(row):
+    dept_name = "" if pd.isna(row["部门"]) else row["部门"]
+    return dept_code_dict.get(dept_name, "")
+
+def get_ccode(row, type):
+    name = "" if pd.isna(row["费用名称"]) else row["费用名称"]
+    name = name.replace("费", "")
+
+    accout = "" if pd.isna(row["账号"]) else row["账号"]
+    if name:
+        # 有费用名称
+        if type == 1:
+            # 事业收入
+            for i, (key, value) in enumerate(income_dict_menzhen.items()):
+                if name in value:
+                    return key
+            return "41010101"
+        elif type == 2:
+            # 住院收入
+            for i, (key, value) in enumerate(income_dict_zhuyuan.items()):
+                if name in value:
+                    return key
+            return "41010102"
+    else:
+        # 账号 收款类型确定
+        for i, (key, value) in enumerate(yonyou_yibao_code_map.items()):
+            if accout in value:
+                return key
+        return "41010102"
+
