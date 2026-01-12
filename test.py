@@ -256,7 +256,7 @@ class ExcelMerger(QMainWindow):
             record = self.sqlite_helper.get_record_by_id(this_record_id)
             if record['status'] == 4:
                 # 已经导出成功得数据
-                reply =QMessageBox.question(self, "提示", "该条数据已经成功导入到用友，请确认再次导入？",
+                reply = QMessageBox.question(self, "提示", "该条数据已经成功导入到用友，请确认再次导入？",
                                      QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
                 if reply == QMessageBox.Yes:
                     self._start_import_data_to_yy(record)
@@ -277,13 +277,15 @@ class ExcelMerger(QMainWindow):
         公共用友导入方法
         """
         logger.info(f"开始用友导入: {record}")
-        def on_complete(success, message, int):
+        def on_complete(success, message, num):
             if success:
                 logger.info("导入成功，刷新列表")
+                self.sqlite_helper.import_yy_result(record["id"], success, message, num)
                 QMessageBox.information(self, "成功", "导入数据成功")
             else:
                 logger.info("导入失败，刷新列表")
                 QMessageBox.critical(self, "失败", f"导入失败{message}")
+                self.sqlite_helper.import_yy_result(record["id"], success, "", -1)
             self.table.refresh_data()
 
         sqlserver_start_import(self, self.config_manager.get_db_config('sqlserver'), record, on_complete)

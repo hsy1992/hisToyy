@@ -93,7 +93,8 @@ def read_excel_real(df, conn, finished_signal):
                 mc_v = pd.to_numeric(row.get('金额', 0))
                 mc = 0.0 if pd.isna(mc_v) else float(mc_v)
                 # 部门
-                cdept_id = get_dept_id(row)
+                # cdept_id = get_dept_id(row)
+                cdept_id = None
                 # 科目
                 ccode = get_ccode(row, 2)
                 #  对方科目  121102010205,121102010235,121102010219  410101010801,410101010802,410101010803,4101010101
@@ -182,7 +183,8 @@ def read_excel():
                 mc_v = pd.to_numeric(row.get('金额', 0))
                 mc = 0.0 if pd.isna(mc_v) else float(mc_v)
                 # 部门
-                cdept_id = get_dept_id(row)
+                # cdept_id = get_dept_id(row)
+                cdept_id = None
                 # 科目
                 ccode = get_ccode(row, 2)
                 #  对方科目  121102010205,121102010235,121102010219  410101010801,410101010802,410101010803,4101010101
@@ -191,7 +193,6 @@ def read_excel():
                 else:
                     mc_ccode_equal.add(ccode)
                 row_list.append(transform_to_yonyou(period, ino_id, inid, dbill_date, user_name, md, mc, cdept_id, ccode, cdigest))
-
 
                 print(f"period是: {period},inid是: {inid},dbill_date: {dbill_date}, cdigest: {cdigest}, user_name: {user_name}, 借方: {md}, 贷方: {mc}, cdept_id: {cdept_id}, ccode:{ccode}")
             for yongyou_row in row_list:
@@ -208,7 +209,7 @@ def read_excel():
             placeholders = ', '.join(['?'] * len(columns))
             columns_sql = ', '.join(columns)
             sql = f"INSERT INTO [UFDATA_999_2012].[dbo].[GL_accvouch] ({columns_sql}) VALUES ({placeholders})"
-            
+            print(sql)
             try:
                 # 将 numpy 类型转换为 python 原生类型，防止 pyodbc 报错
                 data_to_insert = df_empty.astype(object).where(pd.notnull(df_empty), None).values.tolist()
@@ -285,7 +286,7 @@ def transform_to_yonyou(period, ino_id, inid, dbill_date, user_name, md, mc, cde
 
     new_df['cdept_id'] = cdept_id  # 部门  Department.cDepCode 外键    todo 需要 F16部门编码
     # new_df['ccode_equal'] = df.get('ccode_equal', None)  # 对方科目编码 code.ccode todo 需要解决 F70对方科目
-    new_df['ccust_id'] = None  # F50核算单位
+    new_df['ccus_id'] = None  # F50核算单位
 
     # 附件数 -1 0
     new_df['idoc'] = 1  # 附件数 (smallint, NOT NULL) F4附单据数

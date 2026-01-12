@@ -144,9 +144,19 @@ class SQLiteHelper:
         """根据ID查询记录"""
         return self.fetch_one("SELECT * FROM sys_export_record WHERE id = :record_id", {"record_id": record_id})
 
-
-
-
+    def import_yy_result(self, record_id, success, import_yy_start, num):
+        """
+            导入后更改数据库
+            import_yy_start TEXT,
+            import_yy_num INTEGER,
+        """
+        if success:
+            self.update_status(record_id, 4, {
+                "import_yy_num": num,
+                "import_yy_start": import_yy_start
+            })
+        else:
+            self.update_status(record_id, 5, {})
 
 if __name__ == '__main__':
     db = SQLiteHelper()

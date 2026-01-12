@@ -239,3 +239,32 @@
 2026-01-11 21:55:19,948 - INFO - utils - NumExpr defaulting to 8 threads.
 2026-01-12 11:45:58,575 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
 2026-01-12 11:46:09,268 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 10，list：3
+2026-01-12 21:02:33,240 - INFO - utils - Note: NumExpr detected 12 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
+2026-01-12 21:02:33,240 - INFO - utils - NumExpr defaulting to 8 threads.
+2026-01-12 21:02:35,002 - ERROR - sqlserver_db_connect - Error inserting data: ('42S22', "[42S22] [Microsoft][ODBC SQL Server Driver][SQL Server]列名 'ccust_id' 无效。 (207) (SQLExecDirectW); [42S22] [Microsoft][ODBC SQL Server Driver][SQL Server]无法预定义语句。 (8180)")
+2026-01-12 21:03:07,339 - INFO - utils - Note: NumExpr detected 12 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
+2026-01-12 21:03:07,340 - INFO - utils - NumExpr defaulting to 8 threads.
+2026-01-12 21:03:08,281 - ERROR - sqlserver_db_connect - Error inserting data: ('42S22', "[42S22] [Microsoft][ODBC SQL Server Driver][SQL Server]列名 'ccust_id' 无效。 (207) (SQLExecDirectW); [42S22] [Microsoft][ODBC SQL Server Driver][SQL Server]无法预定义语句。 (8180)")
+2026-01-12 21:20:27,003 - INFO - utils - Note: NumExpr detected 12 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
+2026-01-12 21:20:27,004 - INFO - utils - NumExpr defaulting to 8 threads.
+2026-01-12 21:20:27,941 - ERROR - sqlserver_db_connect - Error inserting data: ('23000', '[23000] [Microsoft][ODBC SQL Server Driver][SQL Server]INSERT 语句与 FOREIGN KEY 约束"FK__GL_accvou__cdept__2F25DA6B"冲突。该冲突发生于数据库"UFDATA_999_2012"，表"dbo.Department", column \'cDepCode\'。 (547) (SQLExecDirectW); [23000] [Microsoft][ODBC SQL Server Driver][SQL Server]语句已终止。 (3621)')
+2026-01-12 21:21:21,497 - INFO - utils - Note: NumExpr detected 12 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
+2026-01-12 21:21:21,497 - INFO - utils - NumExpr defaulting to 8 threads.
+2026-01-12 21:21:22,115 - INFO - sqlserver_db_connect - Successfully inserted 9 rows.
+2026-01-12 21:25:47,528 - INFO - utils - Note: NumExpr detected 12 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
+2026-01-12 21:25:47,528 - INFO - utils - NumExpr defaulting to 8 threads.
+2026-01-12 21:25:48,131 - INFO - sqlserver_db_connect - Successfully inserted 9 rows.
+2026-01-12 21:26:27,193 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-12 21:26:35,031 - INFO - test - 开始用友导入: {'id': 13, 'start_time': '2026-01-08 00:00:00', 'end_time': '2026-01-08 23:59:59', 'create_time': '2026-01-08 20:47:04', 'export_time': '2026-01-08 20:47:05', 'data_type': None, 'export_num': '1', 'export_file_name': '2026-01-08 00_00_00-2026-01-08 23_59_59住院数据导出2026-01-08 20_47_05.xlsx', 'export_file_path': 'G:\\pythonProject\\hisToyy\\export_data\\2026-01-08 00_00_00-2026-01-08 23_59_59住院数据导出2026-01-08 20_47_05.xlsx', 'import_yy_start': None, 'import_yy_num': None, 'status': 2}
+2026-01-12 21:26:35,045 - INFO - sqlserver_db_connect - DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-01-12 21:26:35,067 - INFO - sqlserver_db_connect - sqlserver 连接成功, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-01-12 21:26:35,162 - ERROR - sqlserver_db_connect - Error inserting data: ('23000', '[23000] [Microsoft][ODBC SQL Server Driver][SQL Server]INSERT 语句与 FOREIGN KEY 约束"FK__GL_accvou__cdept__2F25DA6B"冲突。该冲突发生于数据库"UFDATA_999_2012"，表"dbo.Department", column \'cDepCode\'。 (547) (SQLExecDirectW); [23000] [Microsoft][ODBC SQL Server Driver][SQL Server]语句已终止。 (3621)')
+2026-01-12 21:26:35,166 - INFO - test - 导入失败，刷新列表
+2026-01-12 21:26:57,802 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-12 21:27:02,695 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-12 21:27:06,718 - INFO - test - 开始用友导入: {'id': 13, 'start_time': '2026-01-08 00:00:00', 'end_time': '2026-01-08 23:59:59', 'create_time': '2026-01-08 20:47:04', 'export_time': '2026-01-08 20:47:05', 'data_type': None, 'export_num': '1', 'export_file_name': '2026-01-08 00_00_00-2026-01-08 23_59_59住院数据导出2026-01-08 20_47_05.xlsx', 'export_file_path': 'G:\\pythonProject\\hisToyy\\export_data\\2026-01-08 00_00_00-2026-01-08 23_59_59住院数据导出2026-01-08 20_47_05.xlsx', 'import_yy_start': None, 'import_yy_num': None, 'status': 5}
+2026-01-12 21:27:06,727 - INFO - sqlserver_db_connect - DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-01-12 21:27:06,746 - INFO - sqlserver_db_connect - sqlserver 连接成功, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-01-12 21:27:06,848 - INFO - sqlserver_db_connect - Successfully inserted 9 rows.
+2026-01-12 21:27:06,852 - INFO - test - 导入成功，刷新列表
+2026-01-12 21:27:08,079 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
