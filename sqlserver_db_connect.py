@@ -52,12 +52,87 @@ def import_data_to_yy(sqlserver_config, record, finished_signal):
         # 1. 读取 Excel 文件
         full_path = record['export_file_path']
         df = pd.read_excel(full_path)
-
+        read_excel_real(df, conn, finished_signal)
         conn.close()
-        finished_signal.emit(True, "成功")
     except Exception as e:
         logger.info(f"sqlserver 导出失败: {e}, {conn_str}")
-        finished_signal.emit(False, f"失败{e}")
+        finished_signal.emit(False, f"失败{e}", -1)
+
+def read_excel_real(df, conn, finished_signal):
+    
+    # 将日期列转为日期格式（确保排序逻辑正确）
+    df['日期（按天到出）'] = pd.to_datetime(df['日期（按天到出）'])
+    # 按照日期降序排列 (ascending=False 表示从大到小)
+    df_sorted = df.sort_values(by='日期（按天到出）', ascending=False)
+    # 分组并保持排序后的顺序 (sort=False 是关键)
+    # 创建一个完全空的
+    df_empty = pd.DataFrame()
+    start_ino_id = get_next_ino_id(conn)
+    for i, (date_val, group) in enumerate(df_sorted.groupby('日期（按天到出）', sort=False)):
+        
+        if pd.notnull(date_val):
+            ino_id = start_ino_id + i
+            # 贷方对方科目
+            mc_ccode_equal = set()
+            # 借方对方科目
+            md_ccode_equal = set()
+            row_list = []
+            for idx, row in group.iterrows():
+                period = date_val.month  # 返回整数，例如 1
+                inid = idx + 1
+                dbill_date = date_val
+                # 摘要
+                cdigest = f"门诊收入{'' if pd.isna(row['收银员（一个业务员一个表）']) else row['收银员（一个业务员一个表）']}"
+                # 制单人
+                user_name = "测试"
+                # 收款金额
+                # 借方
+                md_v = pd.to_numeric(row.get('收款金额', 0))
+                md = 0.0 if pd.isna(md_v) else float(md_v)
+                # 贷方
+                mc_v = pd.to_numeric(row.get('金额', 0))
+                mc = 0.0 if pd.isna(mc_v) else float(mc_v)
+                # 部门
+                cdept_id = get_dept_id(row)
+                # 科目
+                ccode = get_ccode(row, 2)
+                #  对方科目  121102010205,121102010235,121102010219  410101010801,410101010802,410101010803,4101010101
+                if md > 0:
+                    md_ccode_equal.add(ccode)
+                else:
+                    mc_ccode_equal.add(ccode)
+                row_list.append(transform_to_yonyou(period, ino_id, inid, dbill_date, user_name, md, mc, cdept_id, ccode, cdigest))
+
+
+                print(f"period是: {period},inid是: {inid},dbill_date: {dbill_date}, cdigest: {cdigest}, user_name: {user_name}, 借方: {md}, 贷方: {mc}, cdept_id: {cdept_id}, ccode:{ccode}")
+            for yongyou_row in row_list:
+                if yongyou_row["md"] > 0:
+                    yongyou_row["ccode_equal"] = ",".join(md_ccode_equal)
+                else:
+                    yongyou_row["ccode_equal"] = ",".join(mc_ccode_equal)
+            new_row = pd.DataFrame(row_list)
+            df_empty = pd.concat([df_empty, new_row], ignore_index=True)
+        print(df_empty)
+        if not df_empty.empty:
+            cursor = conn.cursor()
+            columns = list(df_empty.columns)
+            placeholders = ', '.join(['?'] * len(columns))
+            columns_sql = ', '.join(columns)
+            sql = f"INSERT INTO [UFDATA_999_2012].[dbo].[GL_accvouch] ({columns_sql}) VALUES ({placeholders})"
+            
+            try:
+                # 将 numpy 类型转换为 python 原生类型，防止 pyodbc 报错
+                data_to_insert = df_empty.astype(object).where(pd.notnull(df_empty), None).values.tolist()
+                cursor.executemany(sql, data_to_insert)
+                conn.commit()
+                logger.info(f"Successfully inserted {len(df_empty)} rows.")
+                finished_signal.emit(True, str(start_ino_id), len(df_empty))
+            except Exception as e:
+                logger.error(f"Error inserting data: {e}")
+                conn.rollback()
+                finished_signal.emit(False, f"rror inserting data, 失败{e}", -1)
+            finally:
+                cursor.close()
 
 
 def read_excel():
@@ -126,8 +201,26 @@ def read_excel():
                     yongyou_row["ccode_equal"] = ",".join(mc_ccode_equal)
             new_row = pd.DataFrame(row_list)
             df_empty = pd.concat([df_empty, new_row], ignore_index=True)
-    print(df_empty)
-    conn.close()
+        print(df_empty)
+        if not df_empty.empty:
+            cursor = conn.cursor()
+            columns = list(df_empty.columns)
+            placeholders = ', '.join(['?'] * len(columns))
+            columns_sql = ', '.join(columns)
+            sql = f"INSERT INTO [UFDATA_999_2012].[dbo].[GL_accvouch] ({columns_sql}) VALUES ({placeholders})"
+            
+            try:
+                # 将 numpy 类型转换为 python 原生类型，防止 pyodbc 报错
+                data_to_insert = df_empty.astype(object).where(pd.notnull(df_empty), None).values.tolist()
+                cursor.executemany(sql, data_to_insert)
+                conn.commit()
+                logger.info(f"Successfully inserted {len(df_empty)} rows.")
+            except Exception as e:
+                logger.error(f"Error inserting data: {e}")
+                conn.rollback()
+            finally:
+                cursor.close()
+        conn.close()
 
 
 def get_next_ino_id(conn):
@@ -294,7 +387,7 @@ def transform_to_yonyou(period, ino_id, inid, dbill_date, user_name, md, mc, cde
 
 
 class ImportWorker(QThread):
-    finished_signal = pyqtSignal(bool, str)
+    finished_signal = pyqtSignal(bool, str, int)
 
     def __init__(self, config, record):
         super().__init__()
@@ -306,7 +399,7 @@ class ImportWorker(QThread):
             # 这里是真正的耗时操作，在子线程运行，不影响界面
             import_data_to_yy(self.config, self.record, self.finished_signal)
         except Exception as e:
-            self.finished_signal.emit(False, str(e))
+            self.finished_signal.emit(False, str(e), -1)
 
 
 # --- 在主界面调用 ---
@@ -330,10 +423,10 @@ def sqlserver_start_import(parent, config, record, callback=None):
     # 将worker绑定到parent上，防止被垃圾回收
     parent._import_worker = worker
 
-    def on_import_finished(success, message):
+    def on_import_finished(success, message, int):
         progress.close()
         if callback:
-            callback(success, message)
+            callback(success, message, int)
 
         # 清理 worker 引用
         if hasattr(parent, '_import_worker'):

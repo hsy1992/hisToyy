@@ -277,7 +277,7 @@ class ExcelMerger(QMainWindow):
         公共用友导入方法
         """
         logger.info(f"开始用友导入: {record}")
-        def on_complete(success, message):
+        def on_complete(success, message, int):
             if success:
                 logger.info("导入成功，刷新列表")
                 QMessageBox.information(self, "成功", "导入数据成功")

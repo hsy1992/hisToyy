@@ -237,3 +237,5 @@
 2026-01-11 21:48:05,654 - INFO - utils - NumExpr defaulting to 8 threads.
 2026-01-11 21:55:19,948 - INFO - utils - Note: NumExpr detected 12 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
 2026-01-11 21:55:19,948 - INFO - utils - NumExpr defaulting to 8 threads.
+2026-01-12 11:45:58,575 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-12 11:46:09,268 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 10，list：3
