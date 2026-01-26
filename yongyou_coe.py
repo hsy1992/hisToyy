@@ -46,6 +46,8 @@ yonyou_yibao_code_map = {
     "121102010242": "新冠住院",
     "121102010243": "哈尔滨中铁局医保",
     "121102010244": "华油医保",
+    "121102010245": "个人统筹",
+    "121102010246": "现金",
     "1001": "库存现金",
 }
 
@@ -90,23 +92,30 @@ advance_receipt_dict = {
     "230502": "住院预收款"
 }
 
+people_list = [
+    "齐金艳", "郝思远"
+]
+
 """
 缺少部门编码 cdept_id
 """
 dept_code_dict = {
     "内二科门诊": "4",
-    "内一科门诊": "5"
+    "神经心理科": "6",
+    "口腔科": "7"
 }
 
 def get_dept_id(row):
-    dept_name = "" if pd.isna(row["部门"]) else row["部门"]
+    dept_name = "" if pd.isna(row["开单科室"]) else row["开单科室"]
     return dept_code_dict.get(dept_name, "")
 
-def get_ccode(row, type):
-    name = "" if pd.isna(row["费用名称"]) else row["费用名称"]
-    name = name.replace("费", "")
 
-    accout = "" if pd.isna(row["账号"]) else row["账号"]
+def get_ccode(row, type):
+    """
+    贷方科目
+    """
+    name = "" if pd.isna(row["项目"]) else row["项目"]
+    name = name.replace("费", "")
     if name:
         # 有费用名称
         if type == 1:
@@ -121,10 +130,22 @@ def get_ccode(row, type):
                 if name in value:
                     return key
             return "41010102"
-    else:
-        # 账号 收款类型确定
+
+
+def get_ccode1(row):
+    """
+    借方科目
+    """
+    if row["参保地"]:
         for i, (key, value) in enumerate(yonyou_yibao_code_map.items()):
-            if accout in value:
+            if row["参保地"] in value:
                 return key
-        return "41010102"
+        return "1001"
+    else:
+        # 使用项目去找科目
+        for i, (key, value) in enumerate(yonyou_yibao_code_map.items()):
+            if row["项目"] in value:
+                return key
+        return "1001"
+
 

@@ -268,3 +268,70 @@
 2026-01-12 21:27:06,848 - INFO - sqlserver_db_connect - Successfully inserted 9 rows.
 2026-01-12 21:27:06,852 - INFO - test - 导入成功，刷新列表
 2026-01-12 21:27:08,079 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-26 20:45:40,552 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-26 20:45:43,698 - INFO - test - 开始his导出: 2026-01-26 00:00:00, 2026-01-26 23:59:59
+2026-01-26 20:45:43,732 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-26 20:45:44,854 - INFO - orcale_db_connect - 文件已保存至: G:\pythonProject\hisToyy\export_data\2026-01-26 00_00_00-2026-01-26 23_59_59数据导出2026-01-26 20_45.xlsx, 已成功导出 2 条数据！
+2026-01-26 20:45:44,985 - INFO - test - 导出地址：G:\pythonProject\hisToyy\export_data\2026-01-26 00_00_00-2026-01-26 23_59_59数据导出2026-01-26 20_45.xlsx, 2
+2026-01-26 20:45:44,995 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-26 20:45:46,590 - INFO - test - start_his_export用户点击了‘否’
+2026-01-26 20:47:34,346 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-26 20:47:39,034 - INFO - test - 开始his导出: 2026-01-26 00:00:00, 2026-01-26 23:59:59
+2026-01-26 20:47:39,090 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-26 20:47:39,745 - INFO - orcale_db_connect - 文件已保存至: G:\pythonProject\hisToyy\export_data\2026-01-26 00_00_00-2026-01-26 23_59_59数据导出2026-01-26 20_47.xlsx, 已成功导出 2 条数据！
+2026-01-26 20:47:39,872 - INFO - test - 导出地址：G:\pythonProject\hisToyy\export_data\2026-01-26 00_00_00-2026-01-26 23_59_59数据导出2026-01-26 20_47.xlsx, 2
+2026-01-26 20:47:39,908 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-26 20:47:41,298 - INFO - test - start_his_export用户点击了‘否’
+2026-01-26 21:38:25,843 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-26 21:38:32,788 - INFO - test - 开始his导出: 2026-01-26 00:00:00, 2026-01-26 23:59:59
+2026-01-26 21:38:32,818 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-26 21:39:41,082 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-26 21:39:44,257 - INFO - test - 开始his导出: 2026-01-26 00:00:00, 2026-01-26 23:59:59
+2026-01-26 21:39:44,288 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-26 21:40:48,955 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-26 21:40:51,064 - INFO - test - 开始his导出: 2026-01-26 00:00:00, 2026-01-26 23:59:59
+2026-01-26 21:40:51,095 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-26 21:45:07,537 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-26 21:45:13,432 - INFO - test - 开始his导出: 2026-01-26 00:00:00, 2026-01-26 23:59:59
+2026-01-26 21:45:13,599 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-26 21:46:35,990 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-26 21:46:37,598 - INFO - test - 开始his导出: 2026-01-26 00:00:00, 2026-01-26 23:59:59
+2026-01-26 21:46:37,629 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-26 21:48:52,441 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-26 21:49:19,287 - INFO - test - 开始his导出: 2026-01-26 00:00:00, 2026-01-26 23:59:59
+2026-01-26 21:49:19,314 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-26 21:49:20,139 - INFO - orcale_db_connect - 文件已保存至: G:\pythonProject\hisToyy\export_data\2026-01-26 00_00_00-2026-01-26 23_59_59数据导出2026-01-26 21_49.xlsx, 已成功导出 2 条数据！
+2026-01-26 21:49:20,265 - INFO - test - 导出地址：G:\pythonProject\hisToyy\export_data\2026-01-26 00_00_00-2026-01-26 23_59_59数据导出2026-01-26 21_49.xlsx, 2
+2026-01-26 21:49:20,275 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-26 21:49:22,144 - INFO - test - start_his_export用户点击了‘否’
+2026-01-26 22:22:45,959 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-26 22:22:48,988 - INFO - test - 开始his导出: 2026-01-26 00:00:00, 2026-01-26 23:59:59
+2026-01-26 22:22:49,017 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-26 22:22:49,851 - INFO - orcale_db_connect - 文件已保存至: G:\pythonProject\hisToyy\export_data\2026-01-26 00_00_00-2026-01-26 23_59_59数据导出2026-01-26 22_22.xlsx, 已成功导出 2 条数据！
+2026-01-26 22:22:49,976 - INFO - test - 导出地址：G:\pythonProject\hisToyy\export_data\2026-01-26 00_00_00-2026-01-26 23_59_59数据导出2026-01-26 22_22.xlsx, 2
+2026-01-26 22:22:49,985 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-26 22:22:51,491 - INFO - test - start_his_export用户点击了‘否’
+2026-01-26 22:22:54,549 - INFO - test - 开始用友导入: {'id': 22, 'start_time': '2026-01-26 00:00:00', 'end_time': '2026-01-26 23:59:59', 'create_time': '2026-01-26 22:22:49', 'export_time': '2026-01-26 22:22:49', 'data_type': None, 'export_num': '2', 'export_file_name': '2026-01-26 00_00_00-2026-01-26 23_59_59数据导出2026-01-26 22_22.xlsx', 'export_file_path': 'G:\\pythonProject\\hisToyy\\export_data\\2026-01-26 00_00_00-2026-01-26 23_59_59数据导出2026-01-26 22_22.xlsx', 'import_yy_start': None, 'import_yy_num': None, 'status': 2}
+2026-01-26 22:22:54,560 - INFO - sqlserver_db_connect - DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-01-26 22:22:54,866 - INFO - sqlserver_db_connect - sqlserver 连接成功, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-01-26 22:22:55,309 - INFO - sqlserver_db_connect - sqlserver 导出失败: object of type 'generator' has no len(), DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-01-26 22:22:55,312 - INFO - test - 导入失败，刷新列表
+2026-01-26 22:22:57,511 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-26 22:23:53,091 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-26 22:23:57,542 - INFO - test - 开始用友导入: {'id': 22, 'start_time': '2026-01-26 00:00:00', 'end_time': '2026-01-26 23:59:59', 'create_time': '2026-01-26 22:22:49', 'export_time': '2026-01-26 22:22:49', 'data_type': None, 'export_num': '2', 'export_file_name': '2026-01-26 00_00_00-2026-01-26 23_59_59数据导出2026-01-26 22_22.xlsx', 'export_file_path': 'G:\\pythonProject\\hisToyy\\export_data\\2026-01-26 00_00_00-2026-01-26 23_59_59数据导出2026-01-26 22_22.xlsx', 'import_yy_start': None, 'import_yy_num': None, 'status': 5}
+2026-01-26 22:23:57,553 - INFO - sqlserver_db_connect - DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-01-26 22:23:57,574 - INFO - sqlserver_db_connect - sqlserver 连接成功, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-01-26 22:23:58,134 - INFO - sqlserver_db_connect - sqlserver 导出失败: object of type 'generator' has no len(), DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-01-26 22:23:58,139 - INFO - test - 导入失败，刷新列表
+2026-01-26 22:25:01,612 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-26 22:25:10,253 - INFO - test - 开始用友导入: {'id': 22, 'start_time': '2026-01-26 00:00:00', 'end_time': '2026-01-26 23:59:59', 'create_time': '2026-01-26 22:22:49', 'export_time': '2026-01-26 22:22:49', 'data_type': None, 'export_num': '2', 'export_file_name': '2026-01-26 00_00_00-2026-01-26 23_59_59数据导出2026-01-26 22_22.xlsx', 'export_file_path': 'G:\\pythonProject\\hisToyy\\export_data\\2026-01-26 00_00_00-2026-01-26 23_59_59数据导出2026-01-26 22_22.xlsx', 'import_yy_start': None, 'import_yy_num': None, 'status': 5}
+2026-01-26 22:25:10,264 - INFO - sqlserver_db_connect - DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-01-26 22:25:10,283 - INFO - sqlserver_db_connect - sqlserver 连接成功, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-01-26 22:25:11,271 - INFO - sqlserver_db_connect - sqlserver 导出失败: object of type 'generator' has no len(), DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-01-26 22:25:11,274 - INFO - test - 导入失败，刷新列表
+2026-01-26 22:26:08,201 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-26 22:26:23,079 - INFO - test - 开始用友导入: {'id': 22, 'start_time': '2026-01-26 00:00:00', 'end_time': '2026-01-26 23:59:59', 'create_time': '2026-01-26 22:22:49', 'export_time': '2026-01-26 22:22:49', 'data_type': None, 'export_num': '2', 'export_file_name': '2026-01-26 00_00_00-2026-01-26 23_59_59数据导出2026-01-26 22_22.xlsx', 'export_file_path': 'G:\\pythonProject\\hisToyy\\export_data\\2026-01-26 00_00_00-2026-01-26 23_59_59数据导出2026-01-26 22_22.xlsx', 'import_yy_start': None, 'import_yy_num': None, 'status': 5}
+2026-01-26 22:26:23,089 - INFO - sqlserver_db_connect - DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-01-26 22:26:23,109 - INFO - sqlserver_db_connect - sqlserver 连接成功, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-01-26 22:26:23,661 - INFO - sqlserver_db_connect - sqlserver 导出失败: '收款员', DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-01-26 22:26:23,670 - INFO - test - 导入失败，刷新列表

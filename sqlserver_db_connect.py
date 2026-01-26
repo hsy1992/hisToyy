@@ -5,8 +5,8 @@ import pandas as pd
 from PyQt5.QtCore import QThread, pyqtSignal
 from PyQt5.QtWidgets import (QMessageBox, QProgressDialog)
 import os
-from yongyou_coe import get_dept_id, get_ccode
-
+from yongyou_coe import get_dept_id, get_ccode, get_ccode1
+import traceback
 
 def connect_to_sqlserver_test(host, port, db_name, user, password):
     # 查看你电脑上已有的驱动，选一个填入下面的 DRIVER
@@ -51,26 +51,29 @@ def import_data_to_yy(sqlserver_config, record, finished_signal):
         logger.info(f"sqlserver 连接成功, {conn_str}")
         # 1. 读取 Excel 文件
         full_path = record['export_file_path']
-        df = pd.read_excel(full_path)
+        df = pd.read_excel(full_path, sheet_name=['收款数据', '汇总数据'])
         read_excel_real(df, conn, finished_signal)
         conn.close()
     except Exception as e:
+        traceback.print_exc()  # 打印完整的报错路径
         logger.info(f"sqlserver 导出失败: {e}, {conn_str}")
         finished_signal.emit(False, f"失败{e}", -1)
 
 def read_excel_real(df, conn, finished_signal):
-    
+
+    df_shoukuan = df['收款数据']
+    df_total = df['汇总数据']
     # 将日期列转为日期格式（确保排序逻辑正确）
-    df['日期（按天到出）'] = pd.to_datetime(df['日期（按天到出）'])
+    df_shoukuan['扎帐时间'] = pd.to_datetime(df_shoukuan['扎帐时间'])
     # 按照日期降序排列 (ascending=False 表示从大到小)
-    df_sorted = df.sort_values(by='日期（按天到出）', ascending=False)
+    df_sorted = df_shoukuan.sort_values(by='扎帐时间', ascending=False)
     # 分组并保持排序后的顺序 (sort=False 是关键)
     # 创建一个完全空的
     df_empty = pd.DataFrame()
     start_ino_id = get_next_ino_id(conn)
-    for i, (date_val, group) in enumerate(df_sorted.groupby('日期（按天到出）', sort=False)):
+    for i, (shouyin_name, group) in enumerate(df_sorted.groupby('收款员', sort=False)):
         
-        if pd.notnull(date_val):
+        if pd.notnull(shouyin_name):
             ino_id = start_ino_id + i
             # 贷方对方科目
             mc_ccode_equal = set()
@@ -78,23 +81,24 @@ def read_excel_real(df, conn, finished_signal):
             md_ccode_equal = set()
             row_list = []
             for idx, row in group.iterrows():
+                date_val = row['扎帐时间']
                 period = date_val.month  # 返回整数，例如 1
                 inid = idx + 1
                 dbill_date = date_val
                 # 摘要
-                cdigest = f"门诊收入{'' if pd.isna(row['收银员（一个业务员一个表）']) else row['收银员（一个业务员一个表）']}"
+                cdigest = f"扎帐单号:{'' if pd.isna(row['扎帐单号']) else row['扎帐单号']},{'' if pd.isna(row['收款员']) else row['收款员']}"
                 # 制单人
-                user_name = "测试"
+                user_name = row['收款员']
                 # 收款金额
                 # 借方
-                md_v = pd.to_numeric(row.get('收款金额', 0))
-                md = 0.0 if pd.isna(md_v) else float(md_v)
+                md = 0.0
+                # md_v = pd.to_numeric(row.get('收款金额', 0))
+                # md = 0.0 if pd.isna(md_v) else float(md_v)
                 # 贷方
                 mc_v = pd.to_numeric(row.get('金额', 0))
                 mc = 0.0 if pd.isna(mc_v) else float(mc_v)
                 # 部门
-                # cdept_id = get_dept_id(row)
-                cdept_id = None
+                cdept_id = get_dept_id(row)
                 # 科目
                 ccode = get_ccode(row, 2)
                 #  对方科目  121102010205,121102010235,121102010219  410101010801,410101010802,410101010803,4101010101
@@ -103,7 +107,30 @@ def read_excel_real(df, conn, finished_signal):
                 else:
                     mc_ccode_equal.add(ccode)
                 row_list.append(transform_to_yonyou(period, ino_id, inid, dbill_date, user_name, md, mc, cdept_id, ccode, cdigest))
-
+                # 判断是否为最后一个 (index 从 0 开始，所以是 total-1)
+                if idx == len(group) - 1:
+                    # 去查找汇总数据 并插入
+                    hh_data = df_total[df_total['收银员'] == shouyin_name]
+                    for idx1, row in hh_data.iterrows():
+                        if row['项目'] != '合计':
+                            # 摘要
+                            cdigest1 = f"项目:{'' if pd.isna(row['项目']) else row['项目']},{user_name}"
+                            # 收款金额
+                            # 借方
+                            md_v = pd.to_numeric(row.get('内容', 0))
+                            md = 0.0 if pd.isna(md_v) else float(md_v)
+                            # 贷方
+                            mc = 0.0
+                            # 科目
+                            ccode1 = get_ccode1(row)
+                            #  对方科目  121102010205,121102010235,121102010219  410101010801,410101010802,410101010803,4101010101
+                            if md > 0:
+                                md_ccode_equal.add(ccode)
+                            else:
+                                mc_ccode_equal.add(ccode)
+                            row_list.append(
+                                transform_to_yonyou(period, ino_id, inid + idx1 + 1, dbill_date, user_name, md, mc, None,
+                                                    ccode1, cdigest1))
 
                 print(f"period是: {period},inid是: {inid},dbill_date: {dbill_date}, cdigest: {cdigest}, user_name: {user_name}, 借方: {md}, 贷方: {mc}, cdept_id: {cdept_id}, ccode:{ccode}")
             for yongyou_row in row_list:

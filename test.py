@@ -242,8 +242,6 @@ class ExcelMerger(QMainWindow):
 
     def start_yy_import(self, item=None):
         """ 导入用友数据 """
-        this_record_id = -1
-        this_full_path = None
         if item:
             this_record_id = item['id']
             this_full_path = item['export_file_path']
