@@ -3,7 +3,7 @@ import os
 from openpyxl import load_workbook
 from openpyxl.utils.dataframe import dataframe_to_rows
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, 
-                           QHBoxLayout, QPushButton, QLabel, QFileDialog, QDialog, QDateTimeEdit, QMessageBox, QProgressDialog, QTableView)
+                           QHBoxLayout, QPushButton, QLabel, QFileDialog, QDialog, QDateTimeEdit, QMessageBox, QProgressDialog, QTableView, QButtonGroup, QRadioButton)
 from PyQt5.QtCore import QDateTime, Qt, QThread, pyqtSignal
 from sql_setting_dialog import ConfigDialog
 from config import ConfigManager
@@ -117,6 +117,27 @@ class ExcelMerger(QMainWindow):
         time_layout1.addWidget(self.dt_edit1)
         layout.addLayout(time_layout1)
 
+        # 业务类型
+        type_layout = QHBoxLayout()
+        type_layout.addWidget(QLabel("业务类型："))
+
+        # 创建单选按钮
+        self.radio_outpatient = QRadioButton("门诊")
+        self.radio_inpatient = QRadioButton("住院")
+
+        self.radio_outpatient.setChecked(True)
+
+        # 使用 QButtonGroup 进行逻辑分组（确保互斥）
+        self.type_group = QButtonGroup(self)
+        self.type_group.addButton(self.radio_outpatient, 0)  # ID 为 0
+        self.type_group.addButton(self.radio_inpatient, 1)  # ID 为 1
+
+        # 添加到布局
+        type_layout.addWidget(self.radio_outpatient)
+        type_layout.addWidget(self.radio_inpatient)
+        type_layout.addStretch()  # 添加弹簧，让按钮靠左对齐
+        layout.addLayout(type_layout)
+
         # 开始按钮
         self.full_path = ""
         self.full_path_num = 0
@@ -211,12 +232,13 @@ class ExcelMerger(QMainWindow):
             record_id = self.sqlite_helper.insert_record({
                 "start_time": self.start_str,
                 "end_time": self.end_str,
-                "export_num": ""
+                "export_num": "",
+                "data_type": "门诊" if self.type_group.checkedId() == 0 else "住院"
             })
             self.table.refresh_data()
             # 2. 执行传入的方法
             # 如果 task_func 是 df.to_excel，则这里实际执行 df.to_excel(*args, **kwargs)
-            self.full_path, self.full_path_num = get_his_data(self.config_manager.get_db_config('oracle'), self.start_str, self.end_str)
+            self.full_path, self.full_path_num = get_his_data(self.config_manager.get_db_config('oracle'), self.start_str, self.end_str, self.type_group.checkedId())
             # 3. 关闭加载窗
             progress.close()
 

@@ -92,17 +92,13 @@ advance_receipt_dict = {
     "230502": "住院预收款"
 }
 
-people_list = [
-    "齐金艳", "郝思远"
-]
-
 """
 缺少部门编码 cdept_id
 """
 dept_code_dict = {
     "内二科门诊": "4",
-    "神经心理科": "6",
-    "口腔科": "7"
+    "神经心理科": "5",
+    "口腔科": "5"
 }
 
 def get_dept_id(row):

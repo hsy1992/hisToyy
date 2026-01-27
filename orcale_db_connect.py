@@ -8,8 +8,6 @@ import pandas as pd
 from path_util import resource_path
 from datetime import datetime, time
 from pathlib import Path
-from yongyou_coe import people_list
-
 
 def init_oracle():
     try:
@@ -66,7 +64,7 @@ def connect_to_oracle_test(user, pwd, host, port, service_name):
         return False
 
 
-def get_his_data(oracle_config, start_str, end_str):
+def get_his_data(oracle_config, start_str, end_str, type):
     try:
         init_oracle()
         dsn = oracledb.makedsn(oracle_config.get('ip'), oracle_config.get('port'),
@@ -77,60 +75,46 @@ def get_his_data(oracle_config, start_str, end_str):
             dsn=dsn
         )
 
-        # 准备存放所有结果的列表
-        shoukuan_df = []
-        total_df = []
-
         # 进行查询his数据
-        for people in people_list:
-            sql = f'SELECT * FROM SYSTEM."zhuyuan" WHERE SYSTEM."zhuyuan"."shouyin" = ' + f"'{people}'"
-            sql_total = f'SELECT * FROM SYSTEM."zhuyuan_total" WHERE SYSTEM."zhuyuan_total"."收银员" = ' + f"'{people}'"
+        if type == 0:
+            # 门诊
+            # sql = f'SELECT * FROM SYSTEM."zhuyuan"'
+            # sql_total = f'SELECT * FROM SYSTEM."zhuyuan_total"'
+
+            sql = f'SELECT * FROM ZL_YY."v_门诊人员缴款书收入项目" WHERE "扎帐时间" >= TO_DATE(\'{start_str}\', \'YYYY-MM-DD HH24:MI:SS\') and "扎帐时间" < TO_DATE(\'{end_str}\', \'YYYY-MM-DD HH24:MI:SS\')'
+            sql_total = f'SELECT * FROM ZL_YY."v_门诊人员缴款书结算方式" WHERE "扎帐时间" >= TO_DATE(\'{start_str}\', \'YYYY-MM-DD HH24:MI:SS\') and "扎帐时间" < TO_DATE(\'{end_str}\', \'YYYY-MM-DD HH24:MI:SS\')'
             # 直接使用 pandas 读取
             # 注意：oracledb 建议配合 sql 字符串使用
-            temp_df = pd.read_sql(sql, conn)
-            # 只有当查到数据时才添加
-            if not temp_df.empty:
-                shoukuan_df.append(temp_df)
+            shoukuan_df = pd.read_sql(sql, conn)
             # 合计
-            temp_df_total = pd.read_sql(sql_total, conn)
-            if not temp_df_total.empty:
-                total_df.append(temp_df_total)
+            total_df = pd.read_sql(sql_total, conn)
 
-        # 获取行数
-        row_count = len(shoukuan_df)
-        # 导出到 Excel
-        Path("export_data").mkdir(parents=True, exist_ok=True)
-        full_path = os.path.join(resource_path("export_data"),
-                                 f"{start_str}-{end_str}数据导出{datetime.now().strftime('%Y-%m-%d %H_%M')}.xlsx".replace(
-                                     ":", "_"))
-        column_map = {
-            'id': '序号',
-            'bumen': '开单科室',
-            'zz_code': '扎帐单号',
-            'shoukuantype': '扎帐类别',
-            'shouyin': '收款员',
-            'date': '扎帐时间',
-            'bianma': '编码',
-            'feiyongmingcheng': '项目',
-            'jine': '金额'
-        }
-        # 一次性合并所有人的数据
-        if shoukuan_df:
-            final_shoukuan_df = pd.concat(shoukuan_df, ignore_index=True)
+            # 获取行数
+            row_count = len(shoukuan_df)
+            # 导出到 Excel
+            Path("export_data").mkdir(parents=True, exist_ok=True)
+            full_path = os.path.join(resource_path("export_data"),
+                                     f"门诊{start_str}数据导出.xlsx".replace(
+                                         ":", "_"))
+            # column_map = {
+            #     'id': '序号',
+            #     'bumen': '开单科室',
+            #     'zz_code': '扎帐单号',
+            #     'shoukuantype': '扎帐类别',
+            #     'shouyin': '收款员',
+            #     'date': '扎帐时间',
+            #     'bianma': '编码',
+            #     'feiyongmingcheng': '项目',
+            #     'jine': '金额'
+            # }
+            # 转换表头
+            shoukuan_df.rename(columns=column_map).to_excel(full_path, sheet_name='收款数据', index=False)
+            with pd.ExcelWriter(full_path, engine='openpyxl', mode='a', if_sheet_exists='replace') as writer:
+                total_df.to_excel(writer, sheet_name='汇总数据', index=False)
+            logger.info(f"文件已保存至: {full_path}, 已成功导出 {row_count} 条数据！")
         else:
-            final_shoukuan_df = pd.DataFrame()  # 如果都没查到，返回空表
-        if total_df:
-            final_total_df = pd.concat(total_df, ignore_index=True)
-        else:
-            final_total_df = pd.DataFrame()  # 如果都没查到，返回空表
-        # 写入数据
-        # 转换表头
-        final_shoukuan_df.rename(columns=column_map).to_excel(full_path, sheet_name='收款数据', index=False)
-        with pd.ExcelWriter(full_path, engine='openpyxl', mode='a', if_sheet_exists='replace') as writer:
-            final_total_df.to_excel(writer, sheet_name='汇总数据', index=False)
-
-        print(f"文件已保存至: {full_path}, 已成功导出 {row_count} 条数据！")
-        logger.info(f"文件已保存至: {full_path}, 已成功导出 {row_count} 条数据！")
+            conn.close()
+            return "", 0
         conn.close()
         return full_path, row_count
     except oracledb.Error as e:

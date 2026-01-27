@@ -4,3 +4,4 @@ PyQt5>=5.15.4
 pyinstaller>=4.5.1
 oracledb>=2.5.1
 pyodbc>=4.0.39
+numpy~=1.23.5

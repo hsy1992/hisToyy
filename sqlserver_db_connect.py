@@ -7,6 +7,7 @@ from PyQt5.QtWidgets import (QMessageBox, QProgressDialog)
 import os
 from yongyou_coe import get_dept_id, get_ccode, get_ccode1
 import traceback
+import numpy as np
 
 def connect_to_sqlserver_test(host, port, db_name, user, password):
     # 查看你电脑上已有的驱动，选一个填入下面的 DRIVER
@@ -52,28 +53,28 @@ def import_data_to_yy(sqlserver_config, record, finished_signal):
         # 1. 读取 Excel 文件
         full_path = record['export_file_path']
         df = pd.read_excel(full_path, sheet_name=['收款数据', '汇总数据'])
-        read_excel_real(df, conn, finished_signal)
+        read_excel_real(df, conn, finished_signal, record['data_type'])
         conn.close()
     except Exception as e:
         traceback.print_exc()  # 打印完整的报错路径
         logger.info(f"sqlserver 导出失败: {e}, {conn_str}")
         finished_signal.emit(False, f"失败{e}", -1)
 
-def read_excel_real(df, conn, finished_signal):
+def read_excel_real(df, conn, finished_signal, data_type):
 
-    df_shoukuan = df['收款数据']
-    df_total = df['汇总数据']
+    df_shoukuan = df['收款数据'].replace({np.nan: None})
+    df_total = df['汇总数据'].replace({np.nan: None})
     # 将日期列转为日期格式（确保排序逻辑正确）
     df_shoukuan['扎帐时间'] = pd.to_datetime(df_shoukuan['扎帐时间'])
     # 按照日期降序排列 (ascending=False 表示从大到小)
     df_sorted = df_shoukuan.sort_values(by='扎帐时间', ascending=False)
-    # 分组并保持排序后的顺序 (sort=False 是关键)
     # 创建一个完全空的
     df_empty = pd.DataFrame()
+    # 获取用友最后一个凭证号
     start_ino_id = get_next_ino_id(conn)
-    for i, (shouyin_name, group) in enumerate(df_sorted.groupby('收款员', sort=False)):
-        
-        if pd.notnull(shouyin_name):
+    # 根据扎帐单号分组处理
+    for i, (zz_code, group) in enumerate(df_sorted.groupby('扎帐单号', sort=False)):
+        if pd.notnull(zz_code):
             ino_id = start_ino_id + i
             # 贷方对方科目
             mc_ccode_equal = set()
@@ -82,15 +83,13 @@ def read_excel_real(df, conn, finished_signal):
             row_list = []
             for idx, row in group.iterrows():
                 date_val = row['扎帐时间']
-                period = date_val.month  # 返回整数，例如 1
+                period = date_val.month
                 inid = idx + 1
                 dbill_date = date_val
                 # 摘要
-                cdigest = f"扎帐单号:{'' if pd.isna(row['扎帐单号']) else row['扎帐单号']},{'' if pd.isna(row['收款员']) else row['收款员']}"
+                cdigest = f"{data_type},扎帐单号:{'' if pd.isna(row['扎帐单号']) else row['扎帐单号']},{'' if pd.isna(row['收款员']) else row['收款员']}"
                 # 制单人
                 user_name = row['收款员']
-                # 收款金额
-                # 借方
                 md = 0.0
                 # md_v = pd.to_numeric(row.get('收款金额', 0))
                 # md = 0.0 if pd.isna(md_v) else float(md_v)
@@ -110,14 +109,14 @@ def read_excel_real(df, conn, finished_signal):
                 # 判断是否为最后一个 (index 从 0 开始，所以是 total-1)
                 if idx == len(group) - 1:
                     # 去查找汇总数据 并插入
-                    hh_data = df_total[df_total['收银员'] == shouyin_name]
+                    hh_data = df_total[df_total['扎帐单号'] == zz_code]
                     for idx1, row in hh_data.iterrows():
                         if row['项目'] != '合计':
                             # 摘要
-                            cdigest1 = f"项目:{'' if pd.isna(row['项目']) else row['项目']},{user_name}"
+                            cdigest1 = f"{data_type}项目:{'' if pd.isna(row['项目']) else row['项目']},{user_name}"
                             # 收款金额
                             # 借方
-                            md_v = pd.to_numeric(row.get('内容', 0))
+                            md_v = pd.to_numeric(row.get('金额', 0))
                             md = 0.0 if pd.isna(md_v) else float(md_v)
                             # 贷方
                             mc = 0.0
@@ -140,27 +139,26 @@ def read_excel_real(df, conn, finished_signal):
                     yongyou_row["ccode_equal"] = ",".join(mc_ccode_equal)
             new_row = pd.DataFrame(row_list)
             df_empty = pd.concat([df_empty, new_row], ignore_index=True)
-        print(df_empty)
-        if not df_empty.empty:
-            cursor = conn.cursor()
-            columns = list(df_empty.columns)
-            placeholders = ', '.join(['?'] * len(columns))
-            columns_sql = ', '.join(columns)
-            sql = f"INSERT INTO [UFDATA_999_2012].[dbo].[GL_accvouch] ({columns_sql}) VALUES ({placeholders})"
-            
-            try:
-                # 将 numpy 类型转换为 python 原生类型，防止 pyodbc 报错
-                data_to_insert = df_empty.astype(object).where(pd.notnull(df_empty), None).values.tolist()
-                cursor.executemany(sql, data_to_insert)
-                conn.commit()
-                logger.info(f"Successfully inserted {len(df_empty)} rows.")
-                finished_signal.emit(True, str(start_ino_id), len(df_empty))
-            except Exception as e:
-                logger.error(f"Error inserting data: {e}")
-                conn.rollback()
-                finished_signal.emit(False, f"rror inserting data, 失败{e}", -1)
-            finally:
-                cursor.close()
+    if not df_empty.empty:
+        cursor = conn.cursor()
+        columns = list(df_empty.columns)
+        placeholders = ', '.join(['?'] * len(columns))
+        columns_sql = ', '.join(columns)
+        sql = f"INSERT INTO [UFDATA_999_2012].[dbo].[GL_accvouch] ({columns_sql}) VALUES ({placeholders})"
+
+        try:
+            # 将 numpy 类型转换为 python 原生类型，防止 pyodbc 报错
+            data_to_insert = df_empty.astype(object).where(pd.notnull(df_empty), None).values.tolist()
+            cursor.executemany(sql, data_to_insert)
+            conn.commit()
+            logger.info(f"Successfully inserted {len(df_empty)} rows.")
+            finished_signal.emit(True, str(start_ino_id), len(df_empty))
+        except Exception as e:
+            logger.error(f"Error inserting data: {e}")
+            conn.rollback()
+            finished_signal.emit(False, f"rror inserting data, 失败{e}", -1)
+        finally:
+            cursor.close()
 
 
 def read_excel():

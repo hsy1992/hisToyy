@@ -335,3 +335,100 @@
 2026-01-26 22:26:23,109 - INFO - sqlserver_db_connect - sqlserver 连接成功, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
 2026-01-26 22:26:23,661 - INFO - sqlserver_db_connect - sqlserver 导出失败: '收款员', DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
 2026-01-26 22:26:23,670 - INFO - test - 导入失败，刷新列表
+2026-01-26 22:28:35,881 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-27 19:56:33,507 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-27 19:56:44,163 - INFO - test - 开始his导出: 2026-01-27 00:00:00, 2026-01-27 23:59:59
+2026-01-27 19:56:44,339 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-27 19:58:09,845 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-27 19:58:12,011 - INFO - test - 开始his导出: 2026-01-27 00:00:00, 2026-01-27 23:59:59
+2026-01-27 19:58:12,039 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-27 19:59:36,037 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-27 19:59:40,368 - INFO - test - 开始his导出: 2026-01-27 00:00:00, 2026-01-27 23:59:59
+2026-01-27 19:59:40,395 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-27 19:59:40,955 - INFO - orcale_db_connect - 文件已保存至: G:\pythonProject\hisToyy\export_data\2026-01-27 00_00_00-2026-01-27 23_59_59数据导出2026-01-27 19_59.xlsx, 已成功导出 3 条数据！
+2026-01-27 19:59:41,047 - INFO - test - 导出地址：G:\pythonProject\hisToyy\export_data\2026-01-27 00_00_00-2026-01-27 23_59_59数据导出2026-01-27 19_59.xlsx, 3
+2026-01-27 19:59:41,055 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-27 19:59:43,049 - INFO - test - start_his_export用户点击了‘否’
+2026-01-27 20:00:19,637 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 10，list：10
+2026-01-27 20:00:19,682 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 20，list：5
+2026-01-27 20:04:55,014 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-27 20:05:32,210 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-27 20:12:27,888 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-27 20:12:29,711 - INFO - test - 开始his导出: 2026-01-27 00:00:00, 2026-01-27 23:59:59
+2026-01-27 20:12:29,747 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-27 20:12:30,410 - INFO - orcale_db_connect - 文件已保存至: G:\pythonProject\hisToyy\export_data\门诊2026-01-27 00_00_00数据导出.xlsx, 已成功导出 3 条数据！
+2026-01-27 20:12:30,525 - INFO - test - 导出地址：G:\pythonProject\hisToyy\export_data\门诊2026-01-27 00_00_00数据导出.xlsx, 3
+2026-01-27 20:12:30,534 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-27 20:12:31,635 - INFO - test - start_his_export用户点击了‘否’
+2026-01-27 20:25:50,117 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-27 20:25:52,307 - INFO - test - 开始his导出: 2026-01-27 00:00:00, 2026-01-27 23:59:59
+2026-01-27 20:25:52,390 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-27 20:26:52,807 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-27 20:26:54,081 - INFO - test - 开始his导出: 2026-01-27 00:00:00, 2026-01-27 23:59:59
+2026-01-27 20:26:54,109 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-27 20:27:40,693 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-27 20:27:42,741 - INFO - test - 开始his导出: 2026-01-27 00:00:00, 2026-01-27 23:59:59
+2026-01-27 20:27:42,768 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-27 20:27:43,379 - INFO - orcale_db_connect - 文件已保存至: G:\pythonProject\hisToyy\export_data\门诊2026-01-27 00_00_00数据导出.xlsx, 已成功导出 0 条数据！
+2026-01-27 20:27:43,492 - INFO - test - 导出地址：G:\pythonProject\hisToyy\export_data\门诊2026-01-27 00_00_00数据导出.xlsx, 0
+2026-01-27 20:27:43,500 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-27 20:27:45,560 - INFO - test - start_his_export用户点击了‘否’
+2026-01-27 20:53:12,788 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-27 20:53:14,581 - INFO - test - 开始his导出: 2026-01-27 00:00:00, 2026-01-27 23:59:59
+2026-01-27 20:53:14,605 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-27 20:53:15,276 - INFO - orcale_db_connect - 文件已保存至: G:\pythonProject\hisToyy\export_data\门诊2026-01-27 00_00_00数据导出.xlsx, 已成功导出 3 条数据！
+2026-01-27 20:53:15,390 - INFO - test - 导出地址：G:\pythonProject\hisToyy\export_data\门诊2026-01-27 00_00_00数据导出.xlsx, 3
+2026-01-27 20:53:15,399 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-27 20:53:27,287 - INFO - test - 开始用友导入: {'id': 30, 'start_time': '2026-01-27 00:00:00', 'end_time': '2026-01-27 23:59:59', 'create_time': '2026-01-27 20:53:14', 'export_time': '2026-01-27 20:53:15', 'data_type': '门诊', 'export_num': '3', 'export_file_name': '门诊2026-01-27 00_00_00数据导出.xlsx', 'export_file_path': 'G:\\pythonProject\\hisToyy\\export_data\\门诊2026-01-27 00_00_00数据导出.xlsx', 'import_yy_start': None, 'import_yy_num': None, 'status': 2}
+2026-01-27 20:53:27,295 - INFO - sqlserver_db_connect - DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-01-27 20:53:27,371 - INFO - sqlserver_db_connect - sqlserver 连接成功, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-01-27 20:53:28,122 - ERROR - sqlserver_db_connect - Error inserting data: ('23000', '[23000] [Microsoft][ODBC SQL Server Driver][SQL Server]INSERT 语句与 FOREIGN KEY 约束"FK__GL_accvou__cdept__2F25DA6B"冲突。该冲突发生于数据库"UFDATA_999_2012"，表"dbo.Department", column \'cDepCode\'。 (547) (SQLExecDirectW); [23000] [Microsoft][ODBC SQL Server Driver][SQL Server]语句已终止。 (3621)')
+2026-01-27 20:53:28,125 - INFO - test - 导入失败，刷新列表
+2026-01-27 20:53:28,127 - INFO - sqlserver_db_connect - sqlserver 导出失败: 'in <string>' requires string as left operand, not float, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-01-27 20:53:28,144 - INFO - test - 导入失败，刷新列表
+2026-01-27 20:53:29,751 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-27 20:57:41,612 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-27 20:57:50,201 - INFO - test - start_yy_import用户点击了‘否’
+2026-01-27 20:57:56,545 - INFO - test - 开始用友导入: {'id': 30, 'start_time': '2026-01-27 00:00:00', 'end_time': '2026-01-27 23:59:59', 'create_time': '2026-01-27 20:53:14', 'export_time': '2026-01-27 20:53:15', 'data_type': '门诊', 'export_num': '3', 'export_file_name': '门诊2026-01-27 00_00_00数据导出.xlsx', 'export_file_path': 'G:\\pythonProject\\hisToyy\\export_data\\门诊2026-01-27 00_00_00数据导出.xlsx', 'import_yy_start': None, 'import_yy_num': None, 'status': 5}
+2026-01-27 20:57:56,557 - INFO - sqlserver_db_connect - DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-01-27 20:57:56,576 - INFO - sqlserver_db_connect - sqlserver 连接成功, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-01-27 20:57:56,789 - ERROR - sqlserver_db_connect - Error inserting data: ('23000', '[23000] [Microsoft][ODBC SQL Server Driver][SQL Server]INSERT 语句与 FOREIGN KEY 约束"FK__GL_accvou__cdept__2F25DA6B"冲突。该冲突发生于数据库"UFDATA_999_2012"，表"dbo.Department", column \'cDepCode\'。 (547) (SQLExecDirectW); [23000] [Microsoft][ODBC SQL Server Driver][SQL Server]语句已终止。 (3621)')
+2026-01-27 20:57:56,794 - INFO - test - 导入失败，刷新列表
+2026-01-27 20:57:56,858 - ERROR - sqlserver_db_connect - Error inserting data: ('23000', '[23000] [Microsoft][ODBC SQL Server Driver][SQL Server]INSERT 语句与 FOREIGN KEY 约束"FK__GL_accvou__cdept__2F25DA6B"冲突。该冲突发生于数据库"UFDATA_999_2012"，表"dbo.Department", column \'cDepCode\'。 (547) (SQLExecDirectW); [23000] [Microsoft][ODBC SQL Server Driver][SQL Server]语句已终止。 (3621)')
+2026-01-27 20:57:56,864 - INFO - test - 导入失败，刷新列表
+2026-01-27 20:57:58,383 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-27 20:58:02,191 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-27 20:59:38,431 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-27 20:59:43,871 - INFO - test - 开始用友导入: {'id': 30, 'start_time': '2026-01-27 00:00:00', 'end_time': '2026-01-27 23:59:59', 'create_time': '2026-01-27 20:53:14', 'export_time': '2026-01-27 20:53:15', 'data_type': '门诊', 'export_num': '3', 'export_file_name': '门诊2026-01-27 00_00_00数据导出.xlsx', 'export_file_path': 'G:\\pythonProject\\hisToyy\\export_data\\门诊2026-01-27 00_00_00数据导出.xlsx', 'import_yy_start': None, 'import_yy_num': None, 'status': 5}
+2026-01-27 20:59:43,882 - INFO - sqlserver_db_connect - DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-01-27 20:59:43,902 - INFO - sqlserver_db_connect - sqlserver 连接成功, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-01-27 20:59:43,985 - INFO - sqlserver_db_connect - Successfully inserted 2 rows.
+2026-01-27 20:59:43,991 - INFO - test - 导入成功，刷新列表
+2026-01-27 20:59:44,055 - INFO - sqlserver_db_connect - Successfully inserted 6 rows.
+2026-01-27 20:59:44,071 - INFO - test - 导入成功，刷新列表
+2026-01-27 20:59:45,213 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-27 20:59:46,893 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-27 21:03:00,458 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-27 21:03:05,204 - INFO - test - 开始用友导入: {'id': 30, 'start_time': '2026-01-27 00:00:00', 'end_time': '2026-01-27 23:59:59', 'create_time': '2026-01-27 20:53:14', 'export_time': '2026-01-27 20:53:15', 'data_type': '门诊', 'export_num': '3', 'export_file_name': '门诊2026-01-27 00_00_00数据导出.xlsx', 'export_file_path': 'G:\\pythonProject\\hisToyy\\export_data\\门诊2026-01-27 00_00_00数据导出.xlsx', 'import_yy_start': '45', 'import_yy_num': 6, 'status': 4}
+2026-01-27 21:03:05,214 - INFO - sqlserver_db_connect - DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-01-27 21:03:05,234 - INFO - sqlserver_db_connect - sqlserver 连接成功, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-01-27 21:03:05,313 - INFO - sqlserver_db_connect - Successfully inserted 2 rows.
+2026-01-27 21:03:05,319 - INFO - test - 导入成功，刷新列表
+2026-01-27 21:03:05,381 - INFO - sqlserver_db_connect - Successfully inserted 6 rows.
+2026-01-27 21:03:05,387 - INFO - test - 导入成功，刷新列表
+2026-01-27 21:03:06,976 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-27 21:03:09,782 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-27 21:07:37,048 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-27 21:07:49,266 - INFO - test - 开始用友导入: {'id': 30, 'start_time': '2026-01-27 00:00:00', 'end_time': '2026-01-27 23:59:59', 'create_time': '2026-01-27 20:53:14', 'export_time': '2026-01-27 20:53:15', 'data_type': '门诊', 'export_num': '3', 'export_file_name': '门诊2026-01-27 00_00_00数据导出.xlsx', 'export_file_path': 'G:\\pythonProject\\hisToyy\\export_data\\门诊2026-01-27 00_00_00数据导出.xlsx', 'import_yy_start': '45', 'import_yy_num': 6, 'status': 4}
+2026-01-27 21:07:49,277 - INFO - sqlserver_db_connect - DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-01-27 21:07:49,297 - INFO - sqlserver_db_connect - sqlserver 连接成功, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-01-27 21:07:49,340 - INFO - sqlserver_db_connect - Successfully inserted 6 rows.
+2026-01-27 21:07:49,343 - INFO - test - 导入成功，刷新列表
+2026-01-27 21:07:51,217 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-27 21:12:15,870 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-27 21:12:17,808 - INFO - test - 开始his导出: 2026-01-27 00:00:00, 2026-01-27 23:59:59
+2026-01-27 21:12:17,835 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-27 21:13:10,686 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-27 21:13:12,551 - INFO - test - 开始his导出: 2026-01-27 00:00:00, 2026-01-27 23:59:59
+2026-01-27 21:13:12,579 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-27 22:23:52,934 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
