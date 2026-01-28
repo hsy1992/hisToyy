@@ -20,6 +20,7 @@ def init_oracle():
             # 如果是直接运行 .py
             base_path = os.path.dirname(os.path.abspath(__file__))
         # 2. 拼接内置客户端的路径
+        print(base_path)
         client_path = os.path.join(base_path, "lib", "instantclient_11_2")
         # 假设你的 client 路径是 client_path
         # 3. 核心步骤：初始化 Thick 模式
@@ -33,12 +34,16 @@ def init_oracle():
 
 def connect_to_oracle(user, pwd, host, port, service_name):
     try:
-        dsn = oracledb.makedsn(host, port, service_name=service_name)
-        print(f"生成的DSN: {dsn}")
+        # 使用显式的 SID 连接描述符
+        dsn_tns = f"""(DESCRIPTION=
+                 (ADDRESS=(PROTOCOL=TCP)(HOST={host})(PORT={port}))
+                 (CONNECT_DATA=(SID={service_name}))
+             )"""
+        logger.info(dsn_tns)
         conn = oracledb.connect(
             user=user,
             password=pwd,
-            dsn=dsn
+            dsn=dsn_tns
         )
         return conn
     except oracledb.Error as e:
@@ -49,19 +54,22 @@ def connect_to_oracle(user, pwd, host, port, service_name):
 def connect_to_oracle_test(user, pwd, host, port, service_name):
     try:
         init_oracle()
-        dsn = oracledb.makedsn(host, port, service_name=service_name)
-        print(f"生成的DSN: {dsn}")
+        # 使用显式的 SID 连接描述符
+        dsn_tns = f"""(DESCRIPTION=
+                        (ADDRESS=(PROTOCOL=TCP)(HOST={host})(PORT={port}))
+                        (CONNECT_DATA=(SID={service_name}))
+                    )"""
+        logger.info(dsn_tns)
         conn = oracledb.connect(
             user=user,
             password=pwd,
-            dsn=dsn
+            dsn=dsn_tns
         )
         conn.close()
-        logger.info(f"oracle 连接成功: {dsn}")
+        logger.info(f"oracle 连接成功: {dsn_tns}")
         return True
     except oracledb.Error as e:
-        print(f"数据库连接失败: {e}")
-        logger.info(f"oracle 连接失败: {e}, {dsn}")
+        logger.info(f"oracle 连接失败: {e}, {dsn_tns}")
         return False
 
 

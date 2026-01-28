@@ -239,3 +239,18 @@
 2026-01-11 21:55:19,948 - INFO - utils - NumExpr defaulting to 8 threads.
 2026-01-12 11:45:58,575 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
 2026-01-12 11:46:09,268 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 10，list：3
+2026-01-28 13:33:26,544 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-28 13:33:37,421 - INFO - orcale_db_connect - oracle 连接失败: ORA-12514: TNS:listener does not currently know of service requested in connect descriptor, (DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=118.190.202.74)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=EE)))
+2026-01-28 13:45:11,239 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-28 13:45:16,689 - INFO - orcale_db_connect - oracle 连接失败: ORA-12514: TNS:listener does not currently know of service requested in connect descriptor, (DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=118.190.202.74)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=EE)))
+2026-01-28 13:46:12,820 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-28 13:46:14,428 - INFO - orcale_db_connect - oracle 连接失败: ORA-12514: TNS:listener does not currently know of service requested in connect descriptor, (DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=118.190.202.74)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=EE)))
+2026-01-28 13:49:25,864 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-28 13:49:34,160 - INFO - orcale_db_connect - (DESCRIPTION=
+                        (ADDRESS=(PROTOCOL=TCP)(HOST=118.190.202.74)(PORT=1521))
+                        (CONNECT_DATA=(SID=EE))
+                    )
+2026-01-28 13:49:38,450 - INFO - orcale_db_connect - oracle 连接成功: (DESCRIPTION=
+                        (ADDRESS=(PROTOCOL=TCP)(HOST=118.190.202.74)(PORT=1521))
+                        (CONNECT_DATA=(SID=EE))
+                    )
