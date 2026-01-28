@@ -4,6 +4,7 @@ from PyQt5.QtCore import Qt, pyqtSignal
 from py_sqlite import SQLiteHelper
 from log_util import logger
 from path_util import open_with_default_app
+from yongyou_coe import data_type
 
 class SqlInfiniteTableWidget(QTableView):
     """
@@ -84,7 +85,7 @@ class SqlInfiniteTableWidget(QTableView):
             # 直接通过字段名取值
             for item in list:
                 row_items = [QStandardItem(item["create_time"]), QStandardItem(f"{item['start_time']}~\n{item['end_time']}"),
-                             QStandardItem(item['data_type']), QStandardItem(str(item['export_num'])), QStandardItem(item['import_yy_start']),
+                             QStandardItem(data_type.get(item['data_type'], "")), QStandardItem(str(item['export_num'])), QStandardItem(item['import_yy_start']),
                              QStandardItem(self.STATUS_MAP[item['status']]), QStandardItem(item['export_time'])]
                 self.model.appendRow(row_items)
             self.has_more_data = len(list) >= self.limit

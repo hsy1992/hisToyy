@@ -19,7 +19,7 @@ def init_oracle():
             # 如果是直接运行 .py
             base_path = os.path.dirname(os.path.abspath(__file__))
         # 2. 拼接内置客户端的路径
-        client_path = os.path.join(base_path, "lib", "instantclient_11_2")
+        client_path = os.path.join(base_path, "lib", "plsql")
         # 假设你的 client 路径是 client_path
         # 3. 核心步骤：初始化 Thick 模式
         # 只要指定了 lib_dir，python-oracledb 就会进入 Thick 模式并兼容 11g
@@ -36,6 +36,13 @@ def connect_to_oracle(user, pwd, host, port, service_name):
                        (ADDRESS=(PROTOCOL=TCP)(HOST={host})(PORT={port}))
                        (CONNECT_DATA=(SID={service_name}))
                    )"""
+        dsn = f"""
+                 (DESCRIPTION =
+                   (ADDRESS =(PROTOCOL=TCP)(HOST ={host})(PORT={port}))
+                   (CONNECT_DATA=
+                     (SERVER=DEDICATED)
+                     (SERVICE_NAME={service_name}))
+                 )"""
         logger.info(dsn)
         conn = oracledb.connect(
             user=user,
@@ -55,6 +62,13 @@ def connect_to_oracle_test(user, pwd, host, port, service_name):
                          (ADDRESS=(PROTOCOL=TCP)(HOST={host})(PORT={port}))
                          (CONNECT_DATA=(SID={service_name}))
                      )"""
+        dsn = f"""
+              (DESCRIPTION =
+                (ADDRESS =(PROTOCOL=TCP)(HOST ={host})(PORT={port}))
+                (CONNECT_DATA=
+                  (SERVER=DEDICATED)
+                  (SERVICE_NAME={service_name}))
+              )"""
         logger.info(dsn)
         conn = oracledb.connect(
             user=user,

@@ -450,3 +450,14 @@
                          (ADDRESS=(PROTOCOL=TCP)(HOST=118.190.202.74)(PORT=1521))
                          (CONNECT_DATA=(SID=EE))
                      )
+2026-01-28 20:22:22,373 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-28 20:22:52,155 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 10，list：10
+2026-01-28 20:22:52,179 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 20，list：10
+2026-01-28 20:22:52,200 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 30，list：2
+2026-01-28 20:30:39,060 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-28 20:32:05,099 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-28 20:34:20,094 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-28 20:34:20,094 - INFO - scroll_window - SQLite 查询错误: '门诊'
+2026-01-28 20:35:00,616 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-28 20:35:02,642 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 10，list：10
+2026-01-28 20:35:02,997 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 20，list：10

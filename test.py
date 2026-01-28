@@ -80,6 +80,33 @@ class ExcelMerger(QMainWindow):
         layout.addLayout(his_layout)
         layout.addLayout(yy_layout)
 
+        # 业务类型
+        type_layout = QHBoxLayout()
+        type_layout.addWidget(QLabel("业务类型："))
+
+        # 创建单选按钮
+        self.radio_outpatient = QRadioButton("门诊")
+        self.radio_inpatient1 = QRadioButton("住院")
+        self.radio_inpatient2 = QRadioButton("门诊扫码")
+        self.radio_inpatient3 = QRadioButton("门诊自助机")
+
+        self.radio_outpatient.setChecked(True)
+
+        # 使用 QButtonGroup 进行逻辑分组（确保互斥）
+        self.type_group = QButtonGroup(self)
+        self.type_group.addButton(self.radio_outpatient, 0)
+        self.type_group.addButton(self.radio_inpatient1, 1)
+        self.type_group.addButton(self.radio_inpatient2, 2)
+        self.type_group.addButton(self.radio_inpatient3, 3)
+        self.type_group.idClicked.connect(self.on_type_changed)
+        # 添加到布局
+        type_layout.addWidget(self.radio_outpatient)
+        type_layout.addWidget(self.radio_inpatient1)
+        type_layout.addWidget(self.radio_inpatient2)
+        type_layout.addWidget(self.radio_inpatient3)
+        type_layout.addStretch()  # 添加弹簧，让按钮靠左对齐
+        layout.addLayout(type_layout)
+
         # 选择导出时间
         folder_layout = QHBoxLayout()
         self.folder_label = QLabel("导出时间")
@@ -116,27 +143,6 @@ class ExcelMerger(QMainWindow):
         time_layout1.addWidget(QLabel("选择结束时间："))
         time_layout1.addWidget(self.dt_edit1)
         layout.addLayout(time_layout1)
-
-        # 业务类型
-        type_layout = QHBoxLayout()
-        type_layout.addWidget(QLabel("业务类型："))
-
-        # 创建单选按钮
-        self.radio_outpatient = QRadioButton("门诊")
-        self.radio_inpatient = QRadioButton("住院")
-
-        self.radio_outpatient.setChecked(True)
-
-        # 使用 QButtonGroup 进行逻辑分组（确保互斥）
-        self.type_group = QButtonGroup(self)
-        self.type_group.addButton(self.radio_outpatient, 0)  # ID 为 0
-        self.type_group.addButton(self.radio_inpatient, 1)  # ID 为 1
-
-        # 添加到布局
-        type_layout.addWidget(self.radio_outpatient)
-        type_layout.addWidget(self.radio_inpatient)
-        type_layout.addStretch()  # 添加弹簧，让按钮靠左对齐
-        layout.addLayout(type_layout)
 
         # 开始按钮
         self.full_path = ""
@@ -196,6 +202,19 @@ class ExcelMerger(QMainWindow):
 
         self.folder_path_label.setText(f"{self.start_str}-{self.end_str}")
 
+    def on_type_changed(self, type_id):
+        now = datetime.now()
+        today = now.date().strftime("%Y-%m-%d")
+        if type_id == 3:
+            # 门诊自助时间选择切换到月
+            today1 = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0).strftime("%Y-%m-%d")
+            self.start_str = f"{today1} 00:00:00"
+        else:
+            self.start_str = f"{today} 00:00:00"
+        self.dt_edit.setDateTime(QDateTime.fromString(self.start_str, format_pattern))
+        self.end_str = f"{today} 23:59:59"
+        self.folder_path_label.setText(f"{self.start_str}-{self.end_str}")
+
     def his_test_connect_click(self):
         """ 测试his连接 """
         oracle_config = self.config_manager.get_db_config("oracle")
@@ -233,7 +252,7 @@ class ExcelMerger(QMainWindow):
                 "start_time": self.start_str,
                 "end_time": self.end_str,
                 "export_num": "",
-                "data_type": "门诊" if self.type_group.checkedId() == 0 else "住院"
+                "data_type": str(self.type_group.checkedId())
             })
             self.table.refresh_data()
             # 2. 执行传入的方法
