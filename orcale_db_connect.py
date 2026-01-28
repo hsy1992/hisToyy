@@ -32,8 +32,11 @@ def init_oracle():
 
 def connect_to_oracle(user, pwd, host, port, service_name):
     try:
-        dsn = oracledb.makedsn(host, port, service_name=service_name)
-        print(f"生成的DSN: {dsn}")
+        dsn = f"""(DESCRIPTION=
+                       (ADDRESS=(PROTOCOL=TCP)(HOST={host})(PORT={port}))
+                       (CONNECT_DATA=(SID={service_name}))
+                   )"""
+        logger.info(dsn)
         conn = oracledb.connect(
             user=user,
             password=pwd,
@@ -41,15 +44,18 @@ def connect_to_oracle(user, pwd, host, port, service_name):
         )
         return conn
     except oracledb.Error as e:
-        print(f"数据库连接失败: {e}")
+        logger.info(f"数据库连接失败: {e}")
         return None
 
 
 def connect_to_oracle_test(user, pwd, host, port, service_name):
     try:
         init_oracle()
-        dsn = oracledb.makedsn(host, port, service_name=service_name)
-        print(f"生成的DSN: {dsn}")
+        dsn = f"""(DESCRIPTION=
+                         (ADDRESS=(PROTOCOL=TCP)(HOST={host})(PORT={port}))
+                         (CONNECT_DATA=(SID={service_name}))
+                     )"""
+        logger.info(dsn)
         conn = oracledb.connect(
             user=user,
             password=pwd,
