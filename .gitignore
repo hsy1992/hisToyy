@@ -1,3 +1,4 @@
 build/
 dist/
 ./idea/
+lib/instantclient_11_21/

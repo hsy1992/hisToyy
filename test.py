@@ -86,9 +86,10 @@ class ExcelMerger(QMainWindow):
 
         # 创建单选按钮
         self.radio_outpatient = QRadioButton("门诊")
-        self.radio_inpatient1 = QRadioButton("住院")
+        self.radio_inpatient1 = QRadioButton("住院缴费")
         self.radio_inpatient2 = QRadioButton("门诊扫码")
-        self.radio_inpatient3 = QRadioButton("门诊自助机")
+        self.radio_inpatient3 = QRadioButton("全院病人费用")
+        self.radio_inpatient4 = QRadioButton("门诊自助机")
 
         self.radio_outpatient.setChecked(True)
 
@@ -98,12 +99,14 @@ class ExcelMerger(QMainWindow):
         self.type_group.addButton(self.radio_inpatient1, 1)
         self.type_group.addButton(self.radio_inpatient2, 2)
         self.type_group.addButton(self.radio_inpatient3, 3)
+        self.type_group.addButton(self.radio_inpatient4, 4)
         self.type_group.idClicked.connect(self.on_type_changed)
         # 添加到布局
         type_layout.addWidget(self.radio_outpatient)
         type_layout.addWidget(self.radio_inpatient1)
         type_layout.addWidget(self.radio_inpatient2)
         type_layout.addWidget(self.radio_inpatient3)
+        type_layout.addWidget(self.radio_inpatient4)
         type_layout.addStretch()  # 添加弹簧，让按钮靠左对齐
         layout.addLayout(type_layout)
 
@@ -262,7 +265,7 @@ class ExcelMerger(QMainWindow):
             progress.close()
 
             logger.info(f"导出地址：{self.full_path}, {self.full_path_num}")
-            if self.full_path:
+            if self.full_path and self.full_path.strip():
                 # 参数说明：父窗口, 标题, 内容, 按钮组合, 默认选中的按钮
                 # 更新数据库
                 self.record_id = record_id

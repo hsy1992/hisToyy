@@ -461,3 +461,44 @@
 2026-01-28 20:35:00,616 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
 2026-01-28 20:35:02,642 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 10，list：10
 2026-01-28 20:35:02,997 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 20，list：10
+2026-01-29 20:20:33,876 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-29 20:20:36,899 - INFO - orcale_db_connect - (DESCRIPTION=
+                         (ADDRESS=(PROTOCOL=TCP)(HOST=118.190.202.74)(PORT=1521))
+                         (CONNECT_DATA=(SID=EE))
+                     )
+2026-01-29 20:20:37,333 - INFO - orcale_db_connect - oracle 连接成功: (DESCRIPTION=
+                         (ADDRESS=(PROTOCOL=TCP)(HOST=118.190.202.74)(PORT=1521))
+                         (CONNECT_DATA=(SID=EE))
+                     )
+2026-01-29 20:32:09,736 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-29 20:32:14,715 - INFO - orcale_db_connect - 
+              (DESCRIPTION =
+                (ADDRESS =(PROTOCOL=TCP)(HOST =118.190.202.74)(PORT=1521))
+                (CONNECT_DATA=
+                  (SERVER=DEDICATED)
+                  (SERVICE_NAME=EE))
+              )
+2026-01-29 20:32:14,804 - INFO - orcale_db_connect - oracle 连接失败: ORA-12514: TNS:listener does not currently know of service requested in connect descriptor, 
+              (DESCRIPTION =
+                (ADDRESS =(PROTOCOL=TCP)(HOST =118.190.202.74)(PORT=1521))
+                (CONNECT_DATA=
+                  (SERVER=DEDICATED)
+                  (SERVICE_NAME=EE))
+              )
+2026-01-29 20:43:38,916 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-01-29 20:43:41,210 - INFO - orcale_db_connect - client_path！G:\pythonProject\hisToyy\lib\instantclient_11_21
+2026-01-29 20:43:41,231 - INFO - orcale_db_connect - 
+              (DESCRIPTION =
+                (ADDRESS =(PROTOCOL=TCP)(HOST =118.190.202.74)(PORT=1521))
+                (CONNECT_DATA=
+                  (SERVER=DEDICATED)
+                  (SERVICE_NAME=EE))
+              )
+2026-01-29 20:43:41,326 - INFO - orcale_db_connect - oracle 连接失败: ORA-12514: TNS:listener does not currently know of service requested in connect descriptor, 
+              (DESCRIPTION =
+                (ADDRESS =(PROTOCOL=TCP)(HOST =118.190.202.74)(PORT=1521))
+                (CONNECT_DATA=
+                  (SERVER=DEDICATED)
+                  (SERVICE_NAME=EE))
+              )
+2026-01-29 21:39:05,477 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10

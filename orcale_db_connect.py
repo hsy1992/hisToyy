@@ -8,6 +8,7 @@ import pandas as pd
 from path_util import resource_path
 from datetime import datetime, time
 from pathlib import Path
+from yongyou_coe import is_build
 
 def init_oracle():
     try:
@@ -17,26 +18,27 @@ def init_oracle():
             base_path = sys._MEIPASS
         else:
             # 如果是直接运行 .py
-            base_path = os.path.dirname(os.path.abspath(__file__))
+            base_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "lib")
         # 2. 拼接内置客户端的路径
-        client_path = os.path.join(base_path, "lib", "plsql")
+        client_path = os.path.join(base_path, "instantclient_11_21")
         # 假设你的 client 路径是 client_path
         # 3. 核心步骤：初始化 Thick 模式
         # 只要指定了 lib_dir，python-oracledb 就会进入 Thick 模式并兼容 11g
+        logger.info(f"client_path！{client_path}")
         oracledb.init_oracle_client(lib_dir=client_path)
-        print("Oracle 内置客户端加载成功！")
-
+        logger.info("Oracle 内置客户端加载成功！", client_path)
     except Exception as e:
-        print(f"内置客户端加载失败: {e}")
+        logger.info(f"内置客户端加载失败: {e}")
+
 
 
 def connect_to_oracle(user, pwd, host, port, service_name):
     try:
+        init_oracle()
         dsn = f"""(DESCRIPTION=
                        (ADDRESS=(PROTOCOL=TCP)(HOST={host})(PORT={port}))
                        (CONNECT_DATA=(SID={service_name}))
-                   )"""
-        dsn = f"""
+                   )""" if not is_build else f"""
                  (DESCRIPTION =
                    (ADDRESS =(PROTOCOL=TCP)(HOST ={host})(PORT={port}))
                    (CONNECT_DATA=
@@ -50,7 +52,7 @@ def connect_to_oracle(user, pwd, host, port, service_name):
             dsn=dsn
         )
         return conn
-    except oracledb.Error as e:
+    except Exception as e:
         logger.info(f"数据库连接失败: {e}")
         return None
 
@@ -61,8 +63,7 @@ def connect_to_oracle_test(user, pwd, host, port, service_name):
         dsn = f"""(DESCRIPTION=
                          (ADDRESS=(PROTOCOL=TCP)(HOST={host})(PORT={port}))
                          (CONNECT_DATA=(SID={service_name}))
-                     )"""
-        dsn = f"""
+                     )""" if not is_build else f"""
               (DESCRIPTION =
                 (ADDRESS =(PROTOCOL=TCP)(HOST ={host})(PORT={port}))
                 (CONNECT_DATA=
@@ -78,67 +79,64 @@ def connect_to_oracle_test(user, pwd, host, port, service_name):
         conn.close()
         logger.info(f"oracle 连接成功: {dsn}")
         return True
-    except oracledb.Error as e:
-        print(f"数据库连接失败: {e}")
+    except Exception as e:
         logger.info(f"oracle 连接失败: {e}, {dsn}")
         return False
 
+# 定义类型配置映射表
+# 格式: type_id: (中文前缀, 详情视图名, 汇总视图名)
+TYPE_CONFIG = {
+    0: ("门诊", "v_门诊人员缴款书收入项目", "v_门诊人员缴款书结算方式", "扎帐时间", "扎帐时间"),
+    1: ("住院缴费", "v_住院人员缴款书收入项目", "v_住院人员缴款书结算方式", "扎帐时间", "扎帐时间"),
+    2: ("门诊扫码", "v_门诊人员缴款书扫码付收入项目", "v_门诊人员缴款书扫码付结算方式", "登记时间", "收款时间"),
+    3: ("全院病人费用", "v_全院病人费用汇总住院", None, "", ""),  # 没有汇总视图
+    4: ("门诊自助机", "v_门诊人员缴款书自助机收入项目", "v_门诊人员缴款书自助机结算方式", "登记时间", "收款时间"),
+}
 
 def get_his_data(oracle_config, start_str, end_str, type):
     try:
-        init_oracle()
-        dsn = oracledb.makedsn(oracle_config.get('ip'), oracle_config.get('port'),
-                               service_name=oracle_config.get('service_name'))
-        conn = oracledb.connect(
-            user=oracle_config.get('user'),
-            password=oracle_config.get('password'),
-            dsn=dsn
-        )
+        conn = connect_to_oracle(oracle_config.get('user'), oracle_config.get('password'), oracle_config.get('ip'), oracle_config.get('port'),
+                               oracle_config.get('service_name'))
+        full_path = ""
+        row_count = 0
+        # 确保export_data文件夹是否存咋
+        Path("export_data").mkdir(parents=True, exist_ok=True)
+        # 获取配置
+        config = TYPE_CONFIG.get(type)
+        if not config:
+            logger.error(f"未知类型: {type}")
+            return
+        prefix, detail_view, total_view, time_type, time_type_total = config
+        # 测试环境下重写表名
+        if not is_build and type == 0:
+            detail_view, total_view = 'SYSTEM."zhuyuan"', 'SYSTEM."zhuyuan_total"'
+        else:
+            detail_view = f'{detail_view}'
+            total_view = f'{total_view}' if total_view else None
 
-        # 进行查询his数据
-        if type == 0:
-            # 门诊
-            # sql = f'SELECT * FROM SYSTEM."zhuyuan"'
-            # sql_total = f'SELECT * FROM SYSTEM."zhuyuan_total"'
+        where_clause = f' WHERE "{time_type}" >= TO_DATE(\'{start_str}\', \'YYYY-MM-DD HH24:MI:SS\') ' \
+                       f'AND "{time_type_total}" < TO_DATE(\'{end_str}\', \'YYYY-MM-DD HH24:MI:SS\')' if type != 3 else ''
+        # 执行查询
+        logger.info(f"查询sql: SELECT * FROM {detail_view}{where_clause}")
+        logger.info(f"查询sql: SELECT * FROM {total_view}{where_clause}")
+        shoukuan_df = pd.read_sql(f"SELECT * FROM {detail_view}{where_clause}", conn)
+        total_df = pd.read_sql(f"SELECT * FROM {total_view}{where_clause}", conn) if total_view else None
+        # 文件导出处理
+        file_name = f"{prefix}{start_str}数据导出.xlsx".replace(":", "_")
+        full_path = os.path.join(resource_path("export_data"), file_name)
 
-            sql = f'SELECT * FROM ZL_YY."v_门诊人员缴款书收入项目" WHERE "扎帐时间" >= TO_DATE(\'{start_str}\', \'YYYY-MM-DD HH24:MI:SS\') and "扎帐时间" < TO_DATE(\'{end_str}\', \'YYYY-MM-DD HH24:MI:SS\')'
-            sql_total = f'SELECT * FROM ZL_YY."v_门诊人员缴款书结算方式" WHERE "扎帐时间" >= TO_DATE(\'{start_str}\', \'YYYY-MM-DD HH24:MI:SS\') and "扎帐时间" < TO_DATE(\'{end_str}\', \'YYYY-MM-DD HH24:MI:SS\')'
-            # 直接使用 pandas 读取
-            # 注意：oracledb 建议配合 sql 字符串使用
-            shoukuan_df = pd.read_sql(sql, conn)
-            # 合计
-            total_df = pd.read_sql(sql_total, conn)
+        # 写入详情页
+        shoukuan_df.to_excel(full_path, sheet_name=f'{prefix}数据', index=False)
 
-            # 获取行数
-            row_count = len(shoukuan_df)
-            # 导出到 Excel
-            Path("export_data").mkdir(parents=True, exist_ok=True)
-            full_path = os.path.join(resource_path("export_data"),
-                                     f"门诊{start_str}数据导出.xlsx".replace(
-                                         ":", "_"))
-            # column_map = {
-            #     'id': '序号',
-            #     'bumen': '开单科室',
-            #     'zz_code': '扎帐单号',
-            #     'shoukuantype': '扎帐类别',
-            #     'shouyin': '收款员',
-            #     'date': '扎帐时间',
-            #     'bianma': '编码',
-            #     'feiyongmingcheng': '项目',
-            #     'jine': '金额'
-            # }
-            # 转换表头
-            shoukuan_df.rename(columns=column_map).to_excel(full_path, sheet_name='收款数据', index=False)
+        # 如果有汇总页，追加写入
+        if total_df is not None:
             with pd.ExcelWriter(full_path, engine='openpyxl', mode='a', if_sheet_exists='replace') as writer:
                 total_df.to_excel(writer, sheet_name='汇总数据', index=False)
-            logger.info(f"文件已保存至: {full_path}, 已成功导出 {row_count} 条数据！")
-        else:
-            conn.close()
-            return "", 0
+
+        logger.info(f"文件已保存至: {full_path}, 已成功导出 {row_count} 条数据！")
         conn.close()
-        return full_path, row_count
-    except oracledb.Error as e:
-        print(f"获取数据失败: {e}")
+        return full_path, len(shoukuan_df)
+    except Exception as e:
         logger.info(f"获取数据失败:: {e}")
         return "", 0
 
