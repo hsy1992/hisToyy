@@ -47,21 +47,22 @@ def import_data_to_yy(sqlserver_config, record, finished_signal):
     logger.info(conn_str)
     # 针对 SQL 2008 的特殊处理
     try:
-        # 1. 建立连接
+        #  建立连接
         conn = pyodbc.connect(conn_str)
         logger.info(f"sqlserver 连接成功, {conn_str}")
-        # 1. 读取 Excel 文件
-        full_path = record['export_file_path']
-        df = pd.read_excel(full_path, sheet_name=['收款数据', '汇总数据'])
-        read_excel_real(df, conn, finished_signal, record['data_type'])
+        read_excel_real(conn, record, finished_signal)
         conn.close()
     except Exception as e:
         traceback.print_exc()  # 打印完整的报错路径
         logger.info(f"sqlserver 导出失败: {e}, {conn_str}")
         finished_signal.emit(False, f"失败{e}", -1)
 
-def read_excel_real(df, conn, finished_signal, data_type):
-
+def read_excel_real(conn, record, finished_signal):
+    # 1. 读取 Excel 文件
+    full_path = record['export_file_path']
+    df = pd.read_excel(full_path, sheet_name=['收款数据', '汇总数据'])
+    data_type = record['data_type']
+    
     df_shoukuan = df['收款数据'].replace({np.nan: None})
     df_total = df['汇总数据'].replace({np.nan: None})
     # 将日期列转为日期格式（确保排序逻辑正确）

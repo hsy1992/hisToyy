@@ -122,11 +122,12 @@ def get_his_data(oracle_config, start_str, end_str, type):
         shoukuan_df = pd.read_sql(f"SELECT * FROM {detail_view}{where_clause}", conn)
         total_df = pd.read_sql(f"SELECT * FROM {total_view}{where_clause}", conn) if total_view else None
         # 文件导出处理
-        file_name = f"{prefix}{start_str}数据导出.xlsx".replace(":", "_")
+        s = datetime.now().strftime("%H:%M:%S")
+        file_name = f"{prefix}{start_str}数据导出{s}.xlsx".replace(":", "_")
         full_path = os.path.join(resource_path("export_data"), file_name)
 
         # 写入详情页
-        shoukuan_df.to_excel(full_path, sheet_name=f'{prefix}数据', index=False)
+        shoukuan_df.to_excel(full_path, sheet_name=f'收款数据', index=False)
 
         # 如果有汇总页，追加写入
         if total_df is not None:
