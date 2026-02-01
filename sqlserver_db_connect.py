@@ -1,13 +1,18 @@
 # sqlserver 操作类
 import pyodbc
+
+from config import ConfigManager
 from log_util import logger
 import pandas as pd
 from PyQt5.QtCore import QThread, pyqtSignal
 from PyQt5.QtWidgets import (QMessageBox, QProgressDialog)
 import os
-from yongyou_coe import get_dept_id, get_ccode, get_ccode1
+from py_sqlite import SQLiteHelper
+from yongyou_coe import get_ccode, get_men_zhen_ccode, is_build, get_zhu_yuan_ccode, get_zhu_yuan_ccode2
+from yy_dept_mapper import get_dept_code_mz
 import traceback
 import numpy as np
+from sqlalchemy import create_engine
 
 def connect_to_sqlserver_test(host, port, db_name, user, password):
     # 查看你电脑上已有的驱动，选一个填入下面的 DRIVER
@@ -50,205 +55,236 @@ def import_data_to_yy(sqlserver_config, record, finished_signal):
         #  建立连接
         conn = pyodbc.connect(conn_str)
         logger.info(f"sqlserver 连接成功, {conn_str}")
-        read_excel_real(conn, record, finished_signal)
-        conn.close()
+        read_excel_real(conn, sqlserver_config, record, finished_signal)
     except Exception as e:
         traceback.print_exc()  # 打印完整的报错路径
         logger.info(f"sqlserver 导出失败: {e}, {conn_str}")
         finished_signal.emit(False, f"失败{e}", -1)
 
-def read_excel_real(conn, record, finished_signal):
-    # 1. 读取 Excel 文件
-    full_path = record['export_file_path']
-    df = pd.read_excel(full_path, sheet_name=['收款数据', '汇总数据'])
+def read_excel_real(conn, sqlserver_config, record, finished_signal):
+    """
+    根据配置读取数据
+    """
     data_type = record['data_type']
-    
-    df_shoukuan = df['收款数据'].replace({np.nan: None})
-    df_total = df['汇总数据'].replace({np.nan: None})
-    # 将日期列转为日期格式（确保排序逻辑正确）
-    df_shoukuan['扎帐时间'] = pd.to_datetime(df_shoukuan['扎帐时间'])
-    # 按照日期降序排列 (ascending=False 表示从大到小)
-    df_sorted = df_shoukuan.sort_values(by='扎帐时间', ascending=False)
     # 创建一个完全空的
     df_empty = pd.DataFrame()
     # 获取用友最后一个凭证号
     start_ino_id = get_next_ino_id(conn)
-    # 根据扎帐单号分组处理
-    for i, (zz_code, group) in enumerate(df_sorted.groupby('扎帐单号', sort=False)):
+    if data_type == "0":
+        df_empty = build_menzhen_df(start_ino_id, record)
+    elif data_type == "1":
+        df_empty = build_zhuyuan_df(start_ino_id, record)
+    # for index, row in df_empty.iterrows():
+    #     print(f"--- 正在处理第 {index} 行 ---")
+    #     for col in df_empty.columns:
+    #         value = row[col]
+    #         # 打印：列名 | 数据值 | Python类型
+    #         print(f"列名: {col} | 值: {value} | 类型: {type(value)}")
+    #         if isinstance(value, str):
+    #             print(f"警告：第 {col} 个参数超长！长度: {len(value)}")
+    #
+    #     # 为了方便调试，只打印第一行就中断（或者根据需要去掉 break）
+    #     break
+    try:
+        if not df_empty.empty:
+            mssql_url = f"mssql+pyodbc://{sqlserver_config.get('user')}:{sqlserver_config.get('password')}@{sqlserver_config.get('ip')}:{sqlserver_config.get('port')}/{'UFDATA_002_2026' if is_build else 'UFDATA_999_2012'}?driver=SQL+Server"
+            logger.info(f"sqlserver 连接成功, {mssql_url}")
+            # 对于 SQL Server，强烈建议开启 fast_executemany 以提升 to_sql 速度
+            engine = create_engine(mssql_url, fast_executemany=True, echo=False)
+            # 使用 with 语句开启显式事务
+            with engine.begin() as connection:
+                df_empty.to_sql(
+                    name='GL_accvouch',
+                    con=connection,
+                    schema='dbo',
+                    if_exists='append',
+                    index=False,
+                    chunksize=1000,
+                )
+            logger.info("所有数据写入成功，事务已自动提交")
+            # 最后一个结尾凭证号
+            last_ino_id = get_next_ino_id(conn)
+            record['import_yy_num'] = len(df_empty)
+            finished_signal.emit(True, f"{str(start_ino_id)},{str(last_ino_id)}", record)
+    except Exception as e:
+        logger.info(f"写入失败，事务已回滚。错误详情: {e}")
+        finished_signal.emit(False, f"写入失败, 失败{e}", record)
+
+def build_menzhen_df(start_ino_id, record):
+    """
+    构建门诊数据
+    """
+    df_empty = pd.DataFrame()
+    full_path = record['export_file_path']
+    df = pd.read_excel(full_path, sheet_name=['收款数据', '汇总数据'])
+    df_shoukuan = df['收款数据'].replace({np.nan: None})
+    df_total = df['汇总数据'].replace({np.nan: None})
+    # 自动去除所有列名两端的空格
+    df_shoukuan.columns = df_shoukuan.columns.str.strip()
+    df_total.columns = df_total.columns.str.strip()
+    # 将日期列转为日期格式（确保排序逻辑正确）
+    df_shoukuan['扎帐时间'] = pd.to_datetime(df_shoukuan['扎帐时间'])
+
+    # 先查找汇总表 根据扎帐单号分组处理
+    for i, (zz_code, total_group) in enumerate(df_total.groupby('扎账单号', sort=False)):
         if pd.notnull(zz_code):
+            start_ino_id = start_ino_id + i
+            row_list = []
             ino_id = start_ino_id + i
             # 贷方对方科目
             mc_ccode_equal = set()
             # 借方对方科目
             md_ccode_equal = set()
-            row_list = []
-            for idx, row in group.iterrows():
-                date_val = row['扎帐时间']
+            # 从明细表查找该单号的所有数据
+            zz_code_result_df = df_shoukuan.query(f'扎账单号 == {zz_code}')
+            inid = 0
+            for index, row in zz_code_result_df.iterrows():
+                date_val = pd.to_datetime(row['扎帐时间'])
                 period = date_val.month
-                inid = idx + 1
+                inid = index + 1
                 dbill_date = date_val
-                # 摘要
-                cdigest = f"{data_type},扎帐单号:{'' if pd.isna(row['扎帐单号']) else row['扎帐单号']},{'' if pd.isna(row['收款员']) else row['收款员']}"
-                # 制单人
                 user_name = row['收款员']
+                # 摘要
+                cdigest = f"门诊收入,扎账单号:{'' if pd.isna(row['扎账单号']) else row['扎账单号']},{'' if pd.isna(user_name) else user_name}"
                 md = 0.0
-                # md_v = pd.to_numeric(row.get('收款金额', 0))
-                # md = 0.0 if pd.isna(md_v) else float(md_v)
                 # 贷方
                 mc_v = pd.to_numeric(row.get('金额', 0))
                 mc = 0.0 if pd.isna(mc_v) else float(mc_v)
                 # 部门
-                cdept_id = get_dept_id(row)
+                cdept_id = get_dept_code_mz(row['开单科室'], 'his_mz')
                 # 科目
-                ccode = get_ccode(row, 2)
-                #  对方科目  121102010205,121102010235,121102010219  410101010801,410101010802,410101010803,4101010101
-                if md > 0:
+                ccode = get_men_zhen_ccode(row, 1)
+                ccode = str(ccode or "").strip()
+                if not ccode:
+                    # 抛出内置的“值错误”异常
+                    raise ValueError("错误：科目编码(ccode)不能为空或纯空格！")
+                # 贷方对方科目
+                mc_ccode_equal.add(ccode)
+                row_list.append(
+                    transform_to_yonyou(period, ino_id, inid, dbill_date, '李红霞', md, mc, cdept_id, ccode, cdigest))
+                print(
+                    f"period是: {period},inid是: {inid},dbill_date: {dbill_date}, cdigest: {cdigest}, user_name: {user_name}, 借方: {md}, 贷方: {mc}, cdept_id: {cdept_id}, ccode:{ccode}")
+            # 继续去插入汇总数据
+            for index, row in total_group.iterrows():
+                if row['项目'] != '合计':
+                    date_val = pd.to_datetime(row['扎帐时间'])
+                    period = date_val.month
+                    inid = inid + 1
+                    user_name = row['收款员']
+                    # 摘要
+                    cdigest = f"门诊收入,{user_name}"
+                    # 收款金额
+                    # 借方
+                    md_v = pd.to_numeric(row.get('金额', 0))
+                    md = 0.0 if pd.isna(md_v) else float(md_v)
+                    # 贷方
+                    mc = 0.0
+                    # 科目
+                    ccode = get_men_zhen_ccode(row, 2)
+                    ccode = str(ccode or "").strip()
+                    if not ccode:
+                        # 抛出内置的“值错误”异常
+                        raise ValueError("错误：科目编码(ccode)不能为空或纯空格！")
                     md_ccode_equal.add(ccode)
-                else:
-                    mc_ccode_equal.add(ccode)
-                row_list.append(transform_to_yonyou(period, ino_id, inid, dbill_date, user_name, md, mc, cdept_id, ccode, cdigest))
-                # 判断是否为最后一个 (index 从 0 开始，所以是 total-1)
-                if idx == len(group) - 1:
-                    # 去查找汇总数据 并插入
-                    hh_data = df_total[df_total['扎帐单号'] == zz_code]
-                    for idx1, row in hh_data.iterrows():
-                        if row['项目'] != '合计':
-                            # 摘要
-                            cdigest1 = f"{data_type}项目:{'' if pd.isna(row['项目']) else row['项目']},{user_name}"
-                            # 收款金额
-                            # 借方
-                            md_v = pd.to_numeric(row.get('金额', 0))
-                            md = 0.0 if pd.isna(md_v) else float(md_v)
-                            # 贷方
-                            mc = 0.0
-                            # 科目
-                            ccode1 = get_ccode1(row)
-                            #  对方科目  121102010205,121102010235,121102010219  410101010801,410101010802,410101010803,4101010101
-                            if md > 0:
-                                md_ccode_equal.add(ccode)
-                            else:
-                                mc_ccode_equal.add(ccode)
-                            row_list.append(
-                                transform_to_yonyou(period, ino_id, inid + idx1 + 1, dbill_date, user_name, md, mc, None,
-                                                    ccode1, cdigest1))
+                    row_list.append(transform_to_yonyou(period, ino_id, inid, date_val, '李红霞', md, mc, None, ccode, cdigest))
+                    print(
+                        f"period是: {period},inid是: {inid},dbill_date: {date_val}, cdigest: {cdigest}, user_name: {user_name}, 借方: {md}, 贷方: {mc}, cdept_id: NONE, ccode:{ccode}")
 
-                print(f"period是: {period},inid是: {inid},dbill_date: {dbill_date}, cdigest: {cdigest}, user_name: {user_name}, 借方: {md}, 贷方: {mc}, cdept_id: {cdept_id}, ccode:{ccode}")
             for yongyou_row in row_list:
                 if yongyou_row["md"] > 0:
-                    yongyou_row["ccode_equal"] = ",".join(md_ccode_equal)
+                    yongyou_row["ccode_equal"] = ",".join(list(md_ccode_equal)[:4])
                 else:
-                    yongyou_row["ccode_equal"] = ",".join(mc_ccode_equal)
+                    yongyou_row["ccode_equal"] = ",".join(list(mc_ccode_equal)[:4])
             new_row = pd.DataFrame(row_list)
             df_empty = pd.concat([df_empty, new_row], ignore_index=True)
-    if not df_empty.empty:
-        cursor = conn.cursor()
-        columns = list(df_empty.columns)
-        placeholders = ', '.join(['?'] * len(columns))
-        columns_sql = ', '.join(columns)
-        sql = f"INSERT INTO [UFDATA_999_2012].[dbo].[GL_accvouch] ({columns_sql}) VALUES ({placeholders})"
-
-        try:
-            # 将 numpy 类型转换为 python 原生类型，防止 pyodbc 报错
-            data_to_insert = df_empty.astype(object).where(pd.notnull(df_empty), None).values.tolist()
-            cursor.executemany(sql, data_to_insert)
-            conn.commit()
-            logger.info(f"Successfully inserted {len(df_empty)} rows.")
-            finished_signal.emit(True, str(start_ino_id), len(df_empty))
-        except Exception as e:
-            logger.error(f"Error inserting data: {e}")
-            conn.rollback()
-            finished_signal.emit(False, f"rror inserting data, 失败{e}", -1)
-        finally:
-            cursor.close()
+    return df_empty
 
 
-def read_excel():
-    path = os.path.join(os.path.join(os.path.abspath("."), "export_data"),
-                        "2026-01-08 00_00_00-2026-01-08 23_59_59住院数据导出2026-01-08 20_47_05.xlsx")
-    df = pd.read_excel(path)
-    # 仅查看所有列名
-    print(df.columns.tolist())
-
-    conn_str = (
-        "DRIVER={SQL Server};"  # 使用系统自带驱动
-        f"SERVER=127.0.0.1,1433;"
-        f"DATABASE=master;"
-        f"UID=sa;"
-        f"PWD=123456;"
-        "Connect Timeout=5;"
-    )
-    conn = pyodbc.connect(conn_str)
-    ino_id = get_next_ino_id(conn)
-    # 将日期列转为日期格式（确保排序逻辑正确）
-    df['日期（按天到出）'] = pd.to_datetime(df['日期（按天到出）'])
-    # 按照日期降序排列 (ascending=False 表示从大到小)
-    df_sorted = df.sort_values(by='日期（按天到出）', ascending=False)
-    # 分组并保持排序后的顺序 (sort=False 是关键)
-    # 创建一个完全空的
+def build_zhuyuan_df(start_ino_id, record):
+    """
+       构建住院数据
+    """
     df_empty = pd.DataFrame()
-    for date_val, group in df_sorted.groupby('日期（按天到出）', sort=False):
-        if pd.notnull(date_val):
+    full_path = record['export_file_path']
+    df = pd.read_excel(full_path, sheet_name=['收款数据', '汇总数据'])
+    df_shoukuan = df['收款数据'].replace({np.nan: None})
+    df_total = df['汇总数据'].replace({np.nan: None})
+    # 自动去除所有列名两端的空格
+    df_shoukuan.columns = df_shoukuan.columns.str.strip()
+    df_total.columns = df_total.columns.str.strip()
+    # 将日期列转为日期格式（确保排序逻辑正确）
+    df_shoukuan['扎帐时间'] = pd.to_datetime(df_shoukuan['扎帐时间'])
+
+    # 先查找汇总表 根据收款员分组
+    for i, (name, name_group) in enumerate(df_total.groupby('收款员', sort=False)):
+        if pd.notnull(name):
+            start_ino_id = start_ino_id + i
+            row_list = []
+            ino_id = start_ino_id + i
             # 贷方对方科目
             mc_ccode_equal = set()
             # 借方对方科目
             md_ccode_equal = set()
-            row_list = []
-            for idx, row in group.iterrows():
-                period = date_val.month  # 返回整数，例如 1
-                inid = idx + 1
+            # 从明细表查找该单号的所有数据
+            zz_code_result_df = df_shoukuan.query(f'收款员 == {name}')
+            inid = 0
+            # 缴费数据
+            for index, row in zz_code_result_df.iterrows():
+                date_val = pd.to_datetime(row['扎帐时间'])
+                period = date_val.month
+                inid = index + 1
                 dbill_date = date_val
                 # 摘要
-                cdigest = f"门诊收入{'' if pd.isna(row['收银员（一个业务员一个表）']) else row['收银员（一个业务员一个表）']}"
-                # 制单人
-                user_name = "测试"
-                # 收款金额
-                # 借方
-                md_v = pd.to_numeric(row.get('收款金额', 0))
-                md = 0.0 if pd.isna(md_v) else float(md_v)
+                cdigest = f"住院收入,扎账单号:{'' if pd.isna(row['扎账单号']) else row['扎账单号']},{'' if pd.isna(name) else name}"
+                md = 0.0
                 # 贷方
                 mc_v = pd.to_numeric(row.get('金额', 0))
                 mc = 0.0 if pd.isna(mc_v) else float(mc_v)
                 # 部门
-                # cdept_id = get_dept_id(row)
-                cdept_id = None
+                cdept_id = get_dept_code_mz(row['开单科室'], 'his_zy')
                 # 科目
-                ccode = get_ccode(row, 2)
-                #  对方科目  121102010205,121102010235,121102010219  410101010801,410101010802,410101010803,4101010101
-                if md > 0:
+                ccode = get_zhu_yuan_ccode(row)
+                if not str(ccode or "").strip():
+                    # 抛出内置的“值错误”异常
+                    raise ValueError(f"错误：科目编码(ccode)不能为空或纯空格！{row['项目']}")
+                # 贷方对方科目
+                mc_ccode_equal.add(ccode)
+                row_list.append(transform_to_yonyou(period, ino_id, inid, dbill_date, '李红霞', md, mc, cdept_id, ccode, cdigest))
+                print(f"period是: {period},inid是: {inid},dbill_date: {dbill_date}, cdigest: {cdigest}, user_name: {name}, 借方: {md}, 贷方: {mc}, cdept_id: {cdept_id}, ccode:{ccode}")
+            # 继续去插入汇总数据
+            for index, row in name_group.iterrows():
+                if row['扎帐类别'] == '结帐':
+                    date_val = pd.to_datetime(row['扎帐时间'])
+                    period = date_val.month
+                    inid = inid + 1
+                    # 摘要
+                    cdigest = f"住院收入,{name}"
+                    # 收款金额
+                    # 借方
+                    md_v = pd.to_numeric(row.get('金额', 0))
+                    md = 0.0 if pd.isna(md_v) else float(md_v)
+                    # 贷方
+                    mc = 0.0
+                    # 科目
+                    ccode = get_zhu_yuan_ccode2(row)
+                    if not str(ccode or "").strip():
+                        # 抛出内置的“值错误”异常
+                        raise ValueError(f"错误：科目编码(ccode)不能为空或纯空格！{row['内容']}")
                     md_ccode_equal.add(ccode)
+                    row_list.append(transform_to_yonyou(period, ino_id, inid, date_val, '李红霞', md, mc, None, ccode, cdigest))
+                    print(f"period是: {period},inid是: {inid},dbill_date: {date_val}, cdigest: {cdigest}, user_name: {name}, 借方: {md}, 贷方: {mc}, cdept_id: NONE, ccode:{ccode}")
                 else:
-                    mc_ccode_equal.add(ccode)
-                row_list.append(transform_to_yonyou(period, ino_id, inid, dbill_date, user_name, md, mc, cdept_id, ccode, cdigest))
+                    # 预交数据
+                    print("...")
 
-                print(f"period是: {period},inid是: {inid},dbill_date: {dbill_date}, cdigest: {cdigest}, user_name: {user_name}, 借方: {md}, 贷方: {mc}, cdept_id: {cdept_id}, ccode:{ccode}")
             for yongyou_row in row_list:
                 if yongyou_row["md"] > 0:
-                    yongyou_row["ccode_equal"] = ",".join(md_ccode_equal)
+                    yongyou_row["ccode_equal"] = ",".join(list(md_ccode_equal)[:4])
                 else:
-                    yongyou_row["ccode_equal"] = ",".join(mc_ccode_equal)
+                    yongyou_row["ccode_equal"] = ",".join(list(mc_ccode_equal)[:4])
             new_row = pd.DataFrame(row_list)
             df_empty = pd.concat([df_empty, new_row], ignore_index=True)
-        print(df_empty)
-        if not df_empty.empty:
-            cursor = conn.cursor()
-            columns = list(df_empty.columns)
-            placeholders = ', '.join(['?'] * len(columns))
-            columns_sql = ', '.join(columns)
-            sql = f"INSERT INTO [UFDATA_999_2012].[dbo].[GL_accvouch] ({columns_sql}) VALUES ({placeholders})"
-            print(sql)
-            try:
-                # 将 numpy 类型转换为 python 原生类型，防止 pyodbc 报错
-                data_to_insert = df_empty.astype(object).where(pd.notnull(df_empty), None).values.tolist()
-                cursor.executemany(sql, data_to_insert)
-                conn.commit()
-                logger.info(f"Successfully inserted {len(df_empty)} rows.")
-            except Exception as e:
-                logger.error(f"Error inserting data: {e}")
-                conn.rollback()
-            finally:
-                cursor.close()
-        conn.close()
-
+    return df_empty
 
 def get_next_ino_id(conn):
     """
@@ -414,7 +450,7 @@ def transform_to_yonyou(period, ino_id, inid, dbill_date, user_name, md, mc, cde
 
 
 class ImportWorker(QThread):
-    finished_signal = pyqtSignal(bool, str, int)
+    finished_signal = pyqtSignal(bool, str, dict)
 
     def __init__(self, config, record):
         super().__init__()
@@ -464,5 +500,25 @@ def sqlserver_start_import(parent, config, record, callback=None):
 
 
 if __name__ == '__main__':
-    # connect_to_sqlserver_test('127.0.0.1', '1433', 'master', 'sa', '123456')
-    read_excel()
+    sqlite_helper = SQLiteHelper()
+    record = sqlite_helper.get_record_by_id(1)
+
+    def on_complete(success, message, record):
+        # 更新本地数据库状态
+        print(record)
+        if success:
+            logger.info("导入成功，刷新列表")
+            # self.sqlite_helper.import_yy_result(record["id"], success, message, num)
+        else:
+            logger.info("导入失败，刷新列表")
+            # self.sqlite_helper.import_yy_result(record["id"], success, "", -1)
+
+    # finished_signal = pyqtSignal(bool, str, dict)
+    # finished_signal.connect(on_complete)
+
+    record['data_type'] = '0'
+    record['export_file_path'] = r"C:\Users\Administrator\Desktop\线上his\门诊2026-01-29 00_00_00数据导出.xlsx"
+    config_manager = ConfigManager()
+    import_data_to_yy(config_manager.get_db_config('sqlserver'), record, finished_signal)
+
+

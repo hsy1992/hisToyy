@@ -119,8 +119,7 @@ class SQLiteHelper:
 
         extra_data['status'] = status
         # 如果是导出成功(2)或导入成功(4)，自动记录时间
-        if status == 2:
-            extra_data['export_time'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        extra_data['export_time'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
         set_clause = ", ".join([f"{k} = ?" for k in extra_data.keys()])
         sql = f"UPDATE sys_export_record SET {set_clause} WHERE id = ?"
@@ -128,14 +127,13 @@ class SQLiteHelper:
         with self.get_connection() as conn:
             conn.execute(sql, list(extra_data.values()) + [record_id])
 
-    def export_his_success(self, record_id, export_num, export_file_name, export_file_path):
+    def export_his_success(self, record_id, export_file_name, export_file_path):
         """
         导出his成功后更改数据库
             export_file_name TEXT,
             export_file_path TEXT,
         """
         self.update_status(record_id, 2, {
-            "export_num": export_num,
             "export_file_name": export_file_name,
             "export_file_path": export_file_path
         })

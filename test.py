@@ -156,7 +156,6 @@ class ExcelMerger(QMainWindow):
         self.start_btn.clicked.connect(self.start_his_export)
         start_layout.addWidget(self.start_btn)
 
-        # 开始按钮
         self.start_yy_btn = QPushButton("开始导入用友")
         self.start_yy_btn.setEnabled(True)
         self.start_yy_btn.clicked.connect(self.start_yy_import)
@@ -254,7 +253,6 @@ class ExcelMerger(QMainWindow):
             record_id = self.sqlite_helper.insert_record({
                 "start_time": self.start_str,
                 "end_time": self.end_str,
-                "export_num": "",
                 "data_type": str(self.type_group.checkedId())
             })
             self.table.refresh_data()
@@ -270,7 +268,7 @@ class ExcelMerger(QMainWindow):
                 # 更新数据库
                 self.record_id = record_id
                 file_name = Path(self.full_path).name
-                self.sqlite_helper.export_his_success(self.record_id, self.full_path_num, file_name, self.full_path)
+                self.sqlite_helper.export_his_success(self.record_id, file_name, self.full_path)
                 self.table.refresh_data()
                 reply = QMessageBox.question(self, '确认', 'HIS数据导出成功，是否立即打开查看？',
                                              QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
@@ -293,9 +291,12 @@ class ExcelMerger(QMainWindow):
             this_record_id = self.record_id
             this_full_path = self.full_path
 
+        this_full_path = r"C:\Users\Administrator\Desktop\线上his\门诊2026-01-29 00_00_00数据导出.xlsx"
         if this_full_path and this_record_id > 0:
             # 参数说明：父窗口, 标题, 内容, 按钮组合, 默认选中的按钮
             record = self.sqlite_helper.get_record_by_id(this_record_id)
+            record['data_type'] = '0'
+            record['export_file_path'] = r"C:\Users\Administrator\Desktop\线上his\门诊2026-01-29 00_00_00数据导出.xlsx"
             if record['status'] == 4:
                 # 已经导出成功得数据
                 reply = QMessageBox.question(self, "提示", "该条数据已经成功导入到用友，请确认再次导入？",
@@ -319,10 +320,11 @@ class ExcelMerger(QMainWindow):
         公共用友导入方法
         """
         logger.info(f"开始用友导入: {record}")
-        def on_complete(success, message, num):
+        def on_complete(success, message, record):
+            # 更新本地数据库状态
             if success:
                 logger.info("导入成功，刷新列表")
-                self.sqlite_helper.import_yy_result(record["id"], success, message, num)
+                self.sqlite_helper.import_yy_result(record["id"], success, message, record["import_yy_num"])
                 QMessageBox.information(self, "成功", "导入数据成功")
             else:
                 logger.info("导入失败，刷新列表")
