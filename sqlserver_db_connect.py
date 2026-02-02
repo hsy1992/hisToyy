@@ -73,7 +73,7 @@ def read_excel_real(conn, sqlserver_config, record, finished_signal):
     if data_type == "0":
         df_empty = build_menzhen_df(start_ino_id, record)
     elif data_type == "1":
-        df_empty = build_zhuyuan_df(start_ino_id, record)
+        df_empty = build_zhuyuan_js_df(start_ino_id, record)
     # for index, row in df_empty.iterrows():
     #     print(f"--- 正在处理第 {index} 行 ---")
     #     for col in df_empty.columns:
@@ -200,9 +200,9 @@ def build_menzhen_df(start_ino_id, record):
     return df_empty
 
 
-def build_zhuyuan_df(start_ino_id, record):
+def build_zhuyuan_js_df(start_ino_id, record):
     """
-       构建住院数据
+    构建住院数据
     """
     df_empty = pd.DataFrame()
     full_path = record['export_file_path']
@@ -215,21 +215,19 @@ def build_zhuyuan_df(start_ino_id, record):
     # 将日期列转为日期格式（确保排序逻辑正确）
     df_shoukuan['扎帐时间'] = pd.to_datetime(df_shoukuan['扎帐时间'])
 
-    # 先查找汇总表 根据收款员分组
-    for i, (name, name_group) in enumerate(df_total.groupby('收款员', sort=False)):
+    # 先处理明细表数据
+    for i, (name, name_group) in enumerate(df_shoukuan.groupby('收款员', sort=False)):
         if pd.notnull(name):
             start_ino_id = start_ino_id + i
             row_list = []
             ino_id = start_ino_id + i
-            # 贷方对方科目
-            mc_ccode_equal = set()
+            # 贷方对方科目 应收
+            mc_ccode_equal = set("121101")
             # 借方对方科目
             md_ccode_equal = set()
-            # 从明细表查找该单号的所有数据
-            zz_code_result_df = df_shoukuan.query(f'收款员 == {name}')
             inid = 0
-            # 缴费数据
-            for index, row in zz_code_result_df.iterrows():
+            # 结算数据
+            for index, row in name_group.iterrows():
                 date_val = pd.to_datetime(row['扎帐时间'])
                 period = date_val.month
                 inid = index + 1
@@ -247,35 +245,12 @@ def build_zhuyuan_df(start_ino_id, record):
                 if not str(ccode or "").strip():
                     # 抛出内置的“值错误”异常
                     raise ValueError(f"错误：科目编码(ccode)不能为空或纯空格！{row['项目']}")
-                # 贷方对方科目
-                mc_ccode_equal.add(ccode)
+                # 借方对方科目
+                md_ccode_equal.add(ccode)
                 row_list.append(transform_to_yonyou(period, ino_id, inid, dbill_date, '李红霞', md, mc, cdept_id, ccode, cdigest))
                 print(f"period是: {period},inid是: {inid},dbill_date: {dbill_date}, cdigest: {cdigest}, user_name: {name}, 借方: {md}, 贷方: {mc}, cdept_id: {cdept_id}, ccode:{ccode}")
-            # 继续去插入汇总数据
-            for index, row in name_group.iterrows():
-                if row['扎帐类别'] == '结帐':
-                    date_val = pd.to_datetime(row['扎帐时间'])
-                    period = date_val.month
-                    inid = inid + 1
-                    # 摘要
-                    cdigest = f"住院收入,{name}"
-                    # 收款金额
-                    # 借方
-                    md_v = pd.to_numeric(row.get('金额', 0))
-                    md = 0.0 if pd.isna(md_v) else float(md_v)
-                    # 贷方
-                    mc = 0.0
-                    # 科目
-                    ccode = get_zhu_yuan_ccode2(row)
-                    if not str(ccode or "").strip():
-                        # 抛出内置的“值错误”异常
-                        raise ValueError(f"错误：科目编码(ccode)不能为空或纯空格！{row['内容']}")
-                    md_ccode_equal.add(ccode)
-                    row_list.append(transform_to_yonyou(period, ino_id, inid, date_val, '李红霞', md, mc, None, ccode, cdigest))
-                    print(f"period是: {period},inid是: {inid},dbill_date: {date_val}, cdigest: {cdigest}, user_name: {name}, 借方: {md}, 贷方: {mc}, cdept_id: NONE, ccode:{ccode}")
-                else:
-                    # 预交数据
-                    print("...")
+
+
 
             for yongyou_row in row_list:
                 if yongyou_row["md"] > 0:

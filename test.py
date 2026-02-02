@@ -85,8 +85,8 @@ class ExcelMerger(QMainWindow):
         type_layout.addWidget(QLabel("业务类型："))
 
         # 创建单选按钮
-        self.radio_outpatient = QRadioButton("门诊")
-        self.radio_inpatient1 = QRadioButton("住院缴费")
+        self.radio_outpatient = QRadioButton("门诊收入")
+        self.radio_inpatient1 = QRadioButton("住院结算")
         self.radio_inpatient2 = QRadioButton("门诊扫码")
         self.radio_inpatient3 = QRadioButton("全院病人费用")
         self.radio_inpatient4 = QRadioButton("门诊自助机")
