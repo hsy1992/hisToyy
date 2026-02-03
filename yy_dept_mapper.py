@@ -27,9 +27,11 @@ def get_dept_code_mz(dept_name, type):
     if df_dept.empty:
         logger.error("错误：部门表加载失败！")
         raise ValueError("错误：部门表加载失败！")
-    filtered_df = df_dept[df_dept[type].str.contains(dept_name, na=False)]
+    df_dept[type] = df_dept[type].str.strip()
+    dept_name = dept_name.strip()
+    filtered_df = df_dept[df_dept[type].str.contains(dept_name, na=False, case=False, regex=False)]
     if filtered_df.empty:
-        logger.error(f"未找到该部门:{dept_name}")
+        logger.error(f"未找到该部门:{dept_name}", df_dept[type].str)
         return None
     else:
         return filtered_df['cDepCode'].iloc[0]

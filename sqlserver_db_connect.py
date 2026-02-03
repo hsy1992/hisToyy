@@ -105,8 +105,6 @@ def read_excel_real(conn, sqlserver_config, record, finished_signal):
                     chunksize=1000,
                 )
             logger.info("所有数据写入成功，事务已自动提交")
-            # 最后一个结尾凭证号
-            last_ino_id = get_next_ino_id(conn)
             record['import_yy_num'] = len(df_empty)
             finished_signal.emit(True, f"{','.join(period_list)}", record)
     except Exception as e:
@@ -137,7 +135,7 @@ def build_menzhen_df(conn, record):
             # 获取该扎账单号的时间
             date_val = pd.to_datetime(zz_code_result_df.iloc[0]['扎帐时间'])
             period = date_val.month
-            # 每个单号都去获取下凭证👌
+            # 每个单号都去获取下凭证
             start_ino_id = get_next_ino_id(conn, period)
             row_list = []
             ino_id = start_ino_id + i
@@ -147,6 +145,8 @@ def build_menzhen_df(conn, record):
             # 借方对方科目
             md_ccode_equal = set()
             inid = 0
+            # 重置索引
+            zz_code_result_df = zz_code_result_df.reset_index(drop=True)
             for index, row in zz_code_result_df.iterrows():
                 inid = index + 1
                 dbill_date = date_val
@@ -221,12 +221,16 @@ def build_zhuyuan_js_df(conn, record):
     df_shoukuan['扎帐时间'] = pd.to_datetime(df_shoukuan['扎帐时间'])
     period_list = []
 
+    # 先只找出结账数据
+    jiezhang_total_df = df_total[df_total['扎帐类别'].str.contains('结帐', na=False, regex=False)]
+
     # 处理汇总表数据 根据扎帐单号分组
-    for i, (zz_code, zz_group) in enumerate(df_total.groupby('扎账单号', sort=False)):
+    for i, (zz_code, zz_group) in enumerate(jiezhang_total_df.groupby('扎账单号', sort=False)):
         if pd.notnull(zz_code):
             # 从汇总表查找该单号的所有数据
             zz_code_result_df = df_total.query(f'扎账单号 == {zz_code}')
-            # 获取该扎账单号的时间
+            # 先只找出结账数据
+            jiezhang_df = zz_code_result_df[zz_code_result_df['扎帐类别'].str.contains('结帐', na=False, regex=False)]
             date_val = pd.to_datetime(zz_code_result_df.iloc[0]['扎帐时间'])
             period = date_val.month
             # 每个单号都去获取下凭证👌
@@ -235,15 +239,15 @@ def build_zhuyuan_js_df(conn, record):
             ino_id = start_ino_id + i
             period_list.append(str(ino_id))
             inid = 0
-            # 先只找出结账数据
-            jiezhang_df = zz_code_result_df[zz_code_result_df['扎帐类别'].str.contains('结帐', na=False)]
             # 病人返押金票据冲住院预收款 230502  找出病人返押金票据数据
-            fanya_df = jiezhang_df[jiezhang_df['项目'].str.contains('病人返押金票据', na=False)]
+            fanya_df = jiezhang_df[jiezhang_df['项目'].str.contains('病人返押金票据', na=False, regex=False)]
             # 结账退款数据
-            tuikuan_df = jiezhang_df[jiezhang_df['项目'].str.contains('结帐退款', na=False)]
+            tuikuan_df = jiezhang_df[jiezhang_df['项目'].str.contains('结帐退款', na=False, regex=False)]
             # 对方科目设置 应收与现金
-            ccode_set = set('121101', '1001')
+            ccode_set = {'121101', '1001'}
             ccode_set1 = set()
+            # 重置索引
+            tuikuan_df = tuikuan_df.reset_index(drop=True)
             # 先处理结账退款数据
             for index, row in tuikuan_df.iterrows():
                 inid = index + 1
@@ -251,18 +255,11 @@ def build_zhuyuan_js_df(conn, record):
                 cdigest = f"结算住院费,扎账单号:{zz_code},{'' if pd.isna(name) else name}"
                 # 科目
                 ccode = get_zhu_yuan_ccode2(row)
-                if ccode == '1001':
-                    # 现金
-                    md = 0.0
-                    # 贷方
-                    mc = pd.to_numeric(row.get('金额', 0))
-                else:
-                    # 其他
-                    # 借方
-                    md = pd.to_numeric(row.get('金额', 0))
-                    # 贷方
-                    mc = 0.0
-                    ccode_set1.add(ccode)
+                # 借方
+                md = pd.to_numeric(row.get('金额', 0))
+                # 贷方
+                mc = 0.0
+                ccode_set1.add(ccode)
                 row_list.append(transform_to_yonyou(period, ino_id, inid, date_val, '李红霞', md, mc, None, ccode, cdigest))
             # 添加病人返押金票据冲住院预收款 230502 凭证 为负 贷方
             """
@@ -274,8 +271,8 @@ def build_zhuyuan_js_df(conn, record):
             total_fanya = fanya_df['金额'].sum()
             if total_fanya > 0:
                 inid = inid + 1
-                name = total_fanya.iloc[0]['收款员']
-                zz_code = total_fanya.iloc[0]['扎账单号']
+                name = fanya_df.iloc[0]['收款员']
+                zz_code = fanya_df.iloc[0]['扎账单号']
                 cdigest = f"结算住院费,扎账单号:{zz_code},{'' if pd.isna(name) else name}"
                 # 科目
                 ccode = '230502'
@@ -298,6 +295,9 @@ def build_zhuyuan_js_df(conn, record):
                 # 贷方
                 mc = pd.to_numeric(total_jiezhang)
                 row_list.append(transform_to_yonyou(period, ino_id, inid, date_val, '李红霞', md, mc, None, ccode, cdigest))
+            """
+            剩余的充现金 1001
+            """
 
             for yongyou_row in row_list:
                 if yongyou_row["md"] > 0.0 or yongyou_row["mc"] < 0.0:
@@ -316,16 +316,16 @@ def get_next_ino_id(conn, period):
     :param csign: 凭证类别 (str)
     """
     sql = f"""
-        SELECT MAX(ino_id) FROM [UFDATA_999_2012].[dbo].[GL_accvouch];
+        SELECT MAX(ino_id) FROM [UFDATA_999_2012].[dbo].[GL_accvouch] WHERE [iperiod] = {period};
     """
     if is_build:
         sql = f"""
                 SELECT MAX(ino_id) FROM [UFDATA_001_2026].[dbo].[GL_accvouch] WHERE [iperiod] = {period};
             """
     result = conn.execute(sql).fetchone()
-    max_id = result[0] if result and result[0] is not None else 1
+    max_id = result[0] if result and result[0] is not None else 0
     # 如果结果为 None (新月份第一张单)，则返回 1，否则返回 最大值 + 1
-    return (max_id if max_id else 0) + 1
+    return max_id + 1
 
 
 def transform_to_yonyou(period, ino_id, inid, dbill_date, user_name, md, mc, cdept_id, ccode, cdigest):

@@ -5477,3 +5477,442 @@ Name: cDepCode, dtype: object, None, 1, None, None, 0, None, None, 0, 0, 0, 0, 0
 2026-02-01 12:32:41,975 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
 2026-02-01 12:34:13,012 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
 2026-02-03 10:44:48,914 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-03 21:22:13,745 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-03 21:22:19,137 - INFO - test - 开始用友导入: {'id': 32, 'start_time': '2026-01-27 00:00:00', 'end_time': '2026-01-27 23:59:59', 'create_time': '2026-01-27 21:13:12', 'export_time': None, 'data_type': '0', 'export_num': '', 'export_file_name': None, 'export_file_path': 'C:\\Users\\Administrator\\Desktop\\线上his\\门诊2026-01-29 00_00_00数据导出.xlsx', 'import_yy_start': '45,81', 'import_yy_num': 637, 'status': 4}
+2026-02-03 21:22:19,149 - INFO - sqlserver_db_connect - DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-03 21:22:19,274 - INFO - sqlserver_db_connect - sqlserver 连接成功, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-03 21:22:20,068 - ERROR - yy_dept_mapper - 未找到该部门:耳鼻喉科(五官)
+2026-02-03 21:22:20,069 - ERROR - yy_dept_mapper - 未找到该部门:耳鼻喉科(五官)
+2026-02-03 21:22:20,069 - ERROR - yy_dept_mapper - 未找到该部门:耳鼻喉科(五官)
+2026-02-03 21:22:20,073 - ERROR - yy_dept_mapper - 未找到该部门:感染性疾病科(肠道)
+2026-02-03 21:22:20,073 - ERROR - yy_dept_mapper - 未找到该部门:骨外科(外二)
+2026-02-03 21:22:20,074 - ERROR - yy_dept_mapper - 未找到该部门:骨外科(外二)
+2026-02-03 21:22:20,074 - ERROR - yy_dept_mapper - 未找到该部门:骨外科(外二)
+2026-02-03 21:22:20,080 - ERROR - yy_dept_mapper - 未找到该部门:内八科(消化)
+2026-02-03 21:22:20,080 - ERROR - yy_dept_mapper - 未找到该部门:内八科(消化)
+2026-02-03 21:22:20,081 - ERROR - yy_dept_mapper - 未找到该部门:内八科(消化)
+2026-02-03 21:22:20,081 - ERROR - yy_dept_mapper - 未找到该部门:内分泌内科(内一)
+2026-02-03 21:22:20,081 - ERROR - yy_dept_mapper - 未找到该部门:内分泌内科(内一)
+2026-02-03 21:22:20,082 - ERROR - yy_dept_mapper - 未找到该部门:内分泌内科(内一)
+2026-02-03 21:22:20,082 - ERROR - yy_dept_mapper - 未找到该部门:内分泌内科(内一)
+2026-02-03 21:22:20,082 - ERROR - yy_dept_mapper - 未找到该部门:内分泌内科(内一)
+2026-02-03 21:22:20,086 - ERROR - yy_dept_mapper - 未找到该部门:内七科(血液、风湿免疫)
+2026-02-03 21:22:20,086 - ERROR - yy_dept_mapper - 未找到该部门:内七科(血液、风湿免疫)
+2026-02-03 21:22:20,086 - ERROR - yy_dept_mapper - 未找到该部门:内七科(血液、风湿免疫)
+2026-02-03 21:22:20,087 - ERROR - yy_dept_mapper - 未找到该部门:内三(消化、肿瘤、肾内科)
+2026-02-03 21:22:20,087 - ERROR - yy_dept_mapper - 未找到该部门:内三(消化、肿瘤、肾内科)
+2026-02-03 21:22:20,087 - ERROR - yy_dept_mapper - 未找到该部门:内三(消化、肿瘤、肾内科)
+2026-02-03 21:22:20,088 - ERROR - yy_dept_mapper - 未找到该部门:内三(消化、肿瘤、肾内科)
+2026-02-03 21:22:20,088 - ERROR - yy_dept_mapper - 未找到该部门:内三(消化、肿瘤、肾内科)
+2026-02-03 21:22:20,091 - ERROR - yy_dept_mapper - 未找到该部门:普通外科(外一)
+2026-02-03 21:22:20,091 - ERROR - yy_dept_mapper - 未找到该部门:普通外科(外一)
+2026-02-03 21:22:20,092 - ERROR - yy_dept_mapper - 未找到该部门:普通外科(外一)
+2026-02-03 21:22:20,092 - ERROR - yy_dept_mapper - 未找到该部门:神经内科(内二)
+2026-02-03 21:22:20,093 - ERROR - yy_dept_mapper - 未找到该部门:神经内科(内二)
+2026-02-03 21:22:20,093 - ERROR - yy_dept_mapper - 未找到该部门:神经内科(内二)
+2026-02-03 21:22:20,093 - ERROR - yy_dept_mapper - 未找到该部门:神经内科(内二)
+2026-02-03 21:22:20,094 - ERROR - yy_dept_mapper - 未找到该部门:神经外科(外三)
+2026-02-03 21:22:20,095 - ERROR - yy_dept_mapper - 未找到该部门:神经外科(外三)
+2026-02-03 21:22:20,095 - ERROR - yy_dept_mapper - 未找到该部门:神经外科(外三)
+2026-02-03 21:22:20,096 - ERROR - yy_dept_mapper - 未找到该部门:神经外科(外三)
+2026-02-03 21:22:20,096 - ERROR - yy_dept_mapper - 未找到该部门:神经外科(外三)
+2026-02-03 21:22:20,097 - ERROR - yy_dept_mapper - 未找到该部门:神经外科(外三)
+2026-02-03 21:22:20,097 - ERROR - yy_dept_mapper - 未找到该部门:心血管内科(内一)
+2026-02-03 21:22:20,097 - ERROR - yy_dept_mapper - 未找到该部门:心血管内科(内一)
+2026-02-03 21:22:20,098 - ERROR - yy_dept_mapper - 未找到该部门:心血管内科(内一)
+2026-02-03 21:22:20,098 - ERROR - yy_dept_mapper - 未找到该部门:眼科(五官)
+2026-02-03 21:22:20,098 - ERROR - yy_dept_mapper - 未找到该部门:眼科(五官)
+2026-02-03 21:22:20,129 - ERROR - yy_dept_mapper - 未找到该部门:耳鼻喉科(五官)
+2026-02-03 21:22:20,130 - ERROR - yy_dept_mapper - 未找到该部门:耳鼻喉科(五官)
+2026-02-03 21:22:20,130 - ERROR - yy_dept_mapper - 未找到该部门:耳鼻喉科(五官)
+2026-02-03 21:22:20,130 - ERROR - yy_dept_mapper - 未找到该部门:耳鼻喉科(五官)
+2026-02-03 21:22:20,131 - ERROR - yy_dept_mapper - 未找到该部门:耳鼻喉科(五官)
+2026-02-03 21:22:20,132 - ERROR - yy_dept_mapper - 未找到该部门:耳鼻喉科(五官)
+2026-02-03 21:22:20,137 - ERROR - yy_dept_mapper - 未找到该部门:骨外科(外二)
+2026-02-03 21:22:20,137 - ERROR - yy_dept_mapper - 未找到该部门:骨外科(外二)
+2026-02-03 21:22:20,138 - ERROR - yy_dept_mapper - 未找到该部门:骨外科(外二)
+2026-02-03 21:22:20,138 - ERROR - yy_dept_mapper - 未找到该部门:泌尿外科(外一)
+2026-02-03 21:22:20,138 - ERROR - yy_dept_mapper - 未找到该部门:泌尿外科(外一)
+2026-02-03 21:22:20,139 - ERROR - yy_dept_mapper - 未找到该部门:泌尿外科(外一)
+2026-02-03 21:22:20,139 - ERROR - yy_dept_mapper - 未找到该部门:泌尿外科(外一)
+2026-02-03 21:22:20,139 - ERROR - yy_dept_mapper - 未找到该部门:内八科(消化)
+2026-02-03 21:22:20,140 - ERROR - yy_dept_mapper - 未找到该部门:内八科(消化)
+2026-02-03 21:22:20,140 - ERROR - yy_dept_mapper - 未找到该部门:内分泌内科(内一)
+2026-02-03 21:22:20,140 - ERROR - yy_dept_mapper - 未找到该部门:内分泌内科(内一)
+2026-02-03 21:22:20,142 - ERROR - yy_dept_mapper - 未找到该部门:内三(消化、肿瘤、肾内科)
+2026-02-03 21:22:20,142 - ERROR - yy_dept_mapper - 未找到该部门:内三(消化、肿瘤、肾内科)
+2026-02-03 21:22:20,143 - ERROR - yy_dept_mapper - 未找到该部门:内三(消化、肿瘤、肾内科)
+2026-02-03 21:22:20,143 - ERROR - yy_dept_mapper - 未找到该部门:内三(消化、肿瘤、肾内科)
+2026-02-03 21:22:20,143 - ERROR - yy_dept_mapper - 未找到该部门:内三(消化、肿瘤、肾内科)
+2026-02-03 21:22:20,144 - ERROR - yy_dept_mapper - 未找到该部门:内三(消化、肿瘤、肾内科)
+2026-02-03 21:22:20,145 - ERROR - yy_dept_mapper - 未找到该部门:普通外科(外一)
+2026-02-03 21:22:20,146 - ERROR - yy_dept_mapper - 未找到该部门:普通外科(外一)
+2026-02-03 21:22:20,146 - ERROR - yy_dept_mapper - 未找到该部门:普通外科(外一)
+2026-02-03 21:22:20,147 - ERROR - yy_dept_mapper - 未找到该部门:神经内科(内二)
+2026-02-03 21:22:20,147 - ERROR - yy_dept_mapper - 未找到该部门:神经内科(内二)
+2026-02-03 21:22:20,147 - ERROR - yy_dept_mapper - 未找到该部门:神经内科(内二)
+2026-02-03 21:22:20,148 - ERROR - yy_dept_mapper - 未找到该部门:神经内科(内二)
+2026-02-03 21:22:20,150 - ERROR - yy_dept_mapper - 未找到该部门:心血管内科(内一)
+2026-02-03 21:22:20,150 - ERROR - yy_dept_mapper - 未找到该部门:心血管内科(内一)
+2026-02-03 21:22:20,151 - ERROR - yy_dept_mapper - 未找到该部门:心血管内科(内一)
+2026-02-03 21:22:20,151 - ERROR - yy_dept_mapper - 未找到该部门:心血管内科(内一)
+2026-02-03 21:22:20,151 - ERROR - yy_dept_mapper - 未找到该部门:心血管内科(内一)
+2026-02-03 21:22:20,151 - ERROR - yy_dept_mapper - 未找到该部门:心血管内科(内一)
+2026-02-03 21:22:20,174 - ERROR - yy_dept_mapper - 未找到该部门:骨外科(外二)
+2026-02-03 21:22:20,174 - ERROR - yy_dept_mapper - 未找到该部门:骨外科(外二)
+2026-02-03 21:22:20,175 - ERROR - yy_dept_mapper - 未找到该部门:骨外科(外二)
+2026-02-03 21:22:20,176 - ERROR - yy_dept_mapper - 未找到该部门:泌尿外科(外一)
+2026-02-03 21:22:20,176 - ERROR - yy_dept_mapper - 未找到该部门:泌尿外科(外一)
+2026-02-03 21:22:20,177 - ERROR - yy_dept_mapper - 未找到该部门:泌尿外科(外一)
+2026-02-03 21:22:20,177 - ERROR - yy_dept_mapper - 未找到该部门:泌尿外科(外一)
+2026-02-03 21:22:20,178 - ERROR - yy_dept_mapper - 未找到该部门:泌尿外科(外一)
+2026-02-03 21:22:20,178 - ERROR - yy_dept_mapper - 未找到该部门:泌尿外科(外一)
+2026-02-03 21:22:20,178 - ERROR - yy_dept_mapper - 未找到该部门:内八科(消化)
+2026-02-03 21:22:20,179 - ERROR - yy_dept_mapper - 未找到该部门:内八科(消化)
+2026-02-03 21:22:20,180 - ERROR - yy_dept_mapper - 未找到该部门:内八科(消化)
+2026-02-03 21:22:20,180 - ERROR - yy_dept_mapper - 未找到该部门:内八科(消化)
+2026-02-03 21:22:20,180 - ERROR - yy_dept_mapper - 未找到该部门:内八科(消化)
+2026-02-03 21:22:20,181 - ERROR - yy_dept_mapper - 未找到该部门:内分泌内科(内一)
+2026-02-03 21:22:20,181 - ERROR - yy_dept_mapper - 未找到该部门:内分泌内科(内一)
+2026-02-03 21:22:20,181 - ERROR - yy_dept_mapper - 未找到该部门:内三(消化、肿瘤、肾内科)
+2026-02-03 21:22:20,182 - ERROR - yy_dept_mapper - 未找到该部门:内三(消化、肿瘤、肾内科)
+2026-02-03 21:22:20,182 - ERROR - yy_dept_mapper - 未找到该部门:内三(消化、肿瘤、肾内科)
+2026-02-03 21:22:20,183 - ERROR - yy_dept_mapper - 未找到该部门:内三(消化、肿瘤、肾内科)
+2026-02-03 21:22:20,183 - ERROR - yy_dept_mapper - 未找到该部门:内三(消化、肿瘤、肾内科)
+2026-02-03 21:22:20,183 - ERROR - yy_dept_mapper - 未找到该部门:内三(消化、肿瘤、肾内科)
+2026-02-03 21:22:20,185 - ERROR - yy_dept_mapper - 未找到该部门:普通外科(外一)
+2026-02-03 21:22:20,185 - ERROR - yy_dept_mapper - 未找到该部门:普通外科(外一)
+2026-02-03 21:22:20,186 - ERROR - yy_dept_mapper - 未找到该部门:普通外科(外一)
+2026-02-03 21:22:20,186 - ERROR - yy_dept_mapper - 未找到该部门:普通外科(外一)
+2026-02-03 21:22:20,186 - ERROR - yy_dept_mapper - 未找到该部门:普通外科(外一)
+2026-02-03 21:22:20,187 - ERROR - yy_dept_mapper - 未找到该部门:普通外科(外一)
+2026-02-03 21:22:20,187 - ERROR - yy_dept_mapper - 未找到该部门:神经内科(内二)
+2026-02-03 21:22:20,187 - ERROR - yy_dept_mapper - 未找到该部门:神经内科(内二)
+2026-02-03 21:22:20,188 - ERROR - yy_dept_mapper - 未找到该部门:神经内科(内二)
+2026-02-03 21:22:20,188 - ERROR - yy_dept_mapper - 未找到该部门:神经内科(内二)
+2026-02-03 21:22:20,188 - ERROR - yy_dept_mapper - 未找到该部门:神经内科(内二)
+2026-02-03 21:22:20,190 - ERROR - yy_dept_mapper - 未找到该部门:心血管内科(内一)
+2026-02-03 21:22:20,190 - ERROR - yy_dept_mapper - 未找到该部门:心血管内科(内一)
+2026-02-03 21:22:20,190 - ERROR - yy_dept_mapper - 未找到该部门:心血管内科(内一)
+2026-02-03 21:22:20,190 - ERROR - yy_dept_mapper - 未找到该部门:心血管内科(内一)
+2026-02-03 21:22:20,191 - ERROR - yy_dept_mapper - 未找到该部门:心血管内科(内一)
+2026-02-03 21:22:20,191 - ERROR - yy_dept_mapper - 未找到该部门:心血管内科(内一)
+2026-02-03 21:22:20,191 - ERROR - yy_dept_mapper - 未找到该部门:眼科(五官)
+2026-02-03 21:22:20,192 - ERROR - yy_dept_mapper - 未找到该部门:眼科(五官)
+2026-02-03 21:22:20,192 - ERROR - yy_dept_mapper - 未找到该部门:眼科(五官)
+2026-02-03 21:22:20,192 - ERROR - yy_dept_mapper - 未找到该部门:眼科(五官)
+2026-02-03 21:22:20,212 - ERROR - yy_dept_mapper - 未找到该部门:耳鼻喉科(五官)
+2026-02-03 21:22:20,212 - ERROR - yy_dept_mapper - 未找到该部门:耳鼻喉科(五官)
+2026-02-03 21:22:20,212 - ERROR - yy_dept_mapper - 未找到该部门:耳鼻喉科(五官)
+2026-02-03 21:22:20,213 - ERROR - yy_dept_mapper - 未找到该部门:耳鼻喉科(五官)
+2026-02-03 21:22:20,213 - ERROR - yy_dept_mapper - 未找到该部门:耳鼻喉科(五官)
+2026-02-03 21:22:20,214 - ERROR - yy_dept_mapper - 未找到该部门:耳鼻喉科(五官)
+2026-02-03 21:22:20,218 - ERROR - yy_dept_mapper - 未找到该部门:骨外科(外二)
+2026-02-03 21:22:20,218 - ERROR - yy_dept_mapper - 未找到该部门:骨外科(外二)
+2026-02-03 21:22:20,219 - ERROR - yy_dept_mapper - 未找到该部门:骨外科(外二)
+2026-02-03 21:22:20,219 - ERROR - yy_dept_mapper - 未找到该部门:骨外科(外二)
+2026-02-03 21:22:20,221 - ERROR - yy_dept_mapper - 未找到该部门:泌尿外科(外一)
+2026-02-03 21:22:20,221 - ERROR - yy_dept_mapper - 未找到该部门:泌尿外科(外一)
+2026-02-03 21:22:20,221 - ERROR - yy_dept_mapper - 未找到该部门:泌尿外科(外一)
+2026-02-03 21:22:20,222 - ERROR - yy_dept_mapper - 未找到该部门:泌尿外科(外一)
+2026-02-03 21:22:20,222 - ERROR - yy_dept_mapper - 未找到该部门:泌尿外科(外一)
+2026-02-03 21:22:20,222 - ERROR - yy_dept_mapper - 未找到该部门:内八科(消化)
+2026-02-03 21:22:20,223 - ERROR - yy_dept_mapper - 未找到该部门:内八科(消化)
+2026-02-03 21:22:20,223 - ERROR - yy_dept_mapper - 未找到该部门:内八科(消化)
+2026-02-03 21:22:20,224 - ERROR - yy_dept_mapper - 未找到该部门:内八科(消化)
+2026-02-03 21:22:20,224 - ERROR - yy_dept_mapper - 未找到该部门:内八科(消化)
+2026-02-03 21:22:20,224 - ERROR - yy_dept_mapper - 未找到该部门:内八科(消化)
+2026-02-03 21:22:20,225 - ERROR - yy_dept_mapper - 未找到该部门:内分泌内科(内一)
+2026-02-03 21:22:20,225 - ERROR - yy_dept_mapper - 未找到该部门:内分泌内科(内一)
+2026-02-03 21:22:20,225 - ERROR - yy_dept_mapper - 未找到该部门:内分泌内科(内一)
+2026-02-03 21:22:20,226 - ERROR - yy_dept_mapper - 未找到该部门:内分泌内科(内一)
+2026-02-03 21:22:20,226 - ERROR - yy_dept_mapper - 未找到该部门:内分泌内科(内一)
+2026-02-03 21:22:20,228 - ERROR - yy_dept_mapper - 未找到该部门:内三(消化、肿瘤、肾内科)
+2026-02-03 21:22:20,228 - ERROR - yy_dept_mapper - 未找到该部门:内三(消化、肿瘤、肾内科)
+2026-02-03 21:22:20,229 - ERROR - yy_dept_mapper - 未找到该部门:内三(消化、肿瘤、肾内科)
+2026-02-03 21:22:20,229 - ERROR - yy_dept_mapper - 未找到该部门:内三(消化、肿瘤、肾内科)
+2026-02-03 21:22:20,229 - ERROR - yy_dept_mapper - 未找到该部门:内三(消化、肿瘤、肾内科)
+2026-02-03 21:22:20,229 - ERROR - yy_dept_mapper - 未找到该部门:内三(消化、肿瘤、肾内科)
+2026-02-03 21:22:20,232 - ERROR - yy_dept_mapper - 未找到该部门:普通外科(外一)
+2026-02-03 21:22:20,232 - ERROR - yy_dept_mapper - 未找到该部门:普通外科(外一)
+2026-02-03 21:22:20,232 - ERROR - yy_dept_mapper - 未找到该部门:普通外科(外一)
+2026-02-03 21:22:20,232 - ERROR - yy_dept_mapper - 未找到该部门:普通外科(外一)
+2026-02-03 21:22:20,233 - ERROR - yy_dept_mapper - 未找到该部门:普通外科(外一)
+2026-02-03 21:22:20,233 - ERROR - yy_dept_mapper - 未找到该部门:普通外科(外一)
+2026-02-03 21:22:20,233 - ERROR - yy_dept_mapper - 未找到该部门:神经内科(内二)
+2026-02-03 21:22:20,234 - ERROR - yy_dept_mapper - 未找到该部门:神经内科(内二)
+2026-02-03 21:22:20,234 - ERROR - yy_dept_mapper - 未找到该部门:神经内科(内二)
+2026-02-03 21:22:20,235 - ERROR - yy_dept_mapper - 未找到该部门:神经内科(内二)
+2026-02-03 21:22:20,235 - ERROR - yy_dept_mapper - 未找到该部门:神经内科(内二)
+2026-02-03 21:22:20,235 - ERROR - yy_dept_mapper - 未找到该部门:神经内科(内二)
+2026-02-03 21:22:20,236 - ERROR - yy_dept_mapper - 未找到该部门:神经外科(外三)
+2026-02-03 21:22:20,236 - ERROR - yy_dept_mapper - 未找到该部门:神经外科(外三)
+2026-02-03 21:22:20,236 - ERROR - yy_dept_mapper - 未找到该部门:神经外科(外三)
+2026-02-03 21:22:20,237 - ERROR - yy_dept_mapper - 未找到该部门:神经外科(外三)
+2026-02-03 21:22:20,239 - ERROR - yy_dept_mapper - 未找到该部门:心血管内科(内一)
+2026-02-03 21:22:20,239 - ERROR - yy_dept_mapper - 未找到该部门:心血管内科(内一)
+2026-02-03 21:22:20,239 - ERROR - yy_dept_mapper - 未找到该部门:心血管内科(内一)
+2026-02-03 21:22:20,241 - ERROR - yy_dept_mapper - 未找到该部门:心血管内科(内一)
+2026-02-03 21:22:20,241 - ERROR - yy_dept_mapper - 未找到该部门:心血管内科(内一)
+2026-02-03 21:22:20,241 - ERROR - yy_dept_mapper - 未找到该部门:心血管内科(内一)
+2026-02-03 21:22:20,242 - ERROR - yy_dept_mapper - 未找到该部门:眼科(五官)
+2026-02-03 21:22:20,242 - ERROR - yy_dept_mapper - 未找到该部门:眼科(五官)
+2026-02-03 21:22:20,269 - ERROR - yy_dept_mapper - 未找到该部门:内分泌内科(内一)
+2026-02-03 21:22:20,270 - ERROR - yy_dept_mapper - 未找到该部门:内分泌内科(内一)
+2026-02-03 21:22:20,270 - ERROR - yy_dept_mapper - 未找到该部门:内三(消化、肿瘤、肾内科)
+2026-02-03 21:22:20,270 - ERROR - yy_dept_mapper - 未找到该部门:内三(消化、肿瘤、肾内科)
+2026-02-03 21:22:20,270 - ERROR - yy_dept_mapper - 未找到该部门:内三(消化、肿瘤、肾内科)
+2026-02-03 21:22:20,270 - ERROR - yy_dept_mapper - 未找到该部门:内三(消化、肿瘤、肾内科)
+2026-02-03 21:22:20,271 - ERROR - yy_dept_mapper - 未找到该部门:内三(消化、肿瘤、肾内科)
+2026-02-03 21:22:20,271 - ERROR - yy_dept_mapper - 未找到该部门:普通外科(外一)
+2026-02-03 21:22:20,272 - ERROR - yy_dept_mapper - 未找到该部门:普通外科(外一)
+2026-02-03 21:22:20,272 - ERROR - yy_dept_mapper - 未找到该部门:心血管内科(内一)
+2026-02-03 21:22:20,272 - ERROR - yy_dept_mapper - 未找到该部门:心血管内科(内一)
+2026-02-03 21:22:20,273 - ERROR - yy_dept_mapper - 未找到该部门:心血管内科(内一)
+2026-02-03 21:22:20,273 - ERROR - yy_dept_mapper - 未找到该部门:心血管内科(内一)
+2026-02-03 21:22:20,303 - ERROR - yy_dept_mapper - 未找到该部门:耳鼻喉科(五官)
+2026-02-03 21:22:20,303 - ERROR - yy_dept_mapper - 未找到该部门:耳鼻喉科(五官)
+2026-02-03 21:22:20,309 - ERROR - yy_dept_mapper - 未找到该部门:感染性疾病科(肠道)
+2026-02-03 21:22:20,309 - ERROR - yy_dept_mapper - 未找到该部门:感染性疾病科(肠道)
+2026-02-03 21:22:20,310 - ERROR - yy_dept_mapper - 未找到该部门:骨外科(外二)
+2026-02-03 21:22:20,310 - ERROR - yy_dept_mapper - 未找到该部门:骨外科(外二)
+2026-02-03 21:22:20,311 - ERROR - yy_dept_mapper - 未找到该部门:骨外科(外二)
+2026-02-03 21:22:20,311 - ERROR - yy_dept_mapper - 未找到该部门:泌尿外科(外一)
+2026-02-03 21:22:20,312 - ERROR - yy_dept_mapper - 未找到该部门:泌尿外科(外一)
+2026-02-03 21:22:20,312 - ERROR - yy_dept_mapper - 未找到该部门:泌尿外科(外一)
+2026-02-03 21:22:20,313 - ERROR - yy_dept_mapper - 未找到该部门:泌尿外科(外一)
+2026-02-03 21:22:20,313 - ERROR - yy_dept_mapper - 未找到该部门:泌尿外科(外一)
+2026-02-03 21:22:20,313 - ERROR - yy_dept_mapper - 未找到该部门:泌尿外科(外一)
+2026-02-03 21:22:20,314 - ERROR - yy_dept_mapper - 未找到该部门:内八科(消化)
+2026-02-03 21:22:20,314 - ERROR - yy_dept_mapper - 未找到该部门:内八科(消化)
+2026-02-03 21:22:20,314 - ERROR - yy_dept_mapper - 未找到该部门:内八科(消化)
+2026-02-03 21:22:20,315 - ERROR - yy_dept_mapper - 未找到该部门:内八科(消化)
+2026-02-03 21:22:20,315 - ERROR - yy_dept_mapper - 未找到该部门:内八科(消化)
+2026-02-03 21:22:20,315 - ERROR - yy_dept_mapper - 未找到该部门:内八科(消化)
+2026-02-03 21:22:20,316 - ERROR - yy_dept_mapper - 未找到该部门:内分泌内科(内一)
+2026-02-03 21:22:20,316 - ERROR - yy_dept_mapper - 未找到该部门:内分泌内科(内一)
+2026-02-03 21:22:20,319 - ERROR - yy_dept_mapper - 未找到该部门:内三(消化、肿瘤、肾内科)
+2026-02-03 21:22:20,320 - ERROR - yy_dept_mapper - 未找到该部门:内三(消化、肿瘤、肾内科)
+2026-02-03 21:22:20,320 - ERROR - yy_dept_mapper - 未找到该部门:内三(消化、肿瘤、肾内科)
+2026-02-03 21:22:20,320 - ERROR - yy_dept_mapper - 未找到该部门:内三(消化、肿瘤、肾内科)
+2026-02-03 21:22:20,321 - ERROR - yy_dept_mapper - 未找到该部门:内三(消化、肿瘤、肾内科)
+2026-02-03 21:22:20,323 - ERROR - yy_dept_mapper - 未找到该部门:神经内科(内二)
+2026-02-03 21:22:20,323 - ERROR - yy_dept_mapper - 未找到该部门:神经内科(内二)
+2026-02-03 21:22:20,324 - ERROR - yy_dept_mapper - 未找到该部门:神经内科(内二)
+2026-02-03 21:22:20,324 - ERROR - yy_dept_mapper - 未找到该部门:神经内科(内二)
+2026-02-03 21:22:20,324 - ERROR - yy_dept_mapper - 未找到该部门:神经内科(内二)
+2026-02-03 21:22:20,325 - ERROR - yy_dept_mapper - 未找到该部门:神经外科(外三)
+2026-02-03 21:22:20,325 - ERROR - yy_dept_mapper - 未找到该部门:神经外科(外三)
+2026-02-03 21:22:20,325 - ERROR - yy_dept_mapper - 未找到该部门:神经外科(外三)
+2026-02-03 21:22:20,328 - ERROR - yy_dept_mapper - 未找到该部门:心血管内科(内一)
+2026-02-03 21:22:20,329 - ERROR - yy_dept_mapper - 未找到该部门:心血管内科(内一)
+2026-02-03 21:22:20,330 - ERROR - yy_dept_mapper - 未找到该部门:心血管内科(内一)
+2026-02-03 21:22:20,330 - ERROR - yy_dept_mapper - 未找到该部门:心血管内科(内一)
+2026-02-03 21:22:20,330 - ERROR - yy_dept_mapper - 未找到该部门:心血管内科(内一)
+2026-02-03 21:22:20,331 - ERROR - yy_dept_mapper - 未找到该部门:心血管内科(内一)
+2026-02-03 21:22:20,331 - ERROR - yy_dept_mapper - 未找到该部门:眼科(五官)
+2026-02-03 21:22:20,332 - ERROR - yy_dept_mapper - 未找到该部门:眼科(五官)
+2026-02-03 21:22:20,367 - ERROR - yy_dept_mapper - 未找到该部门:内八科(消化)
+2026-02-03 21:22:20,367 - ERROR - yy_dept_mapper - 未找到该部门:内分泌内科(内一)
+2026-02-03 21:22:20,368 - ERROR - yy_dept_mapper - 未找到该部门:内分泌内科(内一)
+2026-02-03 21:22:20,405 - ERROR - yy_dept_mapper - 未找到该部门:骨外科(外二)
+2026-02-03 21:22:20,405 - ERROR - yy_dept_mapper - 未找到该部门:骨外科(外二)
+2026-02-03 21:22:20,405 - ERROR - yy_dept_mapper - 未找到该部门:骨外科(外二)
+2026-02-03 21:22:20,407 - ERROR - yy_dept_mapper - 未找到该部门:泌尿外科(外一)
+2026-02-03 21:22:20,408 - ERROR - yy_dept_mapper - 未找到该部门:泌尿外科(外一)
+2026-02-03 21:22:20,408 - ERROR - yy_dept_mapper - 未找到该部门:泌尿外科(外一)
+2026-02-03 21:22:20,408 - ERROR - yy_dept_mapper - 未找到该部门:泌尿外科(外一)
+2026-02-03 21:22:20,409 - ERROR - yy_dept_mapper - 未找到该部门:泌尿外科(外一)
+2026-02-03 21:22:20,409 - ERROR - yy_dept_mapper - 未找到该部门:内八科(消化)
+2026-02-03 21:22:20,409 - ERROR - yy_dept_mapper - 未找到该部门:内八科(消化)
+2026-02-03 21:22:20,410 - ERROR - yy_dept_mapper - 未找到该部门:内八科(消化)
+2026-02-03 21:22:20,410 - ERROR - yy_dept_mapper - 未找到该部门:内八科(消化)
+2026-02-03 21:22:20,410 - ERROR - yy_dept_mapper - 未找到该部门:内八科(消化)
+2026-02-03 21:22:20,412 - ERROR - yy_dept_mapper - 未找到该部门:内三(消化、肿瘤、肾内科)
+2026-02-03 21:22:20,413 - ERROR - yy_dept_mapper - 未找到该部门:内三(消化、肿瘤、肾内科)
+2026-02-03 21:22:20,413 - ERROR - yy_dept_mapper - 未找到该部门:内三(消化、肿瘤、肾内科)
+2026-02-03 21:22:20,414 - ERROR - yy_dept_mapper - 未找到该部门:内三(消化、肿瘤、肾内科)
+2026-02-03 21:22:20,414 - ERROR - yy_dept_mapper - 未找到该部门:内三(消化、肿瘤、肾内科)
+2026-02-03 21:22:20,415 - ERROR - yy_dept_mapper - 未找到该部门:普通外科(外一)
+2026-02-03 21:22:20,416 - ERROR - yy_dept_mapper - 未找到该部门:普通外科(外一)
+2026-02-03 21:22:20,416 - ERROR - yy_dept_mapper - 未找到该部门:普通外科(外一)
+2026-02-03 21:22:20,416 - ERROR - yy_dept_mapper - 未找到该部门:普通外科(外一)
+2026-02-03 21:22:20,417 - ERROR - yy_dept_mapper - 未找到该部门:神经内科(内二)
+2026-02-03 21:22:20,417 - ERROR - yy_dept_mapper - 未找到该部门:神经内科(内二)
+2026-02-03 21:22:20,417 - ERROR - yy_dept_mapper - 未找到该部门:神经内科(内二)
+2026-02-03 21:22:20,420 - ERROR - yy_dept_mapper - 未找到该部门:心血管内科(内一)
+2026-02-03 21:22:20,420 - ERROR - yy_dept_mapper - 未找到该部门:心血管内科(内一)
+2026-02-03 21:22:20,420 - ERROR - yy_dept_mapper - 未找到该部门:心血管内科(内一)
+2026-02-03 21:22:20,421 - ERROR - yy_dept_mapper - 未找到该部门:心血管内科(内一)
+2026-02-03 21:22:20,421 - ERROR - yy_dept_mapper - 未找到该部门:心血管内科(内一)
+2026-02-03 21:22:20,450 - INFO - sqlserver_db_connect - sqlserver 连接成功, mssql+pyodbc://sa:123456@127.0.0.1:1433/UFDATA_999_2012?driver=SQL+Server
+2026-02-03 21:22:20,896 - INFO - sqlserver_db_connect - 所有数据写入成功，事务已自动提交
+2026-02-03 21:22:20,896 - INFO - sqlserver_db_connect - 写入失败，事务已回滚。错误详情: get_next_ino_id() missing 1 required positional argument: 'period'
+2026-02-03 21:22:20,901 - INFO - test - 导入失败，刷新列表
+2026-02-03 21:22:24,183 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-03 21:27:48,459 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-03 21:27:55,359 - INFO - test - 开始用友导入: {'id': 32, 'start_time': '2026-01-27 00:00:00', 'end_time': '2026-01-27 23:59:59', 'create_time': '2026-01-27 21:13:12', 'export_time': '2026-02-03 21:22:24', 'data_type': '0', 'export_num': '', 'export_file_name': None, 'export_file_path': 'C:\\Users\\Administrator\\Desktop\\线上his\\门诊2026-01-29 00_00_00数据导出.xlsx', 'import_yy_start': '45,81', 'import_yy_num': 637, 'status': 5}
+2026-02-03 21:27:55,388 - INFO - sqlserver_db_connect - DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-03 21:27:55,409 - INFO - sqlserver_db_connect - sqlserver 连接成功, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-03 21:35:55,004 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-03 21:36:02,513 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-03 21:36:11,372 - INFO - test - 开始用友导入: {'id': 32, 'start_time': '2026-01-27 00:00:00', 'end_time': '2026-01-27 23:59:59', 'create_time': '2026-01-27 21:13:12', 'export_time': '2026-02-03 21:22:24', 'data_type': '0', 'export_num': '', 'export_file_name': None, 'export_file_path': 'C:\\Users\\Administrator\\Desktop\\线上his\\门诊2026-01-29 00_00_00数据导出.xlsx', 'import_yy_start': '45,81', 'import_yy_num': 637, 'status': 5}
+2026-02-03 21:36:11,384 - INFO - sqlserver_db_connect - DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-03 21:36:11,403 - INFO - sqlserver_db_connect - sqlserver 连接成功, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-03 21:39:03,163 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-03 21:39:09,519 - INFO - test - 开始用友导入: {'id': 32, 'start_time': '2026-01-27 00:00:00', 'end_time': '2026-01-27 23:59:59', 'create_time': '2026-01-27 21:13:12', 'export_time': '2026-02-03 21:22:24', 'data_type': '0', 'export_num': '', 'export_file_name': None, 'export_file_path': 'C:\\Users\\Administrator\\Desktop\\线上his\\门诊2026-01-29 00_00_00数据导出.xlsx', 'import_yy_start': '45,81', 'import_yy_num': 637, 'status': 5}
+2026-02-03 21:39:09,532 - INFO - sqlserver_db_connect - DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-03 21:39:09,551 - INFO - sqlserver_db_connect - sqlserver 连接成功, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-03 21:39:11,010 - INFO - sqlserver_db_connect - sqlserver 连接成功, mssql+pyodbc://sa:123456@127.0.0.1:1433/UFDATA_999_2012?driver=SQL+Server
+2026-02-03 21:39:11,205 - INFO - sqlserver_db_connect - 所有数据写入成功，事务已自动提交
+2026-02-03 21:39:11,212 - INFO - test - 导入成功，刷新列表
+2026-02-03 21:39:12,551 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-03 21:44:19,299 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-03 21:44:27,425 - INFO - test - 开始用友导入: {'id': 32, 'start_time': '2026-01-27 00:00:00', 'end_time': '2026-01-27 23:59:59', 'create_time': '2026-01-27 21:13:12', 'export_time': '2026-02-03 21:39:11', 'data_type': '1', 'export_num': '', 'export_file_name': None, 'export_file_path': 'C:\\Users\\Administrator\\Desktop\\线上his\\住院缴费2026-01-29 00_00_00数据导出', 'import_yy_start': '45,46,47,48,49,50,51,52', 'import_yy_num': 637, 'status': 4}
+2026-02-03 21:44:27,437 - INFO - sqlserver_db_connect - DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-03 21:44:27,455 - INFO - sqlserver_db_connect - sqlserver 连接成功, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-03 21:44:27,484 - INFO - sqlserver_db_connect - sqlserver 导出失败: [Errno 2] No such file or directory: 'C:\\Users\\Administrator\\Desktop\\线上his\\住院缴费2026-01-29 00_00_00数据导出', DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-03 21:45:11,987 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-03 21:45:55,108 - INFO - test - 开始用友导入: {'id': 32, 'start_time': '2026-01-27 00:00:00', 'end_time': '2026-01-27 23:59:59', 'create_time': '2026-01-27 21:13:12', 'export_time': '2026-02-03 21:39:11', 'data_type': '1', 'export_num': '', 'export_file_name': None, 'export_file_path': 'C:\\Users\\Administrator\\Desktop\\线上his\\住院缴费2026-01-29 00_00_00数据导出.xlsx', 'import_yy_start': '45,46,47,48,49,50,51,52', 'import_yy_num': 637, 'status': 4}
+2026-02-03 21:45:55,119 - INFO - sqlserver_db_connect - DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-03 21:45:55,141 - INFO - sqlserver_db_connect - sqlserver 连接成功, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-03 21:45:55,220 - INFO - sqlserver_db_connect - sqlserver 导出失败: name 'Fals' is not defined, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-03 21:46:36,165 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-03 21:46:40,500 - INFO - test - 开始用友导入: {'id': 32, 'start_time': '2026-01-27 00:00:00', 'end_time': '2026-01-27 23:59:59', 'create_time': '2026-01-27 21:13:12', 'export_time': '2026-02-03 21:39:11', 'data_type': '1', 'export_num': '', 'export_file_name': None, 'export_file_path': 'C:\\Users\\Administrator\\Desktop\\线上his\\住院缴费2026-01-29 00_00_00数据导出.xlsx', 'import_yy_start': '45,46,47,48,49,50,51,52', 'import_yy_num': 637, 'status': 4}
+2026-02-03 21:46:40,511 - INFO - sqlserver_db_connect - DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-03 21:46:40,531 - INFO - sqlserver_db_connect - sqlserver 连接成功, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-03 21:46:40,601 - INFO - sqlserver_db_connect - sqlserver 导出失败: set expected at most 1 argument, got 2, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-03 21:48:07,948 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-03 21:48:11,759 - INFO - test - 开始用友导入: {'id': 32, 'start_time': '2026-01-27 00:00:00', 'end_time': '2026-01-27 23:59:59', 'create_time': '2026-01-27 21:13:12', 'export_time': '2026-02-03 21:39:11', 'data_type': '1', 'export_num': '', 'export_file_name': None, 'export_file_path': 'C:\\Users\\Administrator\\Desktop\\线上his\\住院缴费2026-01-29 00_00_00数据导出.xlsx', 'import_yy_start': '45,46,47,48,49,50,51,52', 'import_yy_num': 637, 'status': 4}
+2026-02-03 21:48:11,768 - INFO - sqlserver_db_connect - DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-03 21:48:11,787 - INFO - sqlserver_db_connect - sqlserver 连接成功, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-03 21:48:11,858 - INFO - sqlserver_db_connect - sqlserver 导出失败: 'float' object has no attribute 'iloc', DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-03 21:48:43,943 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-03 21:48:47,896 - INFO - test - 开始用友导入: {'id': 32, 'start_time': '2026-01-27 00:00:00', 'end_time': '2026-01-27 23:59:59', 'create_time': '2026-01-27 21:13:12', 'export_time': '2026-02-03 21:39:11', 'data_type': '1', 'export_num': '', 'export_file_name': None, 'export_file_path': 'C:\\Users\\Administrator\\Desktop\\线上his\\住院缴费2026-01-29 00_00_00数据导出.xlsx', 'import_yy_start': '45,46,47,48,49,50,51,52', 'import_yy_num': 637, 'status': 4}
+2026-02-03 21:48:47,908 - INFO - sqlserver_db_connect - DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-03 21:48:47,929 - INFO - sqlserver_db_connect - sqlserver 连接成功, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-03 21:48:48,031 - INFO - sqlserver_db_connect - sqlserver 连接成功, mssql+pyodbc://sa:123456@127.0.0.1:1433/UFDATA_999_2012?driver=SQL+Server
+2026-02-03 21:48:48,079 - INFO - sqlserver_db_connect - 所有数据写入成功，事务已自动提交
+2026-02-03 21:48:48,084 - INFO - test - 导入成功，刷新列表
+2026-02-03 21:48:49,110 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-03 21:51:17,355 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-03 21:53:26,964 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-03 21:53:30,998 - INFO - test - 开始用友导入: {'id': 32, 'start_time': '2026-01-27 00:00:00', 'end_time': '2026-01-27 23:59:59', 'create_time': '2026-01-27 21:13:12', 'export_time': '2026-02-03 21:48:48', 'data_type': '1', 'export_num': '', 'export_file_name': None, 'export_file_path': 'C:\\Users\\Administrator\\Desktop\\线上his\\住院缴费2026-01-29 00_00_00数据导出.xlsx', 'import_yy_start': '2,3,4,5,6,7,8,9', 'import_yy_num': 25, 'status': 4}
+2026-02-03 21:53:31,011 - INFO - sqlserver_db_connect - DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-03 21:53:31,031 - INFO - sqlserver_db_connect - sqlserver 连接成功, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-03 21:54:57,054 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-03 21:55:05,499 - INFO - test - 开始用友导入: {'id': 32, 'start_time': '2026-01-27 00:00:00', 'end_time': '2026-01-27 23:59:59', 'create_time': '2026-01-27 21:13:12', 'export_time': '2026-02-03 21:48:48', 'data_type': '1', 'export_num': '', 'export_file_name': None, 'export_file_path': 'C:\\Users\\Administrator\\Desktop\\线上his\\住院缴费2026-01-29 00_00_00数据导出.xlsx', 'import_yy_start': '2,3,4,5,6,7,8,9', 'import_yy_num': 25, 'status': 4}
+2026-02-03 21:55:05,513 - INFO - sqlserver_db_connect - DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-03 21:55:05,535 - INFO - sqlserver_db_connect - sqlserver 连接成功, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-03 21:56:15,319 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-03 21:56:25,254 - INFO - test - 开始用友导入: {'id': 32, 'start_time': '2026-01-27 00:00:00', 'end_time': '2026-01-27 23:59:59', 'create_time': '2026-01-27 21:13:12', 'export_time': '2026-02-03 21:48:48', 'data_type': '1', 'export_num': '', 'export_file_name': None, 'export_file_path': 'C:\\Users\\Administrator\\Desktop\\线上his\\住院缴费2026-01-29 00_00_00数据导出.xlsx', 'import_yy_start': '2,3,4,5,6,7,8,9', 'import_yy_num': 25, 'status': 4}
+2026-02-03 21:56:25,266 - INFO - sqlserver_db_connect - DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-03 21:56:25,285 - INFO - sqlserver_db_connect - sqlserver 连接成功, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-03 21:56:25,390 - INFO - sqlserver_db_connect - sqlserver 连接成功, mssql+pyodbc://sa:123456@127.0.0.1:1433/UFDATA_999_2012?driver=SQL+Server
+2026-02-03 21:56:25,444 - INFO - sqlserver_db_connect - 所有数据写入成功，事务已自动提交
+2026-02-03 21:56:25,449 - INFO - test - 导入成功，刷新列表
+2026-02-03 21:56:27,234 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-03 21:56:33,466 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-03 21:56:48,255 - INFO - test - 开始用友导入: {'id': 32, 'start_time': '2026-01-27 00:00:00', 'end_time': '2026-01-27 23:59:59', 'create_time': '2026-01-27 21:13:12', 'export_time': '2026-02-03 21:56:25', 'data_type': '1', 'export_num': '', 'export_file_name': None, 'export_file_path': 'C:\\Users\\Administrator\\Desktop\\线上his\\住院缴费2026-01-29 00_00_00数据导出.xlsx', 'import_yy_start': '1,2,3,4,5,6,7,8', 'import_yy_num': 25, 'status': 4}
+2026-02-03 21:56:48,268 - INFO - sqlserver_db_connect - DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-03 21:56:48,290 - INFO - sqlserver_db_connect - sqlserver 连接成功, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-03 21:59:29,643 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-03 22:00:05,084 - INFO - test - 开始用友导入: {'id': 32, 'start_time': '2026-01-27 00:00:00', 'end_time': '2026-01-27 23:59:59', 'create_time': '2026-01-27 21:13:12', 'export_time': '2026-02-03 21:56:25', 'data_type': '1', 'export_num': '', 'export_file_name': None, 'export_file_path': 'C:\\Users\\Administrator\\Desktop\\线上his\\住院缴费2026-01-29 00_00_00数据导出.xlsx', 'import_yy_start': '1,2,3,4,5,6,7,8', 'import_yy_num': 25, 'status': 4}
+2026-02-03 22:00:05,097 - INFO - sqlserver_db_connect - DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-03 22:00:05,120 - INFO - sqlserver_db_connect - sqlserver 连接成功, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-03 22:00:05,241 - INFO - sqlserver_db_connect - sqlserver 导出失败: '扎帐单号', DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-03 22:00:30,910 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-03 22:00:37,053 - INFO - test - 开始用友导入: {'id': 32, 'start_time': '2026-01-27 00:00:00', 'end_time': '2026-01-27 23:59:59', 'create_time': '2026-01-27 21:13:12', 'export_time': '2026-02-03 21:56:25', 'data_type': '1', 'export_num': '', 'export_file_name': None, 'export_file_path': 'C:\\Users\\Administrator\\Desktop\\线上his\\住院缴费2026-01-29 00_00_00数据导出.xlsx', 'import_yy_start': '1,2,3,4,5,6,7,8', 'import_yy_num': 25, 'status': 4}
+2026-02-03 22:00:37,065 - INFO - sqlserver_db_connect - DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-03 22:00:37,087 - INFO - sqlserver_db_connect - sqlserver 连接成功, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-03 22:00:37,195 - INFO - sqlserver_db_connect - sqlserver 导出失败: '扎帐单号', DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-03 22:03:16,112 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-03 22:03:21,344 - INFO - test - 开始用友导入: {'id': 32, 'start_time': '2026-01-27 00:00:00', 'end_time': '2026-01-27 23:59:59', 'create_time': '2026-01-27 21:13:12', 'export_time': '2026-02-03 21:56:25', 'data_type': '1', 'export_num': '', 'export_file_name': None, 'export_file_path': 'C:\\Users\\Administrator\\Desktop\\线上his\\住院缴费2026-01-29 00_00_00数据导出.xlsx', 'import_yy_start': '1,2,3,4,5,6,7,8', 'import_yy_num': 25, 'status': 4}
+2026-02-03 22:03:21,357 - INFO - sqlserver_db_connect - DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-03 22:03:21,379 - INFO - sqlserver_db_connect - sqlserver 连接成功, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-03 22:03:21,497 - INFO - sqlserver_db_connect - sqlserver 导出失败: single positional indexer is out-of-bounds, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-03 22:03:36,712 - INFO - test - 开始用友导入: {'id': 32, 'start_time': '2026-01-27 00:00:00', 'end_time': '2026-01-27 23:59:59', 'create_time': '2026-01-27 21:13:12', 'export_time': '2026-02-03 21:56:25', 'data_type': '1', 'export_num': '', 'export_file_name': None, 'export_file_path': 'C:\\Users\\Administrator\\Desktop\\线上his\\住院缴费2026-01-29 00_00_00数据导出.xlsx', 'import_yy_start': '1,2,3,4,5,6,7,8', 'import_yy_num': 25, 'status': 4}
+2026-02-03 22:03:36,723 - INFO - sqlserver_db_connect - DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-03 22:03:36,730 - INFO - sqlserver_db_connect - sqlserver 连接成功, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-03 22:03:36,839 - INFO - sqlserver_db_connect - sqlserver 导出失败: single positional indexer is out-of-bounds, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-03 22:04:22,915 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-03 22:04:28,099 - INFO - test - 开始用友导入: {'id': 32, 'start_time': '2026-01-27 00:00:00', 'end_time': '2026-01-27 23:59:59', 'create_time': '2026-01-27 21:13:12', 'export_time': '2026-02-03 21:56:25', 'data_type': '1', 'export_num': '', 'export_file_name': None, 'export_file_path': 'C:\\Users\\Administrator\\Desktop\\线上his\\住院缴费2026-01-29 00_00_00数据导出.xlsx', 'import_yy_start': '1,2,3,4,5,6,7,8', 'import_yy_num': 25, 'status': 4}
+2026-02-03 22:04:28,113 - INFO - sqlserver_db_connect - DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-03 22:04:28,132 - INFO - sqlserver_db_connect - sqlserver 连接成功, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-03 22:06:33,212 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-03 22:06:38,515 - INFO - test - 开始用友导入: {'id': 32, 'start_time': '2026-01-27 00:00:00', 'end_time': '2026-01-27 23:59:59', 'create_time': '2026-01-27 21:13:12', 'export_time': '2026-02-03 21:56:25', 'data_type': '1', 'export_num': '', 'export_file_name': None, 'export_file_path': 'C:\\Users\\Administrator\\Desktop\\线上his\\住院缴费2026-01-29 00_00_00数据导出.xlsx', 'import_yy_start': '1,2,3,4,5,6,7,8', 'import_yy_num': 25, 'status': 4}
+2026-02-03 22:06:38,528 - INFO - sqlserver_db_connect - DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-03 22:06:38,547 - INFO - sqlserver_db_connect - sqlserver 连接成功, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-03 22:06:38,630 - INFO - sqlserver_db_connect - sqlserver 导出失败: single positional indexer is out-of-bounds, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-03 22:07:10,557 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-03 22:07:16,694 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-03 22:07:20,410 - INFO - test - 开始用友导入: {'id': 32, 'start_time': '2026-01-27 00:00:00', 'end_time': '2026-01-27 23:59:59', 'create_time': '2026-01-27 21:13:12', 'export_time': '2026-02-03 21:56:25', 'data_type': '1', 'export_num': '', 'export_file_name': None, 'export_file_path': 'C:\\Users\\Administrator\\Desktop\\线上his\\住院缴费2026-01-29 00_00_00数据导出.xlsx', 'import_yy_start': '1,2,3,4,5,6,7,8', 'import_yy_num': 25, 'status': 4}
+2026-02-03 22:07:20,424 - INFO - sqlserver_db_connect - DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-03 22:07:20,445 - INFO - sqlserver_db_connect - sqlserver 连接成功, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-03 22:08:49,178 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-03 22:09:19,704 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-03 22:09:22,952 - INFO - test - 开始用友导入: {'id': 32, 'start_time': '2026-01-27 00:00:00', 'end_time': '2026-01-27 23:59:59', 'create_time': '2026-01-27 21:13:12', 'export_time': '2026-02-03 21:56:25', 'data_type': '0', 'export_num': '', 'export_file_name': None, 'export_file_path': 'C:\\Users\\Administrator\\Desktop\\线上his\\门诊2026-01-29 00_00_00数据导出.xlsx', 'import_yy_start': '1,2,3,4,5,6,7,8', 'import_yy_num': 25, 'status': 4}
+2026-02-03 22:09:22,965 - INFO - sqlserver_db_connect - DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-03 22:09:22,987 - INFO - sqlserver_db_connect - sqlserver 连接成功, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-03 22:09:23,067 - INFO - sqlserver_db_connect - sqlserver 导出失败: single positional indexer is out-of-bounds, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-03 22:09:49,748 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-03 22:09:52,920 - INFO - test - 开始用友导入: {'id': 32, 'start_time': '2026-01-27 00:00:00', 'end_time': '2026-01-27 23:59:59', 'create_time': '2026-01-27 21:13:12', 'export_time': '2026-02-03 21:56:25', 'data_type': '0', 'export_num': '', 'export_file_name': None, 'export_file_path': 'C:\\Users\\Administrator\\Desktop\\线上his\\门诊2026-01-29 00_00_00数据导出.xlsx', 'import_yy_start': '1,2,3,4,5,6,7,8', 'import_yy_num': 25, 'status': 4}
+2026-02-03 22:09:52,933 - INFO - sqlserver_db_connect - DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-03 22:09:52,952 - INFO - sqlserver_db_connect - sqlserver 连接成功, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-03 22:09:53,038 - INFO - sqlserver_db_connect - sqlserver 导出失败: single positional indexer is out-of-bounds, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-03 22:10:44,367 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-03 22:10:48,790 - INFO - test - 开始用友导入: {'id': 32, 'start_time': '2026-01-27 00:00:00', 'end_time': '2026-01-27 23:59:59', 'create_time': '2026-01-27 21:13:12', 'export_time': '2026-02-03 21:56:25', 'data_type': '0', 'export_num': '', 'export_file_name': None, 'export_file_path': 'C:\\Users\\Administrator\\Desktop\\线上his\\门诊2026-01-29 00_00_00数据导出.xlsx', 'import_yy_start': '1,2,3,4,5,6,7,8', 'import_yy_num': 25, 'status': 4}
+2026-02-03 22:10:48,800 - INFO - sqlserver_db_connect - DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-03 22:10:48,818 - INFO - sqlserver_db_connect - sqlserver 连接成功, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-03 22:10:49,380 - INFO - sqlserver_db_connect - sqlserver 连接成功, mssql+pyodbc://sa:123456@127.0.0.1:1433/UFDATA_999_2012?driver=SQL+Server
+2026-02-03 22:10:49,513 - INFO - sqlserver_db_connect - 所有数据写入成功，事务已自动提交
+2026-02-03 22:10:49,519 - INFO - test - 导入成功，刷新列表
+2026-02-03 22:10:50,832 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-03 22:14:40,233 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-03 22:14:57,643 - INFO - test - 开始用友导入: {'id': 32, 'start_time': '2026-01-27 00:00:00', 'end_time': '2026-01-27 23:59:59', 'create_time': '2026-01-27 21:13:12', 'export_time': '2026-02-03 22:10:49', 'data_type': '0', 'export_num': '', 'export_file_name': None, 'export_file_path': 'C:\\Users\\Administrator\\Desktop\\线上his\\门诊2026-01-29 00_00_00数据导出.xlsx', 'import_yy_start': '1,2,3,4,5,6,7,8', 'import_yy_num': 637, 'status': 4}
+2026-02-03 22:14:57,657 - INFO - sqlserver_db_connect - DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-03 22:14:57,676 - INFO - sqlserver_db_connect - sqlserver 连接成功, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-03 22:18:05,339 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-03 22:18:08,809 - INFO - test - 开始用友导入: {'id': 32, 'start_time': '2026-01-27 00:00:00', 'end_time': '2026-01-27 23:59:59', 'create_time': '2026-01-27 21:13:12', 'export_time': '2026-02-03 22:10:49', 'data_type': '0', 'export_num': '', 'export_file_name': None, 'export_file_path': 'C:\\Users\\Administrator\\Desktop\\线上his\\门诊2026-01-29 00_00_00数据导出.xlsx', 'import_yy_start': '1,2,3,4,5,6,7,8', 'import_yy_num': 637, 'status': 4}
+2026-02-03 22:18:08,820 - INFO - sqlserver_db_connect - DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-03 22:18:08,842 - INFO - sqlserver_db_connect - sqlserver 连接成功, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-03 22:18:09,407 - INFO - sqlserver_db_connect - sqlserver 连接成功, mssql+pyodbc://sa:123456@127.0.0.1:1433/UFDATA_999_2012?driver=SQL+Server
+2026-02-03 22:18:09,542 - INFO - sqlserver_db_connect - 所有数据写入成功，事务已自动提交
+2026-02-03 22:18:09,548 - INFO - test - 导入成功，刷新列表
+2026-02-03 22:18:11,046 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-03 22:24:55,015 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-03 22:25:04,460 - INFO - test - 开始用友导入: {'id': 32, 'start_time': '2026-01-27 00:00:00', 'end_time': '2026-01-27 23:59:59', 'create_time': '2026-01-27 21:13:12', 'export_time': '2026-02-03 22:18:09', 'data_type': '1', 'export_num': '', 'export_file_name': None, 'export_file_path': 'C:\\Users\\Administrator\\Desktop\\线上his\\住院缴费2026-01-29 00_00_00数据导出1.xlsx', 'import_yy_start': '1,2,3,4,5,6,7,8', 'import_yy_num': 637, 'status': 4}
+2026-02-03 22:25:04,474 - INFO - sqlserver_db_connect - DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-03 22:25:04,494 - INFO - sqlserver_db_connect - sqlserver 连接成功, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-03 22:26:14,447 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-03 22:26:20,274 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-03 22:26:36,540 - INFO - test - 开始用友导入: {'id': 32, 'start_time': '2026-01-27 00:00:00', 'end_time': '2026-01-27 23:59:59', 'create_time': '2026-01-27 21:13:12', 'export_time': '2026-02-03 22:18:09', 'data_type': '1', 'export_num': '', 'export_file_name': None, 'export_file_path': 'C:\\Users\\Administrator\\Desktop\\线上his\\住院缴费2026-01-29 00_00_00数据导出1.xlsx', 'import_yy_start': '1,2,3,4,5,6,7,8', 'import_yy_num': 637, 'status': 4}
+2026-02-03 22:26:36,552 - INFO - sqlserver_db_connect - DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-03 22:26:36,574 - INFO - sqlserver_db_connect - sqlserver 连接成功, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-03 22:31:40,737 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-03 22:31:46,289 - INFO - test - 开始用友导入: {'id': 32, 'start_time': '2026-01-27 00:00:00', 'end_time': '2026-01-27 23:59:59', 'create_time': '2026-01-27 21:13:12', 'export_time': '2026-02-03 22:18:09', 'data_type': '1', 'export_num': '', 'export_file_name': None, 'export_file_path': 'C:\\Users\\Administrator\\Desktop\\线上his\\住院缴费2026-01-29 00_00_00数据导出1.xlsx', 'import_yy_start': '1,2,3,4,5,6,7,8', 'import_yy_num': 637, 'status': 4}
+2026-02-03 22:31:46,300 - INFO - sqlserver_db_connect - DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-03 22:31:46,320 - INFO - sqlserver_db_connect - sqlserver 连接成功, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-03 22:31:46,418 - INFO - sqlserver_db_connect - sqlserver 连接成功, mssql+pyodbc://sa:123456@127.0.0.1:1433/UFDATA_999_2012?driver=SQL+Server
+2026-02-03 22:31:46,466 - INFO - sqlserver_db_connect - 所有数据写入成功，事务已自动提交
+2026-02-03 22:31:46,470 - INFO - test - 导入成功，刷新列表
+2026-02-03 22:32:03,427 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-03 22:34:36,094 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-03 22:34:41,009 - INFO - test - 开始用友导入: {'id': 32, 'start_time': '2026-01-27 00:00:00', 'end_time': '2026-01-27 23:59:59', 'create_time': '2026-01-27 21:13:12', 'export_time': '2026-02-03 22:31:46', 'data_type': '1', 'export_num': '', 'export_file_name': None, 'export_file_path': 'C:\\Users\\Administrator\\Desktop\\线上his\\住院缴费2026-01-29 00_00_00数据导出1.xlsx', 'import_yy_start': '8,9,10,11,12', 'import_yy_num': 25, 'status': 4}
+2026-02-03 22:34:41,021 - INFO - sqlserver_db_connect - DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-03 22:34:41,043 - INFO - sqlserver_db_connect - sqlserver 连接成功, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-03 22:35:11,861 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-03 22:35:17,462 - INFO - test - 开始用友导入: {'id': 32, 'start_time': '2026-01-27 00:00:00', 'end_time': '2026-01-27 23:59:59', 'create_time': '2026-01-27 21:13:12', 'export_time': '2026-02-03 22:31:46', 'data_type': '1', 'export_num': '', 'export_file_name': None, 'export_file_path': 'C:\\Users\\Administrator\\Desktop\\线上his\\住院缴费2026-01-29 00_00_00数据导出1.xlsx', 'import_yy_start': '8,9,10,11,12', 'import_yy_num': 25, 'status': 4}
+2026-02-03 22:35:17,475 - INFO - sqlserver_db_connect - DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-03 22:35:17,497 - INFO - sqlserver_db_connect - sqlserver 连接成功, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-03 22:36:47,573 - INFO - sqlserver_db_connect - sqlserver 连接成功, mssql+pyodbc://sa:123456@127.0.0.1:1433/UFDATA_999_2012?driver=SQL+Server
+2026-02-03 22:36:47,669 - INFO - sqlserver_db_connect - 所有数据写入成功，事务已自动提交
+2026-02-03 22:36:47,672 - INFO - test - 导入成功，刷新列表
+2026-02-03 22:46:43,187 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-03 22:46:48,484 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-03 22:46:56,667 - INFO - test - 开始用友导入: {'id': 32, 'start_time': '2026-01-27 00:00:00', 'end_time': '2026-01-27 23:59:59', 'create_time': '2026-01-27 21:13:12', 'export_time': '2026-02-03 22:36:47', 'data_type': '1', 'export_num': '', 'export_file_name': None, 'export_file_path': 'C:\\Users\\Administrator\\Desktop\\线上his\\住院缴费2026-01-29 00_00_00数据导出1.xlsx', 'import_yy_start': '1,2,3,4,5', 'import_yy_num': 25, 'status': 4}
+2026-02-03 22:46:56,679 - INFO - sqlserver_db_connect - DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-03 22:46:56,702 - INFO - sqlserver_db_connect - sqlserver 连接成功, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-03 22:49:04,223 - INFO - sqlserver_db_connect - sqlserver 连接成功, mssql+pyodbc://sa:123456@127.0.0.1:1433/UFDATA_999_2012?driver=SQL+Server
+2026-02-03 22:49:04,314 - INFO - sqlserver_db_connect - 所有数据写入成功，事务已自动提交
+2026-02-03 22:49:04,316 - INFO - test - 导入成功，刷新列表

@@ -295,8 +295,10 @@ class ExcelMerger(QMainWindow):
         if this_full_path and this_record_id > 0:
             # 参数说明：父窗口, 标题, 内容, 按钮组合, 默认选中的按钮
             record = self.sqlite_helper.get_record_by_id(this_record_id)
-            record['data_type'] = '0'
-            record['export_file_path'] = r"C:\Users\Administrator\Desktop\线上his\门诊2026-01-29 00_00_00数据导出.xlsx"
+            # record['data_type'] = '0'
+            # record['export_file_path'] = r"C:\Users\Administrator\Desktop\线上his\门诊2026-01-29 00_00_00数据导出.xlsx"
+            record['data_type'] = '1'
+            record['export_file_path'] = r"C:\Users\Administrator\Desktop\线上his\住院缴费2026-01-29 00_00_00数据导出1.xlsx"
             if record['status'] == 4:
                 # 已经导出成功得数据
                 reply = QMessageBox.question(self, "提示", "该条数据已经成功导入到用友，请确认再次导入？",
