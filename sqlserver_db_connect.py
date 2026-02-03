@@ -73,6 +73,10 @@ def read_excel_real(conn, sqlserver_config, record, finished_signal):
         df_empty, period_list = build_menzhen_df(conn, record)
     elif data_type == "1":
         df_empty, period_list = build_zhuyuan_js_df(conn, record)
+    elif data_type == "2":
+        # 门诊扫码
+        df_empty, period_list = build_zhuyuan_js_df(conn, record)
+
     # for index, row in df_empty.iterrows():
     #     print(f"--- 正在处理第 {index} 行 ---")
     #     for col in df_empty.columns:
@@ -267,10 +271,33 @@ def build_zhuyuan_js_df(conn, record):
             病人返押金票据:	260129000018	结帐	刘春丽	2026-01-29 10:49:31	现金	35100
             病人返押金票据:	260129000018	结帐	刘春丽	2026-01-29 10:49:31	微信扫码付	145120.24
             """
+            total_fanya = fanya_df['金额'].sum()
+            if total_fanya > 0:
+                inid = inid + 1
+                name = total_fanya.iloc[0]['收款员']
+                zz_code = total_fanya.iloc[0]['扎账单号']
+                cdigest = f"结算住院费,扎账单号:{zz_code},{'' if pd.isna(name) else name}"
+                # 科目
+                ccode = '230502'
+                md = 0.0
+                # 贷方
+                mc = -pd.to_numeric(total_fanya)
+                row_list.append(transform_to_yonyou(period, ino_id, inid, date_val, '李红霞', md, mc, None, ccode, cdigest))
             """
-            贷方 充 121101应收  结账数据总和
+            贷方 充 121101 应收  结账数据总和
             """
-
+            total_jiezhang = jiezhang_df['金额'].sum()
+            if total_jiezhang > 0:
+                inid = inid + 1
+                name = jiezhang_df.iloc[0]['收款员']
+                zz_code = jiezhang_df.iloc[0]['扎账单号']
+                cdigest = f"结算住院费,扎账单号:{zz_code},{'' if pd.isna(name) else name}"
+                # 科目
+                ccode = '121101'
+                md = 0.0
+                # 贷方
+                mc = pd.to_numeric(total_jiezhang)
+                row_list.append(transform_to_yonyou(period, ino_id, inid, date_val, '李红霞', md, mc, None, ccode, cdigest))
 
             for yongyou_row in row_list:
                 if yongyou_row["md"] > 0.0 or yongyou_row["mc"] < 0.0:
@@ -279,7 +306,7 @@ def build_zhuyuan_js_df(conn, record):
                     yongyou_row["ccode_equal"] = ",".join(list(ccode_set1)[:4])
             new_row = pd.DataFrame(row_list)
             df_empty = pd.concat([df_empty, new_row], ignore_index=True)
-    return df_empty
+    return df_empty, period_list
 
 def get_next_ino_id(conn, period):
     """

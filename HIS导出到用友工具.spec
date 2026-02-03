@@ -5,7 +5,7 @@ a = Analysis(
     ['test.py'],
     pathex=[],
     binaries=[],
-    datas=[('requirements.txt', '.'), ('lib/instantclient_11_21', 'instantclient_11_21')],
+    datas=[('requirements.txt', '.'), ('lib/instantclient_11_21', 'instantclient_11_21'), ('config', 'config')],
     hiddenimports=['pandas', 'openpyxl', 'PyQt5', 'PyQt5.QtCore', 'PyQt5.QtGui', 'PyQt5.QtWidgets'],
     hookspath=[],
     hooksconfig={},

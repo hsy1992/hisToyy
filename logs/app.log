@@ -5476,3 +5476,4 @@ Name: cDepCode, dtype: object, None, 1, None, None, 0, None, None, 0, 0, 0, 0, 0
 2026-02-01 12:31:24,723 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
 2026-02-01 12:32:41,975 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
 2026-02-01 12:34:13,012 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-03 10:44:48,914 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
