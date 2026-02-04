@@ -7,12 +7,12 @@ from log_util import logger
 """
 df_dept = pd.DataFrame()
 def load_dept():
-    if getattr(sys, 'frozen', False):
-        # 如果是打包成了 .exe
-        base_path = sys._MEIPASS
-    else:
-        # 如果是直接运行 .py
-        base_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "config")
+    # if getattr(sys, 'frozen', False):
+    #     # 如果是打包成了 .exe
+    #     base_path = sys._MEIPASS
+    # else:
+    #     # 如果是直接运行 .py
+    base_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "config")
     dept = os.path.join(base_path, "bumen.xlsx")
     global df_dept
     df_dept = pd.read_excel(dept, dtype=str)

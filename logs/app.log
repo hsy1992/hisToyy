@@ -5916,3 +5916,19 @@ Name: cDepCode, dtype: object, None, 1, None, None, 0, None, None, 0, 0, 0, 0, 0
 2026-02-03 22:49:04,223 - INFO - sqlserver_db_connect - sqlserver 连接成功, mssql+pyodbc://sa:123456@127.0.0.1:1433/UFDATA_999_2012?driver=SQL+Server
 2026-02-03 22:49:04,314 - INFO - sqlserver_db_connect - 所有数据写入成功，事务已自动提交
 2026-02-03 22:49:04,316 - INFO - test - 导入成功，刷新列表
+2026-02-04 20:00:40,663 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-04 20:00:48,069 - INFO - test - 开始用友导入: {'id': 32, 'start_time': '2026-01-27 00:00:00', 'end_time': '2026-01-27 23:59:59', 'create_time': '2026-01-27 21:13:12', 'export_time': '2026-02-03 22:49:04', 'data_type': '1', 'export_num': '', 'export_file_name': None, 'export_file_path': 'C:\\Users\\Administrator\\Desktop\\线上his\\住院缴费2026-01-29 00_00_00数据导出1.xlsx', 'import_yy_start': '6,7,8,9,10', 'import_yy_num': 25, 'status': 4}
+2026-02-04 20:00:48,118 - INFO - sqlserver_db_connect - DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-04 20:00:48,207 - INFO - sqlserver_db_connect - sqlserver 连接成功, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-04 20:00:48,455 - INFO - sqlserver_db_connect - sqlserver 连接成功, mssql+pyodbc://sa:123456@127.0.0.1:1433/UFDATA_999_2012?driver=SQL+Server
+2026-02-04 20:00:48,614 - INFO - sqlserver_db_connect - 所有数据写入成功，事务已自动提交
+2026-02-04 20:00:48,619 - INFO - test - 导入成功，刷新列表
+2026-02-04 20:00:49,725 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-04 20:06:49,303 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-04 20:07:10,976 - INFO - test - 开始用友导入: {'id': 32, 'start_time': '2026-01-27 00:00:00', 'end_time': '2026-01-27 23:59:59', 'create_time': '2026-01-27 21:13:12', 'export_time': '2026-02-04 20:00:48', 'data_type': '1', 'export_num': '', 'export_file_name': None, 'export_file_path': 'C:\\Users\\Administrator\\Desktop\\线上his\\住院缴费2026-01-29 00_00_00数据导出1.xlsx', 'import_yy_start': '1,2,3,4,5', 'import_yy_num': 25, 'status': 4}
+2026-02-04 20:07:10,989 - INFO - sqlserver_db_connect - DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-04 20:07:11,008 - INFO - sqlserver_db_connect - sqlserver 连接成功, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-04 20:07:11,119 - INFO - sqlserver_db_connect - sqlserver 连接成功, mssql+pyodbc://sa:123456@127.0.0.1:1433/UFDATA_999_2012?driver=SQL+Server
+2026-02-04 20:07:11,170 - INFO - sqlserver_db_connect - 所有数据写入成功，事务已自动提交
+2026-02-04 20:07:11,176 - INFO - test - 导入成功，刷新列表
+2026-02-04 20:07:12,033 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10

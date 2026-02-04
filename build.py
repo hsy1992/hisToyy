@@ -108,7 +108,6 @@ def build_windows_exe():
             '--uac-admin',
             '--noconsole',
             '--add-data=lib/instantclient_11_21;instantclient_11_21',
-            '--add-data=config;config',
         ]
 
         # 添加隐藏导入

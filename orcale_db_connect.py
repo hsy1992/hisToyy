@@ -88,9 +88,9 @@ def connect_to_oracle_test(user, pwd, host, port, service_name):
 TYPE_CONFIG = {
     0: ("门诊收入", "v_门诊人员缴款书收入项目", "v_门诊人员缴款书结算方式", "扎帐时间", "扎帐时间"),
     1: ("住院结算", "v_住院人员缴款书收入项目", "v_住院人员缴款书结算方式", "扎帐时间", "扎帐时间"),
-    2: ("门诊扫码", "v_门诊人员缴款书扫码付收入项目", "v_门诊人员缴款书扫码付结算方式", "登记时间", "收款时间"),
-    3: ("全院病人费用", "v_全院病人费用汇总住院", None, "", ""),  # 没有汇总视图
-    4: ("门诊自助机", "v_门诊人员缴款书自助机收入项目", "v_门诊人员缴款书自助机结算方式", "登记时间", "收款时间"),
+    2: ("全院病人费用", "v_全院病人费用汇总住院", None, "", ""),  # 没有汇总视图
+    3: ("门诊自助机", "v_门诊人员缴款书自助机收入项目", "v_门诊人员缴款书自助机结算方式", "登记时间", "收款时间"),
+    4: ("门诊扫码", "v_门诊人员缴款书扫码付收入项目", "v_门诊人员缴款书扫码付结算方式", "登记时间", "收款时间"),
 }
 
 def get_his_data(oracle_config, start_str, end_str, type):
@@ -114,13 +114,21 @@ def get_his_data(oracle_config, start_str, end_str, type):
             detail_view = f'{detail_view}'
             total_view = f'{total_view}' if total_view else None
 
-        where_clause = f' WHERE "{time_type}" >= TO_DATE(\'{start_str}\', \'YYYY-MM-DD HH24:MI:SS\') ' \
-                       f'AND "{time_type_total}" < TO_DATE(\'{end_str}\', \'YYYY-MM-DD HH24:MI:SS\')' if type != 3 else ''
-        # 执行查询
-        logger.info(f"查询sql: SELECT * FROM {detail_view}{where_clause}")
-        logger.info(f"查询sql: SELECT * FROM {total_view}{where_clause}")
-        shoukuan_df = pd.read_sql(f"SELECT * FROM {detail_view}{where_clause}", conn)
-        total_df = pd.read_sql(f"SELECT * FROM {total_view}{where_clause}", conn) if total_view else None
+        shoukuan_df = pd.DataFrame()
+        total_df = pd.DataFrame()
+        if detail_view:
+            # 详情
+            where_clause = f' WHERE "{time_type}" >= TO_DATE(\'{start_str}\', \'YYYY-MM-DD HH24:MI:SS\') ' \
+                           f'AND "{time_type}" < TO_DATE(\'{end_str}\', \'YYYY-MM-DD HH24:MI:SS\')' if type != 2 else ''
+            logger.info(f"查询sql: SELECT * FROM {detail_view}{where_clause}")
+            shoukuan_df = pd.read_sql(f"SELECT * FROM {detail_view}{where_clause}", conn)
+
+        if total_view:
+            where_clause = f' WHERE "{time_type_total}" >= TO_DATE(\'{start_str}\', \'YYYY-MM-DD HH24:MI:SS\') ' \
+                           f'AND "{time_type_total}" < TO_DATE(\'{end_str}\', \'YYYY-MM-DD HH24:MI:SS\')' if type != 2 else ''
+            logger.info(f"查询totalsql: SELECT * FROM {total_view}{where_clause}")
+            total_df = pd.read_sql(f"SELECT * FROM {total_view}{where_clause}", conn) if total_view else None
+
         # 文件导出处理
         s = datetime.now().strftime("%H:%M:%S")
         file_name = f"{prefix}{start_str}数据导出{s}.xlsx".replace(":", "_")
@@ -128,7 +136,6 @@ def get_his_data(oracle_config, start_str, end_str, type):
 
         # 写入详情页
         shoukuan_df.to_excel(full_path, sheet_name=f'收款数据', index=False)
-
         # 如果有汇总页，追加写入
         if total_df is not None:
             with pd.ExcelWriter(full_path, engine='openpyxl', mode='a', if_sheet_exists='replace') as writer:

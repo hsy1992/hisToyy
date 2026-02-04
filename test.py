@@ -87,9 +87,9 @@ class ExcelMerger(QMainWindow):
         # 创建单选按钮
         self.radio_outpatient = QRadioButton("门诊收入")
         self.radio_inpatient1 = QRadioButton("住院结算")
-        self.radio_inpatient2 = QRadioButton("门诊扫码")
-        self.radio_inpatient3 = QRadioButton("全院病人费用")
-        self.radio_inpatient4 = QRadioButton("门诊自助机")
+        self.radio_inpatient2 = QRadioButton("全院病人费用")
+        self.radio_inpatient3 = QRadioButton("门诊自助机")
+        self.radio_inpatient4 = QRadioButton("门诊扫码(月)")
 
         self.radio_outpatient.setChecked(True)
 
@@ -207,8 +207,8 @@ class ExcelMerger(QMainWindow):
     def on_type_changed(self, type_id):
         now = datetime.now()
         today = now.date().strftime("%Y-%m-%d")
-        if type_id == 3:
-            # 门诊自助时间选择切换到月
+        if type_id == 4:
+            # 门诊扫码时间选择切换到月
             today1 = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0).strftime("%Y-%m-%d")
             self.start_str = f"{today1} 00:00:00"
         else:
