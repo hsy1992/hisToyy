@@ -88,7 +88,7 @@ def connect_to_oracle_test(user, pwd, host, port, service_name):
 TYPE_CONFIG = {
     0: ("门诊收入", "v_门诊人员缴款书收入项目", "v_门诊人员缴款书结算方式", "扎帐时间", "扎帐时间"),
     1: ("住院结算", "v_住院人员缴款书收入项目", "v_住院人员缴款书结算方式", "扎帐时间", "扎帐时间"),
-    2: ("全院病人费用", "v_全院病人费用汇总住院", None, "", ""),  # 没有汇总视图
+    2: ("全院病人费用", "v_全院病人费用汇总住院", None, "日期", ""),  # 没有汇总视图
     3: ("门诊自助机", "v_门诊人员缴款书自助机收入项目", "v_门诊人员缴款书自助机结算方式", "登记时间", "收款时间"),
     4: ("门诊扫码", "v_门诊人员缴款书扫码付收入项目", "v_门诊人员缴款书扫码付结算方式", "登记时间", "收款时间"),
 }
@@ -119,7 +119,7 @@ def get_his_data(oracle_config, start_str, end_str, type):
         if detail_view:
             # 详情
             where_clause = f' WHERE "{time_type}" >= TO_DATE(\'{start_str}\', \'YYYY-MM-DD HH24:MI:SS\') ' \
-                           f'AND "{time_type}" < TO_DATE(\'{end_str}\', \'YYYY-MM-DD HH24:MI:SS\')' if type != 2 else ''
+                           f'AND "{time_type}" < TO_DATE(\'{end_str}\', \'YYYY-MM-DD HH24:MI:SS\')'
             logger.info(f"查询sql: SELECT * FROM {detail_view}{where_clause}")
             shoukuan_df = pd.read_sql(f"SELECT * FROM {detail_view}{where_clause}", conn)
 
@@ -131,7 +131,7 @@ def get_his_data(oracle_config, start_str, end_str, type):
 
         # 文件导出处理
         s = datetime.now().strftime("%H:%M:%S")
-        file_name = f"{prefix}{start_str}数据导出{s}.xlsx".replace(":", "_")
+        file_name = f"{prefix}{start_str}_{end_str}数据导出{s}.xlsx".replace(":", "_")
         full_path = os.path.join(resource_path("export_data"), file_name)
 
         # 写入详情页

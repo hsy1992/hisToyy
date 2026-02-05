@@ -17,6 +17,8 @@ import sys
 from scroll_window import SqlInfiniteTableWidget
 from py_sqlite import SQLiteHelper
 from pathlib import Path
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
 
 format_pattern = "yyyy-MM-dd HH:mm:ss"
 class ExcelMerger(QMainWindow):
@@ -87,8 +89,8 @@ class ExcelMerger(QMainWindow):
         # 创建单选按钮
         self.radio_outpatient = QRadioButton("门诊收入")
         self.radio_inpatient1 = QRadioButton("住院结算")
-        self.radio_inpatient2 = QRadioButton("全院病人费用")
-        self.radio_inpatient3 = QRadioButton("门诊自助机")
+        self.radio_inpatient2 = QRadioButton("全院病人费用(月)")
+        self.radio_inpatient3 = QRadioButton("门诊自助机(月)")
         self.radio_inpatient4 = QRadioButton("门诊扫码(月)")
 
         self.radio_outpatient.setChecked(True)
@@ -206,11 +208,12 @@ class ExcelMerger(QMainWindow):
 
     def on_type_changed(self, type_id):
         now = datetime.now()
-        today = now.date().strftime("%Y-%m-%d")
-        if type_id == 4:
-            # 门诊扫码时间选择切换到月
-            today1 = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0).strftime("%Y-%m-%d")
-            self.start_str = f"{today1} 00:00:00"
+        today = now.date()
+        if type_id >= 2:
+            # 门诊扫码、自助机、住院病人时间选择切换到月
+            # 减去 1 个月
+            last_month_today = now - relativedelta(months=1)
+            self.start_str = f"{last_month_today.strftime('%Y-%m-%d')} 00:00:00"
         else:
             self.start_str = f"{today} 00:00:00"
         self.dt_edit.setDateTime(QDateTime.fromString(self.start_str, format_pattern))
@@ -297,8 +300,10 @@ class ExcelMerger(QMainWindow):
             record = self.sqlite_helper.get_record_by_id(this_record_id)
             # record['data_type'] = '0'
             # record['export_file_path'] = r"C:\Users\Administrator\Desktop\线上his\门诊2026-01-29 00_00_00数据导出.xlsx"
-            record['data_type'] = '1'
-            record['export_file_path'] = r"C:\Users\Administrator\Desktop\线上his\住院缴费2026-01-29 00_00_00数据导出1.xlsx"
+            # record['data_type'] = '1'
+            # record['export_file_path'] = r"C:\Users\Administrator\Desktop\线上his\住院缴费2026-01-29 00_00_00数据导出1.xlsx"
+            record['data_type'] = '2'
+            record['export_file_path'] = r"C:\Users\Administrator\Desktop\线上his\全院病人费用2026-01-05 00_00_00数据导出20_46_15.xlsx"
             if record['status'] == 4:
                 # 已经导出成功得数据
                 reply = QMessageBox.question(self, "提示", "该条数据已经成功导入到用友，请确认再次导入？",

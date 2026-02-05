@@ -5932,3 +5932,89 @@ Name: cDepCode, dtype: object, None, 1, None, None, 0, None, None, 0, 0, 0, 0, 0
 2026-02-04 20:07:11,170 - INFO - sqlserver_db_connect - 所有数据写入成功，事务已自动提交
 2026-02-04 20:07:11,176 - INFO - test - 导入成功，刷新列表
 2026-02-04 20:07:12,033 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-05 20:16:16,449 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-05 20:18:26,029 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-05 20:18:58,401 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-05 21:59:59,013 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-05 22:00:37,100 - INFO - test - 开始his导出: 2026-01-05 00:00:00, 2026-02-05 23:59:59
+2026-02-05 22:00:37,133 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-05 22:00:37,133 - INFO - orcale_db_connect - client_path！G:\pythonProject\hisToyy\lib\instantclient_11_21
+2026-02-05 22:00:37,174 - INFO - orcale_db_connect - 
+                 (DESCRIPTION =
+                   (ADDRESS =(PROTOCOL=TCP)(HOST =118.190.202.74)(PORT=1521))
+                   (CONNECT_DATA=
+                     (SERVER=DEDICATED)
+                     (SERVICE_NAME=EE))
+                 )
+2026-02-05 22:00:39,360 - INFO - orcale_db_connect - 数据库连接失败: DPY-4011: the database or network closed the connection
+ORA-12537: TNS:connection closed
+2026-02-05 22:00:39,361 - INFO - orcale_db_connect - 查询sql: SELECT * FROM v_全院病人费用汇总住院 WHERE "日期" >= TO_DATE('2026-01-05 00:00:00', 'YYYY-MM-DD HH24:MI:SS') AND "日期" < TO_DATE('2026-02-05 23:59:59', 'YYYY-MM-DD HH24:MI:SS')
+2026-02-05 22:00:39,361 - INFO - orcale_db_connect - 获取数据失败:: 'NoneType' object has no attribute 'cursor'
+2026-02-05 22:00:39,367 - INFO - test - 导出地址：, 0
+2026-02-05 22:00:54,255 - INFO - test - 开始用友导入: {'id': 33, 'start_time': '2026-01-05 00:00:00', 'end_time': '2026-02-05 23:59:59', 'create_time': '2026-02-05 22:00:37', 'export_time': None, 'data_type': '2', 'export_num': None, 'export_file_name': None, 'export_file_path': 'C:\\Users\\Administrator\\Desktop\\线上his\\全院病人费用2026-01-05 00_00_00数据导出20_46_15.xlsx', 'import_yy_start': None, 'import_yy_num': None, 'status': 1}
+2026-02-05 22:00:54,267 - INFO - sqlserver_db_connect - DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-05 22:00:54,328 - INFO - sqlserver_db_connect - sqlserver 连接成功, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-05 22:00:54,774 - INFO - sqlserver_db_connect - sqlserver 导出失败: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]对象名 'UFDATA_001_2026.dbo.GL_accvouch' 无效。 (208) (SQLExecDirectW)"), DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-05 22:01:29,071 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-05 22:03:31,299 - INFO - test - 开始用友导入: {'id': 33, 'start_time': '2026-01-05 00:00:00', 'end_time': '2026-02-05 23:59:59', 'create_time': '2026-02-05 22:00:37', 'export_time': None, 'data_type': '2', 'export_num': None, 'export_file_name': None, 'export_file_path': 'C:\\Users\\Administrator\\Desktop\\线上his\\全院病人费用2026-01-05 00_00_00数据导出20_46_15.xlsx', 'import_yy_start': None, 'import_yy_num': None, 'status': 1}
+2026-02-05 22:03:31,309 - INFO - sqlserver_db_connect - DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-05 22:03:31,330 - INFO - sqlserver_db_connect - sqlserver 连接成功, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-05 22:03:35,520 - INFO - sqlserver_db_connect - sqlserver 连接成功, mssql+pyodbc://sa:123456@127.0.0.1:1433/UFDATA_999_2012?driver=SQL+Server
+2026-02-05 22:03:37,390 - INFO - sqlserver_db_connect - 所有数据写入成功，事务已自动提交
+2026-02-05 22:03:37,390 - INFO - sqlserver_db_connect - 写入失败，事务已回滚。错误详情: sequence item 0: expected str instance, int found
+2026-02-05 22:03:37,391 - INFO - test - 导入失败，刷新列表
+2026-02-05 22:05:30,003 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-05 22:13:05,257 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-05 22:13:11,071 - INFO - test - 开始用友导入: {'id': 33, 'start_time': '2026-01-05 00:00:00', 'end_time': '2026-02-05 23:59:59', 'create_time': '2026-02-05 22:00:37', 'export_time': '2026-02-05 22:05:29', 'data_type': '2', 'export_num': None, 'export_file_name': None, 'export_file_path': 'C:\\Users\\Administrator\\Desktop\\线上his\\全院病人费用2026-01-05 00_00_00数据导出20_46_15.xlsx', 'import_yy_start': None, 'import_yy_num': None, 'status': 5}
+2026-02-05 22:13:11,086 - INFO - sqlserver_db_connect - DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-05 22:13:11,105 - INFO - sqlserver_db_connect - sqlserver 连接成功, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-05 22:13:12,474 - INFO - sqlserver_db_connect - sqlserver 导出失败: 'DataFrameGroupBy' object has no attribute 'iterrows', DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-05 22:13:32,781 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-05 22:14:12,540 - INFO - test - 开始用友导入: {'id': 33, 'start_time': '2026-01-05 00:00:00', 'end_time': '2026-02-05 23:59:59', 'create_time': '2026-02-05 22:00:37', 'export_time': '2026-02-05 22:05:29', 'data_type': '2', 'export_num': None, 'export_file_name': None, 'export_file_path': 'C:\\Users\\Administrator\\Desktop\\线上his\\全院病人费用2026-01-05 00_00_00数据导出20_46_15.xlsx', 'import_yy_start': None, 'import_yy_num': None, 'status': 5}
+2026-02-05 22:14:12,553 - INFO - sqlserver_db_connect - DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-05 22:14:12,572 - INFO - sqlserver_db_connect - sqlserver 连接成功, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-05 22:14:38,826 - INFO - sqlserver_db_connect - sqlserver 导出失败: 'DataFrameGroupBy' object has no attribute 'iterrows', DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-05 22:15:03,841 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-05 22:15:11,013 - INFO - test - 开始用友导入: {'id': 33, 'start_time': '2026-01-05 00:00:00', 'end_time': '2026-02-05 23:59:59', 'create_time': '2026-02-05 22:00:37', 'export_time': '2026-02-05 22:05:29', 'data_type': '2', 'export_num': None, 'export_file_name': None, 'export_file_path': 'C:\\Users\\Administrator\\Desktop\\线上his\\全院病人费用2026-01-05 00_00_00数据导出20_46_15.xlsx', 'import_yy_start': None, 'import_yy_num': None, 'status': 5}
+2026-02-05 22:15:11,026 - INFO - sqlserver_db_connect - DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-05 22:15:11,046 - INFO - sqlserver_db_connect - sqlserver 连接成功, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-05 22:26:26,991 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-05 22:27:53,541 - INFO - test - start_yy_import用户点击了‘否’
+2026-02-05 22:27:55,911 - INFO - test - 开始用友导入: {'id': 33, 'start_time': '2026-01-05 00:00:00', 'end_time': '2026-02-05 23:59:59', 'create_time': '2026-02-05 22:00:37', 'export_time': '2026-02-05 22:05:29', 'data_type': '2', 'export_num': None, 'export_file_name': None, 'export_file_path': 'C:\\Users\\Administrator\\Desktop\\线上his\\全院病人费用2026-01-05 00_00_00数据导出20_46_15.xlsx', 'import_yy_start': None, 'import_yy_num': None, 'status': 5}
+2026-02-05 22:27:55,924 - INFO - sqlserver_db_connect - DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-05 22:27:55,944 - INFO - sqlserver_db_connect - sqlserver 连接成功, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-05 22:27:56,591 - INFO - sqlserver_db_connect - sqlserver 连接成功, mssql+pyodbc://sa:123456@127.0.0.1:1433/UFDATA_999_2012?driver=SQL+Server
+2026-02-05 22:27:56,667 - INFO - sqlserver_db_connect - 所有数据写入成功，事务已自动提交
+2026-02-05 22:27:56,667 - INFO - sqlserver_db_connect - 写入失败，事务已回滚。错误详情: sequence item 0: expected str instance, int found
+2026-02-05 22:27:56,675 - INFO - test - 导入失败，刷新列表
+2026-02-05 22:27:58,947 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-05 22:39:42,931 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-05 22:41:46,410 - INFO - test - 开始用友导入: {'id': 33, 'start_time': '2026-01-05 00:00:00', 'end_time': '2026-02-05 23:59:59', 'create_time': '2026-02-05 22:00:37', 'export_time': '2026-02-05 22:27:58', 'data_type': '2', 'export_num': None, 'export_file_name': None, 'export_file_path': 'C:\\Users\\Administrator\\Desktop\\线上his\\全院病人费用2026-01-05 00_00_00数据导出20_46_15.xlsx', 'import_yy_start': None, 'import_yy_num': None, 'status': 5}
+2026-02-05 22:41:46,422 - INFO - sqlserver_db_connect - DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-05 22:41:46,446 - INFO - sqlserver_db_connect - sqlserver 连接成功, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-05 22:41:48,165 - INFO - sqlserver_db_connect - sqlserver 连接成功, mssql+pyodbc://sa:123456@127.0.0.1:1433/UFDATA_999_2012?driver=SQL+Server
+2026-02-05 22:41:48,296 - INFO - sqlserver_db_connect - 所有数据写入成功，事务已自动提交
+2026-02-05 22:48:24,087 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-05 22:48:27,574 - INFO - test - 开始用友导入: {'id': 33, 'start_time': '2026-01-05 00:00:00', 'end_time': '2026-02-05 23:59:59', 'create_time': '2026-02-05 22:00:37', 'export_time': '2026-02-05 22:27:58', 'data_type': '2', 'export_num': None, 'export_file_name': None, 'export_file_path': 'C:\\Users\\Administrator\\Desktop\\线上his\\全院病人费用2026-01-05 00_00_00数据导出20_46_15.xlsx', 'import_yy_start': None, 'import_yy_num': None, 'status': 5}
+2026-02-05 22:48:27,586 - INFO - sqlserver_db_connect - DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-05 22:48:27,605 - INFO - sqlserver_db_connect - sqlserver 连接成功, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-05 22:48:28,260 - INFO - sqlserver_db_connect - sqlserver 连接成功, mssql+pyodbc://sa:123456@127.0.0.1:1433/UFDATA_999_2012?driver=SQL+Server
+2026-02-05 22:48:28,335 - INFO - sqlserver_db_connect - 所有数据写入成功，事务已自动提交
+2026-02-05 22:48:28,343 - INFO - test - 导入成功，刷新列表
+2026-02-05 22:48:30,531 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-05 22:49:04,606 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-05 22:49:17,573 - INFO - test - 开始用友导入: {'id': 33, 'start_time': '2026-01-05 00:00:00', 'end_time': '2026-02-05 23:59:59', 'create_time': '2026-02-05 22:00:37', 'export_time': '2026-02-05 22:48:28', 'data_type': '2', 'export_num': None, 'export_file_name': None, 'export_file_path': 'C:\\Users\\Administrator\\Desktop\\线上his\\全院病人费用2026-01-05 00_00_00数据导出20_46_15.xlsx', 'import_yy_start': '1', 'import_yy_num': 232, 'status': 4}
+2026-02-05 22:49:17,586 - INFO - sqlserver_db_connect - DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-05 22:49:17,606 - INFO - sqlserver_db_connect - sqlserver 连接成功, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-05 22:50:09,879 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-05 22:50:12,959 - INFO - test - 开始用友导入: {'id': 33, 'start_time': '2026-01-05 00:00:00', 'end_time': '2026-02-05 23:59:59', 'create_time': '2026-02-05 22:00:37', 'export_time': '2026-02-05 22:48:28', 'data_type': '2', 'export_num': None, 'export_file_name': None, 'export_file_path': 'C:\\Users\\Administrator\\Desktop\\线上his\\全院病人费用2026-01-05 00_00_00数据导出20_46_15.xlsx', 'import_yy_start': '1', 'import_yy_num': 232, 'status': 4}
+2026-02-05 22:50:12,971 - INFO - sqlserver_db_connect - DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-05 22:50:12,991 - INFO - sqlserver_db_connect - sqlserver 连接成功, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-05 22:50:13,482 - INFO - sqlserver_db_connect - sqlserver 导出失败: 'str' object has no attribute 'trim', DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-05 22:50:41,751 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-05 22:50:45,029 - INFO - test - 开始用友导入: {'id': 33, 'start_time': '2026-01-05 00:00:00', 'end_time': '2026-02-05 23:59:59', 'create_time': '2026-02-05 22:00:37', 'export_time': '2026-02-05 22:48:28', 'data_type': '2', 'export_num': None, 'export_file_name': None, 'export_file_path': 'C:\\Users\\Administrator\\Desktop\\线上his\\全院病人费用2026-01-05 00_00_00数据导出20_46_15.xlsx', 'import_yy_start': '1', 'import_yy_num': 232, 'status': 4}
+2026-02-05 22:50:45,040 - INFO - sqlserver_db_connect - DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-05 22:50:45,061 - INFO - sqlserver_db_connect - sqlserver 连接成功, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-05 22:50:45,689 - INFO - sqlserver_db_connect - sqlserver 连接成功, mssql+pyodbc://sa:123456@127.0.0.1:1433/UFDATA_999_2012?driver=SQL+Server
+2026-02-05 22:50:45,762 - INFO - sqlserver_db_connect - 所有数据写入成功，事务已自动提交
+2026-02-05 22:50:45,769 - INFO - test - 导入成功，刷新列表
