@@ -318,39 +318,6 @@ def build_zhuyuan_js_df(conn, record):
                     yongyou_row["ccode_equal"] = ",".join(list(ccode_set1)[:4])
             new_row = pd.DataFrame(row_list)
             df_empty = pd.concat([df_empty, new_row], ignore_index=True)
-    # 预存医疗费
-    yucun_total_df = df_total[df_total['扎帐类别'].str.contains('预交', na=False, regex=False)]
-    for i, (zz_code, zz_group) in enumerate(yucun_total_df.groupby('扎账单号', sort=False)):
-        if pd.notnull(zz_code):
-            # 从汇总表查找该单号的所有数据
-            dbill_date = pd.to_datetime(zz_group.iloc[0]['扎帐时间'])
-            period = dbill_date.month
-            if not period_list:
-                start_ino_id = get_next_ino_id(conn, period)
-            else:
-                start_ino_id = int(period_list[-1]) + 1
-            inid = 0
-            zz_group = zz_group.reset_index(drop=True)
-            # 预交 结账退款 进医保等科目的贷方  借方 121101
-            inid+=1
-            # 预存进 借 100201 应收 贷 230502 预存住院
-            md_v = pd.to_numeric(yucun_total_df['金额'].sum())
-            md = 0.0 if pd.isna(md_v) else float(md_v)
-            # 科目
-            ccode = "100201"
-            row_df = transform_to_yonyou(period, ino_id, inid, dbill_date, '李红霞', md, 0.0, None, ccode, "预收医疗款")
-            row_df["ccode_equal"] = "230502"
-            row_list.append(row_df)
-            # 贷 230502
-            inid += 1
-            mc_v = pd.to_numeric(yujiao_df['金额'].sum())
-            mc = 0.0 if pd.isna(mc_v) else float(mc_v)
-            # 科目
-            ccode = "230502"
-            row_df = transform_to_yonyou(period, ino_id, inid, dbill_date, '李红霞', 0.0, mc, None, ccode, "预收医疗款")
-            row_df["ccode_equal"] = "100201"
-            row_list.append(row_df)
-
 
     return df_empty, period_list
 
