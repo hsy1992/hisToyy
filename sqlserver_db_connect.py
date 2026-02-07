@@ -11,7 +11,7 @@ from datetime import datetime
 from config import ConfigManager
 from log_util import logger
 from py_sqlite import SQLiteHelper
-from yongyou_coe import get_men_zhen_ccode, is_build, get_zhu_yuan_ccode2, get_zhu_yuan_ccode3
+from yongyou_coe import get_men_zhen_ccode, is_build, get_zhu_yuan_ccode2, get_zhu_yuan_ccode3, get_jiesuan_ccode
 from yy_dept_mapper import get_dept_code_mz
 
 
@@ -85,7 +85,7 @@ def read_excel_real(conn, sqlserver_config, record, finished_signal):
         df_empty, period_list = build_menzhen_zizhuji(conn, record)
     elif data_type == "4":
         # 门诊扫码
-        df_empty, period_list = build_zhuyuan_js_df(conn, record)
+        df_empty, period_list = build_menzhen_saoma(conn, record)
 
     # for index, row in df_empty.iterrows():
     #     print(f"--- 正在处理第 {index} 行 ---")
@@ -323,6 +323,68 @@ def build_zhuyuan_js_df(conn, record):
     return df_empty, period_list
 
 
+def build_zhuyuan_shouru(conn, record):
+    """
+    住院收入
+    """
+    df_empty = pd.DataFrame()
+    row_list = []
+    period_list = []
+    full_path = record['export_file_path']
+    df = pd.read_excel(full_path, sheet_name=['收款数据'])
+    df_shoukuan = df['收款数据'].replace({np.nan: None})
+    # 自动去除所有列名两端的空格
+    df_shoukuan.columns = df_shoukuan.columns.str.strip()
+    # 将日期列转为日期格式（确保排序逻辑正确）
+    df_shoukuan['日期'] = pd.to_datetime(df_shoukuan['日期'])
+    # 贷方对方科目
+    mc_ccode_equal = set()
+    # 今天时期
+    date_val = pd.to_datetime(datetime.now().date().strftime("%Y-%m-%d %H:%M:%S"))
+    period = date_val.month
+    # 只生成一张凭证
+    # 每个单号都去获取下凭证
+    if not df_shoukuan.empty:
+        # 获取该扎账单号的时间
+        ino_id = get_next_ino_id(conn, period)
+        period_list.append(ino_id)
+        inid = 0
+
+        for (dept, project), group in df_shoukuan.groupby(["部门名称", "收入项目"], sort=False):
+            inid += 1
+            md = 0.0
+            # 贷方
+            mc_v = pd.to_numeric(group['折扣后'].sum())
+            mc = 0.0 if pd.isna(mc_v) else float(mc_v)
+            # 部门
+            cdept_id = get_dept_code_mz(dept, 'his_zy')
+            # 科目
+            ccode = get_zhu_yuan_ccode3(project)
+            ccode = str(ccode or "").strip()
+            if not ccode:
+                # 抛出内置的“值错误”异常
+                raise ValueError("错误：科目编码(ccode)不能为空或纯空格！")
+            # 贷方对方科目
+            mc_ccode_equal.add(ccode)
+            row_df = transform_to_yonyou(period, ino_id, inid, date_val, '李红霞', md, mc, cdept_id, ccode, "住院收入")
+            row_df["ccode_equal"] = "100201"
+            row_list.append(row_df)
+        # 最后加一个121101 应收
+        inid += 1
+        md_v = pd.to_numeric(df_shoukuan['折扣后'].sum())
+        md = 0.0 if pd.isna(md_v) else float(md_v)
+        # 贷方
+        mc = 0.0
+        # 科目
+        ccode = "100201"
+        row_df = transform_to_yonyou(period, ino_id, inid, date_val, '李红霞', md, mc, None, ccode, "住院收入")
+        row_df["ccode_equal"] = ",".join(list(mc_ccode_equal)[:4])
+        row_list.append(row_df)
+        new_row = pd.DataFrame(row_list)
+        df_empty = pd.concat([df_empty, new_row], ignore_index=True)
+    return df_empty, period_list
+
+
 def build_menzhen_zizhuji(conn, record):
     """
     门诊自助机
@@ -412,20 +474,23 @@ def build_menzhen_zizhuji(conn, record):
         df_empty = pd.concat([df_empty, new_row], ignore_index=True)
     return df_empty, period_list
 
-def build_zhuyuan_shouru(conn, record):
+def build_menzhen_saoma(conn, record):
     """
-    住院收入
+    门诊扫码
     """
     df_empty = pd.DataFrame()
     row_list = []
     period_list = []
     full_path = record['export_file_path']
-    df = pd.read_excel(full_path, sheet_name=['收款数据'])
+    df = pd.read_excel(full_path, sheet_name=['收款数据', '汇总数据'])
     df_shoukuan = df['收款数据'].replace({np.nan: None})
+    df_total = df['汇总数据'].replace({np.nan: None})
     # 自动去除所有列名两端的空格
     df_shoukuan.columns = df_shoukuan.columns.str.strip()
+    df_total.columns = df_total.columns.str.strip()
     # 将日期列转为日期格式（确保排序逻辑正确）
-    df_shoukuan['日期'] = pd.to_datetime(df_shoukuan['日期'])
+    df_shoukuan['登记时间'] = pd.to_datetime(df_shoukuan['登记时间'])
+    df_total['收款时间'] = pd.to_datetime(df_total['收款时间'])
     # 贷方对方科目
     mc_ccode_equal = set()
     # 今天时期
@@ -438,37 +503,62 @@ def build_zhuyuan_shouru(conn, record):
         ino_id = get_next_ino_id(conn, period)
         period_list.append(ino_id)
         inid = 0
-
-        for (dept, project), group in df_shoukuan.groupby(["部门名称", "收入项目"], sort=False):
+        for (dept, project), group in df_shoukuan.groupby(["开单科室", "项目"], sort=False):
+            # 根据开单科室、项目分组
+            if not pd.isna(dept):
+                inid += 1
+                md = 0.0
+                # 贷方
+                mc_v = pd.to_numeric(group['金额'].sum())
+                mc = 0.0 if pd.isna(mc_v) else float(mc_v)
+                # 部门
+                cdept_id = get_dept_code_mz(row['开单科室'], 'his_mz')
+                # 科目
+                ccode = get_men_zhen_ccode(row, 1)
+                ccode = str(ccode or "").strip()
+                if not ccode:
+                    # 抛出内置的“值错误”异常
+                    raise ValueError("错误：科目编码(ccode)不能为空或纯空格！")
+                # 贷方对方科目
+                mc_ccode_equal.add(ccode)
+                row_list.append(
+                    transform_to_yonyou(period, ino_id, inid, date_val, '李红霞', md, mc, cdept_id, ccode, "门诊扫码收入"))
+        # 扫码收入分类
+        shoufei_df = df_total[df_total['项目'].str.contains('收费情况', na=False, regex=False)]
+ 
+        if not shoufei_df.empty:
+            for type, group  in shoufei_df.groupby("内容", sort=False):
+                inid += 1
+                md_v = pd.to_numeric(group['金额'].sum())
+                md = 0.0 if pd.isna(md_v) else float(md_v)
+                # 贷方
+                mc = 0.0
+                # 科目
+                ccode = get_jiesuan_ccode(type)
+                row_df = transform_to_yonyou(period, ino_id, inid, date_val, '李红霞', md, mc, None, ccode,
+                                            "门诊扫码收入")
+                row_df["ccode_equal"] = ",".join(list(mc_ccode_equal)[:4])
+                row_list.append(row_df)
+        # 预存进 借 100201 应收 贷 230502 预存住院
+        yujiao_df = df_total[df_total['项目'].str.contains('住院预交', na=False, regex=False)]
+        if not yujiao_df.empty:
             inid += 1
-            md = 0.0
-            # 贷方
-            mc_v = pd.to_numeric(group['折扣后'].sum())
-            mc = 0.0 if pd.isna(mc_v) else float(mc_v)
-            # 部门
-            cdept_id = get_dept_code_mz(dept, 'his_zy')
+            md_v = pd.to_numeric(yujiao_df['金额'].sum())
+            md = 0.0 if pd.isna(md_v) else float(md_v)
             # 科目
-            ccode = get_zhu_yuan_ccode3(project)
-            ccode = str(ccode or "").strip()
-            if not ccode:
-                # 抛出内置的“值错误”异常
-                raise ValueError("错误：科目编码(ccode)不能为空或纯空格！")
-            # 贷方对方科目
-            mc_ccode_equal.add(ccode)
-            row_df = transform_to_yonyou(period, ino_id, inid, date_val, '李红霞', md, mc, cdept_id, ccode, "住院收入")
+            ccode = "100201"
+            row_df = transform_to_yonyou(period, ino_id, inid, date_val, '李红霞', md, 0.0, None, ccode, "预收医疗款")
+            row_df["ccode_equal"] = "230502"
+            row_list.append(row_df)
+            # 贷 230502
+            inid += 1
+            mc_v = pd.to_numeric(yujiao_df['金额'].sum())
+            mc = 0.0 if pd.isna(mc_v) else float(mc_v)
+            # 科目
+            ccode = "230502"
+            row_df = transform_to_yonyou(period, ino_id, inid, date_val, '李红霞', 0.0, mc, None, ccode, "预收医疗款")
             row_df["ccode_equal"] = "100201"
             row_list.append(row_df)
-        # 最后加一个121101 应收
-        inid += 1
-        md_v = pd.to_numeric(df_shoukuan['折扣后'].sum())
-        md = 0.0 if pd.isna(md_v) else float(md_v)
-        # 贷方
-        mc = 0.0
-        # 科目
-        ccode = "100201"
-        row_df = transform_to_yonyou(period, ino_id, inid, date_val, '李红霞', md, mc, None, ccode, "住院收入")
-        row_df["ccode_equal"] = ",".join(list(mc_ccode_equal)[:4])
-        row_list.append(row_df)
         new_row = pd.DataFrame(row_list)
         df_empty = pd.concat([df_empty, new_row], ignore_index=True)
     return df_empty, period_list

@@ -131,7 +131,7 @@ def get_his_data(oracle_config, start_str, end_str, type):
 
         # 文件导出处理
         s = datetime.now().strftime("%H:%M:%S")
-        file_name = f"{prefix}{start_str}_{end_str}数据导出{s}.xlsx".replace(":", "_")
+        file_name = f"{prefix}{start_str}_{end_str}导出时间{s}.xlsx".replace(":", "_")
         full_path = os.path.join(resource_path("export_data"), file_name)
 
         # 写入详情页

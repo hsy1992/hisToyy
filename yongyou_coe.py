@@ -49,12 +49,12 @@ income_dict_zhuyuan = {
 
 # 铁力市
 # 现金
-# 农垦
-income_dict_zhuyuan1 = {
-    "哈尔滨铁路局": ("121102010247", "哈尔滨中铁局结算医保"),
-    "铁力市": ("121102010247", "铁力市医保局结算医保"),
-    "农垦": ("121102010248", "农垦结算医保"),
+# 农垦 结算方式
+income_dict_common_code = {
+    "铁力市": ("121102010245", "铁力市医保局结算医保"),
     "异地": ("121102010246", "伊春外地区结算医保"),
+    "哈尔滨铁路局": ("121102010247", "哈尔滨中铁局结算医保"),
+    "农垦": ("121102010248", "农垦结算医保"),
     "惠民宝": ("121102010249", "惠民宝"),
     "现金": ("1001", "库存现金"),
 }
@@ -115,7 +115,7 @@ def get_men_zhen_ccode(row, type):
         if pd.isna(row['参保地']):
             # 现金
             return "1001"
-        ccode = income_dict_menzhen1.get(row['参保地'])[0]
+        ccode = income_dict_common_code.get(row['参保地'])[0]
         return ccode if ccode else "1001"
 
 def get_zhu_yuan_ccode(row):
@@ -132,7 +132,7 @@ def get_zhu_yuan_ccode2(row):
     """
     构建住院结算数据
     """
-    config = income_dict_zhuyuan1.get(row['内容'])
+    config = income_dict_common_code.get(row['内容'])
     if config:
         return config[0]
     # 其他住院费用
@@ -170,6 +170,15 @@ data_type = {
     "3": "门诊自助机",
     "4": "门诊扫码",
 }
+
+def get_jiesuan_ccode(name):
+    """
+    结算方式
+    """
+    config = income_dict_common_code.get(name.strip())
+    if config:
+        return config[0]
+    return "1001"
 
 is_build = False
 # is_build = True
