@@ -294,7 +294,7 @@ class ExcelMerger(QMainWindow):
             this_record_id = self.record_id
             this_full_path = self.full_path
 
-        this_full_path = r"C:\Users\Administrator\Desktop\线上his\门诊2026-01-29 00_00_00数据导出.xlsx"
+        # this_full_path = r"C:\Users\Administrator\Desktop\线上his\门诊2026-01-29 00_00_00数据导出.xlsx"
         if this_full_path and this_record_id > 0:
             # 参数说明：父窗口, 标题, 内容, 按钮组合, 默认选中的按钮
             record = self.sqlite_helper.get_record_by_id(this_record_id)
@@ -302,8 +302,13 @@ class ExcelMerger(QMainWindow):
             # record['export_file_path'] = r"C:\Users\Administrator\Desktop\线上his\门诊2026-01-29 00_00_00数据导出.xlsx"
             # record['data_type'] = '1'
             # record['export_file_path'] = r"C:\Users\Administrator\Desktop\线上his\住院缴费2026-01-29 00_00_00数据导出1.xlsx"
-            record['data_type'] = '2'
-            record['export_file_path'] = r"C:\Users\Administrator\Desktop\线上his\全院病人费用2026-01-05 00_00_00数据导出20_46_15.xlsx"
+            # record['data_type'] = '2'
+            # record['export_file_path'] = r"C:\Users\Administrator\Desktop\线上his\全院病人费用2026-01-05 00_00_00数据导出20_46_15.xlsx"
+            # record['data_type'] = '3'
+            # record['export_file_path'] = r"C:\Users\Administrator\Desktop\线上his\门诊自助机2026-02-04 00_00_00数据导出20_58_20.xlsx"
+            # record['data_type'] = '4'
+            # record['export_file_path'] = r"C:\Users\Administrator\Desktop\线上his\门诊扫码2026-02-04 00_00_00数据导出20_56_48.xlsx"
+
             if record['status'] == 4:
                 # 已经导出成功得数据
                 reply = QMessageBox.question(self, "提示", "该条数据已经成功导入到用友，请确认再次导入？",

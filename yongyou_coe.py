@@ -77,29 +77,6 @@ def get_dept_id(row):
     dept_name = "" if pd.isna(row["开单科室"]) else row["开单科室"]
     return dept_code_dict.get(dept_name, None)
 
-
-def get_ccode(row, type):
-    """
-    贷方科目
-    """
-    name = "" if pd.isna(row["项目"]) else row["项目"]
-    name = name.replace("费", "")
-    if name:
-        # 有费用名称
-        if type == 1:
-            # 事业收入
-            for i, (key, value) in enumerate(income_dict_menzhen.items()):
-                if name in value:
-                    return key
-            return "41010101"
-        elif type == 2:
-            # 住院收入
-            for i, (key, value) in enumerate(income_dict_zhuyuan.items()):
-                if name in value:
-                    return key
-            return "41010102"
-
-
 def get_men_zhen_ccode(row, type):
     """
     门诊收入
@@ -115,8 +92,8 @@ def get_men_zhen_ccode(row, type):
         if pd.isna(row['参保地']):
             # 现金
             return "1001"
-        ccode = income_dict_common_code.get(row['参保地'])[0]
-        return ccode if ccode else "1001"
+        res = income_dict_common_code.get(row['参保地'])
+        return res[0] if res else "1001"
 
 def get_zhu_yuan_ccode(row):
     """
@@ -180,5 +157,15 @@ def get_jiesuan_ccode(name):
         return config[0]
     return "1001"
 
-is_build = False
-# is_build = True
+def get_feiyong_menzhen_code(name):
+    """
+    门诊费用
+    """
+    config = income_dict_menzhen.get(name)
+    if config:
+        return config[0]
+    # 其他门诊费用
+    return "4101010110"
+
+# is_build = False
+is_build = True

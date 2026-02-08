@@ -11,7 +11,7 @@ from datetime import datetime
 from config import ConfigManager
 from log_util import logger
 from py_sqlite import SQLiteHelper
-from yongyou_coe import get_men_zhen_ccode, is_build, get_zhu_yuan_ccode2, get_zhu_yuan_ccode3, get_jiesuan_ccode
+from yongyou_coe import get_men_zhen_ccode, is_build, get_zhu_yuan_ccode2, get_zhu_yuan_ccode3, get_jiesuan_ccode, get_feiyong_menzhen_code
 from yy_dept_mapper import get_dept_code_mz
 
 
@@ -59,8 +59,8 @@ def import_data_to_yy(sqlserver_config, record, finished_signal):
         read_excel_real(conn, sqlserver_config, record, finished_signal)
     except Exception as e:
         traceback.print_exc()  # 打印完整的报错路径
-        logger.info(f"sqlserver 导出失败: {e}, {conn_str}")
-        finished_signal.emit(False, f"失败{e}", -1)
+        logger.info(f"sqlserver 导入失败: {e}, {conn_str}")
+        finished_signal.emit(False, f"失败{e}", {})
 
 
 def read_excel_real(conn, sqlserver_config, record, finished_signal):
@@ -136,6 +136,7 @@ def build_menzhen_df(conn, record):
     df_total.columns = df_total.columns.str.strip()
     # 将日期列转为日期格式（确保排序逻辑正确）
     df_shoukuan['扎帐时间'] = pd.to_datetime(df_shoukuan['扎帐时间'])
+    date_val = pd.to_datetime(datetime.now().date().strftime("%Y-%m-%d %H:%M:%S"))
     period_list = []
 
     # 先查找汇总表 根据扎帐单号分组处理
@@ -144,7 +145,7 @@ def build_menzhen_df(conn, record):
             # 从明细表查找该单号的所有数据
             zz_code_result_df = df_shoukuan.query(f'扎账单号 == {zz_code}')
             # 获取该扎账单号的时间
-            date_val = pd.to_datetime(zz_code_result_df.iloc[0]['扎帐时间'])
+            # date_val = pd.to_datetime(zz_code_result_df.iloc[0]['扎帐时间'])
             period = date_val.month
             # 每个单号都去获取下凭证
             start_ino_id = get_next_ino_id(conn, period)
@@ -233,6 +234,7 @@ def build_zhuyuan_js_df(conn, record):
     df_shoukuan['扎帐时间'] = pd.to_datetime(df_shoukuan['扎帐时间'])
     period_list = []
 
+    date_val = pd.to_datetime(datetime.now().date().strftime("%Y-%m-%d %H:%M:%S"))
     # 先只找出结账数据
     jiezhang_total_df = df_total[df_total['扎帐类别'].str.contains('结帐', na=False, regex=False)]
 
@@ -243,7 +245,6 @@ def build_zhuyuan_js_df(conn, record):
             zz_code_result_df = df_total.query(f'扎账单号 == {zz_code}')
             # 先只找出结账数据
             jiezhang_df = zz_code_result_df[zz_code_result_df['扎帐类别'].str.contains('结帐', na=False, regex=False)]
-            date_val = pd.to_datetime(zz_code_result_df.iloc[0]['扎帐时间'])
             period = date_val.month
             # 每个单号都去获取下凭证
             start_ino_id = get_next_ino_id(conn, period)
@@ -414,18 +415,17 @@ def build_menzhen_zizhuji(conn, record):
         ino_id = get_next_ino_id(conn, period)
         period_list.append(ino_id)
         inid = 0
-        for index, row in df_shoukuan.iterrows():
-            if not pd.isna(row['编码']):
+        for (dept, project), group in df_shoukuan.groupby(["开单科室", "项目"], sort=False):
+            if not pd.isna(dept):
                 inid += 1
-                dbill_date = row['登记时间']
                 md = 0.0
                 # 贷方
-                mc_v = pd.to_numeric(row.get('金额', 0))
+                mc_v = pd.to_numeric(group['金额'].sum())
                 mc = 0.0 if pd.isna(mc_v) else float(mc_v)
                 # 部门
-                cdept_id = get_dept_code_mz(row['开单科室'], 'his_mz')
+                cdept_id = get_dept_code_mz(dept, 'his_mz')
                 # 科目
-                ccode = get_men_zhen_ccode(row, 1)
+                ccode = get_feiyong_menzhen_code(project)
                 ccode = str(ccode or "").strip()
                 if not ccode:
                     # 抛出内置的“值错误”异常
@@ -437,18 +437,18 @@ def build_menzhen_zizhuji(conn, record):
         # 自助机收入进 100201
         shoufei_df = df_total[df_total['项目'].str.contains('收费情况', na=False, regex=False)]
         if not shoufei_df.empty:
-            inid += 1
-            dbill_date = pd.to_datetime(shoufei_df.iloc[0]['收款时间'])
-            md_v = pd.to_numeric(shoufei_df['金额'].sum())
-            md = 0.0 if pd.isna(md_v) else float(md_v)
-            # 贷方
-            mc = 0.0
-            # 科目
-            ccode = "100201"
-            row_df = transform_to_yonyou(period, ino_id, inid, date_val, '李红霞', md, mc, None, ccode,
-                                         "自助门诊收入")
-            row_df["ccode_equal"] = ",".join(list(mc_ccode_equal)[:4])
-            row_list.append(row_df)
+            for type, group in shoufei_df.groupby("内容", sort=False):
+                inid += 1
+                md_v = pd.to_numeric(group['金额'].sum())
+                md = 0.0 if pd.isna(md_v) else float(md_v)
+                # 贷方
+                mc = 0.0
+                # 科目
+                ccode = get_jiesuan_ccode(type)
+                row_df = transform_to_yonyou(period, ino_id, inid, date_val, '李红霞', md, mc, None, ccode,
+                                             "自助门诊收入")
+                row_df["ccode_equal"] = ",".join(list(mc_ccode_equal)[:4])
+                row_list.append(row_df)
         # 预存进 借 100201 应收 贷 230502 预存住院
         yujiao_df = df_total[df_total['项目'].str.contains('住院预交', na=False, regex=False)]
         if not yujiao_df.empty:
@@ -512,9 +512,9 @@ def build_menzhen_saoma(conn, record):
                 mc_v = pd.to_numeric(group['金额'].sum())
                 mc = 0.0 if pd.isna(mc_v) else float(mc_v)
                 # 部门
-                cdept_id = get_dept_code_mz(row['开单科室'], 'his_mz')
+                cdept_id = get_dept_code_mz(dept, 'his_mz')
                 # 科目
-                ccode = get_men_zhen_ccode(row, 1)
+                ccode = get_feiyong_menzhen_code(project)
                 ccode = str(ccode or "").strip()
                 if not ccode:
                     # 抛出内置的“值错误”异常
@@ -525,9 +525,8 @@ def build_menzhen_saoma(conn, record):
                     transform_to_yonyou(period, ino_id, inid, date_val, '李红霞', md, mc, cdept_id, ccode, "门诊扫码收入"))
         # 扫码收入分类
         shoufei_df = df_total[df_total['项目'].str.contains('收费情况', na=False, regex=False)]
- 
         if not shoufei_df.empty:
-            for type, group  in shoufei_df.groupby("内容", sort=False):
+            for type, group in shoufei_df.groupby("内容", sort=False):
                 inid += 1
                 md_v = pd.to_numeric(group['金额'].sum())
                 md = 0.0 if pd.isna(md_v) else float(md_v)
@@ -535,8 +534,7 @@ def build_menzhen_saoma(conn, record):
                 mc = 0.0
                 # 科目
                 ccode = get_jiesuan_ccode(type)
-                row_df = transform_to_yonyou(period, ino_id, inid, date_val, '李红霞', md, mc, None, ccode,
-                                            "门诊扫码收入")
+                row_df = transform_to_yonyou(period, ino_id, inid, date_val, '李红霞', md, mc, None, ccode, "门诊扫码收入")
                 row_df["ccode_equal"] = ",".join(list(mc_ccode_equal)[:4])
                 row_list.append(row_df)
         # 预存进 借 100201 应收 贷 230502 预存住院
@@ -668,7 +666,7 @@ def transform_to_yonyou(period, ino_id, inid, dbill_date, user_name, md, mc, cde
     new_df['coutsysver'] = None  # 外部凭证系统版本号 F79外部系统版本
     new_df['doutbilldate'] = None  # 外部凭证制单日期 F78外部制单日期
     new_df['ioutperiod'] = 0  # 外部凭证会计期间 F77外部会计期间
-    new_df['coutsign'] = None  # 外部凭证业务类型
+    new_df['coutsign'] = ''  # 外部凭证业务类型
     new_df['coutno_id'] = None  # 外部凭证业务号
     new_df['doutdate'] = None  # 外部凭证单据日期
     new_df['coutbillsign'] = None  # 外部凭证单据类型
