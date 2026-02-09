@@ -1,8 +1,10 @@
 import os
-import sys
+
 import pandas as pd
+
 from log_util import logger
 from path_util import resource_path
+
 """
 用友部门code映射
 """
@@ -16,7 +18,6 @@ def load_dept():
     dept = os.path.join(resource_path("config"), "bumen.xlsx")
     global df_dept
     df_dept = pd.read_excel(dept, dtype=str)
-
 
 def get_dept_code_mz(dept_name, type):
     """
@@ -36,6 +37,19 @@ def get_dept_code_mz(dept_name, type):
     else:
         return filtered_df['cDepCode'].iloc[0]
 
+def get_shoukuan():
+    """
+    获取收款员
+    """
+    base_path = os.path.join(base_path, "eee.txt")
+    with open(base_path, 'r', encoding='utf-8') as f:
+        # 使用列表推导式去掉每行末尾的换行符 \n
+        my_list = [line.strip() for line in f.readlines()]
+    if filtered_df.empty:
+        logger.error(f"未找到该部门:{dept_name}", df_dept[type].str)
+        return None
+    else:
+        return filtered_df['cDepCode'].iloc[0]
 
 # if __name__ == '__main__':
 #     base_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "dist")
