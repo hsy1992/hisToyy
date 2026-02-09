@@ -1,0 +1,49 @@
+2026-02-09 20:06:29,106 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-09 20:25:54,493 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-09 20:29:49,065 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-09 20:31:12,790 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-09 20:35:40,170 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-09 20:36:09,441 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-09 20:38:54,518 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-09 20:40:35,172 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-09 20:43:07,989 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-09 20:46:32,617 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-09 20:47:03,167 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-09 20:48:21,109 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-09 20:48:52,758 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-09 21:09:46,051 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-09 21:11:03,048 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-09 21:13:23,444 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-09 21:17:13,363 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-02-09 21:17:45,451 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 10，list：10
+2026-02-09 21:17:45,499 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 20，list：10
+2026-02-09 21:17:45,791 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 30，list：3
+2026-02-09 21:21:33,852 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：0
+2026-02-09 21:24:49,083 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：0
+2026-02-09 22:32:14,774 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：0
+2026-02-09 22:32:23,853 - INFO - test - 开始查询His: 2026-02-08 00:00:00, 2026-02-08 23:59:59
+2026-02-09 22:32:23,878 - INFO - orcale_db_connect - client_path！G:\pythonProject\hisToyy\lib\instantclient_11_21
+2026-02-09 22:32:24,177 - INFO - orcale_db_connect - 
+                 (DESCRIPTION =
+                   (ADDRESS =(PROTOCOL=TCP)(HOST =118.190.202.74)(PORT=1521))
+                   (CONNECT_DATA=
+                     (SERVER=DEDICATED)
+                     (SERVICE_NAME=EE))
+                 )
+2026-02-09 22:32:26,402 - INFO - orcale_db_connect - 数据库连接失败: DPY-4011: the database or network closed the connection
+ORA-12537: TNS:connection closed
+2026-02-09 22:32:26,403 - INFO - orcale_db_connect - 查询sql: SELECT * FROM v_门诊人员缴款书收入项目 WHERE "扎帐时间" >= TO_DATE('2026-02-08 00:00:00', 'YYYY-MM-DD HH24:MI:SS') AND "扎帐时间" < TO_DATE('2026-02-08 23:59:59', 'YYYY-MM-DD HH24:MI:SS')
+2026-02-09 22:32:26,403 - INFO - orcale_db_connect - 获取数据失败:: 'NoneType' object has no attribute 'cursor'
+2026-02-09 22:32:26,408 - INFO - test - 导出地址：, 0
+2026-02-09 22:32:55,181 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：0
+2026-02-09 22:34:09,833 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：0
+2026-02-09 22:35:00,264 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：0
+2026-02-09 22:37:31,678 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：0
+2026-02-09 22:46:26,373 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：0
+2026-02-09 22:47:12,201 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：0
+2026-02-09 22:49:04,000 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：0
+2026-02-09 22:49:35,382 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：0
+2026-02-09 22:50:38,795 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：0
+2026-02-09 22:50:57,721 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：0
+2026-02-09 22:51:34,558 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：0
+2026-02-09 22:52:06,123 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：0

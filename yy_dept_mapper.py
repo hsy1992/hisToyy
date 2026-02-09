@@ -9,6 +9,7 @@ from path_util import resource_path
 用友部门code映射
 """
 df_dept = pd.DataFrame()
+shoukuan_list = []
 def load_dept():
     # if getattr(sys, 'frozen', False):
     #     # 如果是打包成了 .exe
@@ -41,25 +42,15 @@ def get_shoukuan():
     """
     获取收款员
     """
-    base_path = os.path.join(base_path, "eee.txt")
-    with open(base_path, 'r', encoding='utf-8') as f:
+    global shoukuan_list
+    if shoukuan_list:
+        return shoukuan_list
+    shouakuan_path = os.path.join(resource_path("config"), "shoukuan.txt")
+    with open(shouakuan_path, 'r', encoding='utf-8') as f:
         # 使用列表推导式去掉每行末尾的换行符 \n
-        my_list = [line.strip() for line in f.readlines()]
-    if filtered_df.empty:
-        logger.error(f"未找到该部门:{dept_name}", df_dept[type].str)
-        return None
-    else:
-        return filtered_df['cDepCode'].iloc[0]
+        shoukuan_list = [line.strip() for line in f.readlines()]
+    return shoukuan_list
 
-# if __name__ == '__main__':
-#     base_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "dist")
-#     base_path = os.path.join(base_path, "eee.txt")
-#     with open(base_path, 'r', encoding='utf-8') as f:
-#         # 使用列表推导式去掉每行末尾的换行符 \n
-#         my_list = [line.strip() for line in f.readlines()]
-#     print(my_list)
-#     load_dept()
-#     illegal_depts = df_dept[~df_dept['cDepCode'].isin(my_list)]['cDepCode'].unique()
-#
-#     print(f"以下部门编码在系统中不存在，导致了冲突: {illegal_depts}")
+if __name__ == '__main__':
+    print(get_shoukuan())
 

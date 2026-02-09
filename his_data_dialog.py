@@ -1,0 +1,186 @@
+from PyQt5.QtWidgets import (QApplication, QDialog, QVBoxLayout, QHBoxLayout,
+                             QLabel, QLineEdit, QPushButton, QTableWidget,
+                             QTableWidgetItem, QHeaderView, QDateEdit, QCheckBox, QWidget)
+from PyQt5.QtCore import Qt, QDate
+import sys
+
+
+class PaymentRecordDialog(QDialog):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("缴款记录列表")
+        self.resize(1000, 600)
+        self.setup_ui()
+
+    def setup_ui(self):
+        layout = QVBoxLayout(self)
+
+        # --- 1. 顶部筛选栏 (日期范围) ---
+        filter_layout = QHBoxLayout()
+        self.start_date = QDateEdit(QDate.currentDate().addDays(-1))  # 默认昨天
+        self.start_date.setCalendarPopup(True)
+        self.end_date = QDateEdit(QDate.currentDate())
+        self.end_date.setCalendarPopup(True)
+
+        filter_layout.addWidget(QLabel("扎帐日期:"))
+        filter_layout.addWidget(self.start_date)
+        filter_layout.addWidget(QLabel(" 至 "))
+        filter_layout.addWidget(self.end_date)
+        filter_layout.addStretch()  # 弹簧，将控件推向左侧
+
+        layout.addLayout(filter_layout)
+
+        # --- 2. 全选控制栏 ---
+        select_layout = QHBoxLayout()
+        self.cb_all = QCheckBox("全选")
+        select_layout.addWidget(self.cb_all)
+        layout.addLayout(select_layout)
+
+        # --- 3. 表格区域 ---
+        self.table = QTableWidget()
+        # 设置列数和表头 (对应图片中的字段)
+        headers = ["", "NO", "登记时间", "收款员", "开始时间", "终止时间", "门诊收费合计"]
+        self.table.setColumnCount(len(headers))
+        self.table.setHorizontalHeaderLabels(headers)
+
+        # 设置第一列宽度（仅容纳复选框即可）
+        self.table.setColumnWidth(0, 40)
+        # 设置其他列自动撑满剩余空间
+        self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        # 样式调整
+        self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)  # 自动拉伸
+        # 如果希望第一列不被 Stretch 影响，可以单独指定：
+        self.table.horizontalHeader().setSectionResizeMode(0, QHeaderView.Fixed)
+        self.table.setAlternatingRowColors(True)  # 隔行变色
+        self.table.setSelectionBehavior(QTableWidget.SelectRows)  # 按行选中
+
+        layout.addWidget(self.table)
+
+        # --- 4. 底部按钮 ---
+        btn_layout = QHBoxLayout()
+        btn_layout.addStretch()
+        self.btn_confirm = QPushButton("确定")
+        self.btn_confirm.setFixedWidth(100)
+        self.btn_confirm.clicked.connect(self.accept)  # 点击确定关闭窗口
+        btn_layout.addWidget(self.btn_confirm)
+
+        layout.addLayout(btn_layout)
+
+
+        # 绑定全选复选框的信号
+        self.cb_all.stateChanged.connect(self.on_all_checked)
+
+        # 修改表格列：增加一列用于放复选框
+        headers = ["", "NO", "登记时间", "收款员", "开始时间", "终止时间", "门诊收费合计"]
+        self.table.setColumnCount(len(headers))
+        self.table.setHorizontalHeaderLabels(headers)
+        # 第一列（勾选列）宽度设固定
+        self.table.setColumnWidth(0, 40)
+
+    def on_all_checked(self, state):
+        """全选/取消全选逻辑"""
+        # state 为 2 表示选中 (Qt.Checked)，0 表示未选中 (Qt.Unchecked)
+        is_checked = (state == Qt.Checked)
+
+        for row in range(self.table.rowCount()):
+            # 找到每一行第一列的那个复选框控件
+            cell_widget = self.table.cellWidget(row, 0)
+            if cell_widget:
+                checkbox = cell_widget.findChild(QCheckBox)
+                if checkbox:
+                    checkbox.setChecked(is_checked)
+
+    def add_row_with_checkbox(self, data_list):
+        """向表格添加一行，并带上复选框"""
+        row_idx = self.table.rowCount()
+        self.table.insertRow(row_idx)
+
+        # --- 1. 创建居中的复选框容器 ---
+        cb_widget = QWidget()
+        cb_layout = QHBoxLayout(cb_widget)
+        checkbox = QCheckBox()
+        checkbox.setStyleSheet("""
+            QCheckBox::indicator {
+                width: 15px;   /* 宽度从默认的约13px加大到25px */
+                height: 15px;  /* 高度同步加大 */
+            }
+        """)
+        cb_layout.addWidget(checkbox)
+        cb_layout.setAlignment(Qt.AlignCenter)  # 居中对齐
+        cb_layout.setContentsMargins(0, 0, 0, 0)
+        self.table.setCellWidget(row_idx, 0, cb_widget)
+
+        # --- 2. 填充其余数据列 ---
+        # 注意：data_list 中的数据从第二列 (索引 1) 开始填充
+        for col_idx, value in enumerate(data_list):
+            # 确保单号没有 .0 尾缀
+            clean_val = str(value).replace('.0', '')
+            item = QTableWidgetItem(clean_val)
+            item.setTextAlignment(Qt.AlignCenter)
+            self.table.setItem(row_idx, col_idx + 1, item)
+
+    def get_checked_nos(self):
+        """获取所有勾选行的单号(NO)"""
+        checked_nos = []
+        for row in range(self.table.rowCount()):
+            cell_widget = self.table.cellWidget(row, 0)
+            if cell_widget:
+                checkbox = cell_widget.findChild(QCheckBox)
+                if checkbox and checkbox.isChecked():
+                    # 获取第二列的单号文本
+                    no_text = self.table.item(row, 1).text()
+                    checked_nos.append(no_text)
+        return checked_nos
+
+    def get_checked_rows_data(self):
+        checked_nos = []
+        for row in range(self.table.rowCount()):
+            # 获取第一列的容器
+            cell_widget = self.table.cellWidget(row, 0)
+            if cell_widget:
+                # 在容器中寻找 QCheckBox
+                checkbox = cell_widget.findChild(QCheckBox)
+                if checkbox and checkbox.isChecked():
+                    # 获取第二列的“NO”文本
+                    no_item = self.table.item(row, 1)
+                    if no_item:
+                        checked_nos.append(no_item.text())
+        return checked_nos
+
+
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+
+    # 这里假设你已经贴入了之前完整的 PaymentRecordDialog 类
+    main_win = PaymentRecordDialog()
+
+    # 添加演示数据
+    main_win.add_row_with_checkbox(["250901000002", "2025-09-01 12:23:11", "郭廷臣", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "7899.40"])
+    main_win.add_row_with_checkbox(["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
+    main_win.add_row_with_checkbox(["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
+    main_win.add_row_with_checkbox(["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
+    main_win.add_row_with_checkbox(["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
+    main_win.add_row_with_checkbox(["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
+    main_win.add_row_with_checkbox(["250901000002", "2025-09-01 12:23:11", "郭廷臣", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "7899.40"])
+    main_win.add_row_with_checkbox(["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
+    main_win.add_row_with_checkbox(["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
+    main_win.add_row_with_checkbox(["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
+    main_win.add_row_with_checkbox(["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
+    main_win.add_row_with_checkbox(["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
+    main_win.add_row_with_checkbox(["250901000002", "2025-09-01 12:23:11", "郭廷臣", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "7899.40"])
+    main_win.add_row_with_checkbox(["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
+    main_win.add_row_with_checkbox(["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
+    main_win.add_row_with_checkbox(["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
+    main_win.add_row_with_checkbox(["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
+    main_win.add_row_with_checkbox(["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
+    main_win.add_row_with_checkbox(["250901000002", "2025-09-01 12:23:11", "郭廷臣", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "7899.40"])
+    main_win.add_row_with_checkbox(["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
+    main_win.add_row_with_checkbox(["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
+    main_win.add_row_with_checkbox(["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
+    main_win.add_row_with_checkbox(["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
+    main_win.add_row_with_checkbox(["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
+
+    main_win.show()
+    sys.exit(app.exec_())
+
+

@@ -3,7 +3,7 @@ import os
 from openpyxl import load_workbook
 from openpyxl.utils.dataframe import dataframe_to_rows
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, 
-                           QHBoxLayout, QPushButton, QLabel, QFileDialog, QDialog, QDateTimeEdit, QMessageBox, QProgressDialog, QTableView, QButtonGroup, QRadioButton)
+                           QHBoxLayout, QPushButton, QLabel, QFileDialog, QDialog, QDateTimeEdit, QMessageBox, QProgressDialog, QTableView, QButtonGroup, QRadioButton, QLineEdit)
 from PyQt5.QtCore import QDateTime, Qt, QThread, pyqtSignal
 from sql_setting_dialog import ConfigDialog
 from config import ConfigManager
@@ -19,6 +19,9 @@ from py_sqlite import SQLiteHelper
 from pathlib import Path
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
+from checkable_combo_box import CheckableComboBox
+from yy_dept_mapper import get_shoukuan
+from his_data_dialog import PaymentRecordDialog
 
 format_pattern = "yyyy-MM-dd HH:mm:ss"
 class ExcelMerger(QMainWindow):
@@ -112,20 +115,10 @@ class ExcelMerger(QMainWindow):
         type_layout.addStretch()  # 添加弹簧，让按钮靠左对齐
         layout.addLayout(type_layout)
 
-        # 选择导出时间
-        folder_layout = QHBoxLayout()
-        self.folder_label = QLabel("导出时间")
-        # 1. 获取今天的日期
-        today = datetime.now().date().strftime("%Y-%m-%d")
-        self.start_str = f"{today} 00:00:00"
-        self.end_str = f"{today} 23:59:59"
-        # 导出时间默认今天
-        self.folder_path_label = QLabel(f"{self.start_str}-{self.end_str}")
-        self.folder_path_label.setStyleSheet("color: gray;")
-
-        folder_layout.addWidget(self.folder_label)
-        folder_layout.addWidget(self.folder_path_label)
-        layout.addLayout(folder_layout)
+        # 日导出初始日期选择为昨天
+        prev_day = get_prev_day()
+        self.start_str = f"{prev_day} 00:00:00"
+        self.end_str = f"{prev_day} 23:59:59"
 
         # 时间选择
         time_layout = QHBoxLayout()
@@ -135,7 +128,7 @@ class ExcelMerger(QMainWindow):
         self.dt_edit.setDisplayFormat(format_pattern)
         self.dt_edit.setCalendarPopup(True)
         self.dt_edit.dateTimeChanged.connect(lambda dt: self.on_date_changed(dt, 0))
-        time_layout.addWidget(QLabel("选择开始时间："))
+        time_layout.addWidget(QLabel("扎帐开始时间："))
         time_layout.addWidget(self.dt_edit)
         layout.addLayout(time_layout)
         time_layout1 = QHBoxLayout()
@@ -145,23 +138,35 @@ class ExcelMerger(QMainWindow):
         self.dt_edit1.setDisplayFormat(format_pattern)
         self.dt_edit1.setCalendarPopup(True)
         self.dt_edit1.dateTimeChanged.connect(lambda dt: self.on_date_changed(dt, 1))
-        time_layout1.addWidget(QLabel("选择结束时间："))
+        time_layout1.addWidget(QLabel("扎帐结束时间："))
         time_layout1.addWidget(self.dt_edit1)
         layout.addLayout(time_layout1)
+
+        self.shouyin_layout = QHBoxLayout()
+        self.shouyin_box = CheckableComboBox()
+        self.shouyin_box.add_all_option()  # 先加全选项
+        self.shouyin_box.addItem(get_shoukuan())
+        self.shouyin_layout.addWidget(QLabel("收银员"))
+        self.shouyin_layout.addWidget(self.shouyin_box)
+        layout.addLayout(self.shouyin_layout)
+
+        self.code_layout = QHBoxLayout()
+        self.code_edit = QLineEdit()
+        self.code_edit.setPlaceholderText("请输入扎帐单号，不输入则不筛选")
+        self.code_edit.setFixedWidth(390)
+        self.code_layout.addWidget(QLabel("扎帐单号:"))
+        self.code_layout.addStretch()
+        self.code_layout.addWidget(self.code_edit)
+        layout.addLayout(self.code_layout)
 
         # 开始按钮
         self.full_path = ""
         self.full_path_num = 0
         start_layout = QHBoxLayout()
-        self.start_btn = QPushButton("开始导出His")
+        self.start_btn = QPushButton("开始查询")
         self.start_btn.setEnabled(True)
-        self.start_btn.clicked.connect(self.start_his_export)
+        self.start_btn.clicked.connect(self.show_his_data_dialog)
         start_layout.addWidget(self.start_btn)
-
-        self.start_yy_btn = QPushButton("开始导入用友")
-        self.start_yy_btn.setEnabled(True)
-        self.start_yy_btn.clicked.connect(self.start_yy_import)
-        start_layout.addWidget(self.start_yy_btn)
 
         layout.addLayout(start_layout)
 
@@ -187,6 +192,65 @@ class ExcelMerger(QMainWindow):
         else:
             print("用户取消了输入")
 
+    def show_his_data_dialog(self):
+        # 实例化弹窗
+        dialog = PaymentRecordDialog()
+        # 添加演示数据
+        dialog.add_row_with_checkbox(
+            ["250901000002", "2025-09-01 12:23:11", "郭廷臣", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "7899.40"])
+        dialog.add_row_with_checkbox(
+            ["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
+        dialog.add_row_with_checkbox(
+            ["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
+        dialog.add_row_with_checkbox(
+            ["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
+        dialog.add_row_with_checkbox(
+            ["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
+        dialog.add_row_with_checkbox(
+            ["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
+        dialog.add_row_with_checkbox(
+            ["250901000002", "2025-09-01 12:23:11", "郭廷臣", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "7899.40"])
+        dialog.add_row_with_checkbox(
+            ["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
+        dialog.add_row_with_checkbox(
+            ["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
+        dialog.add_row_with_checkbox(
+            ["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
+        dialog.add_row_with_checkbox(
+            ["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
+        dialog.add_row_with_checkbox(
+            ["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
+        dialog.add_row_with_checkbox(
+            ["250901000002", "2025-09-01 12:23:11", "郭廷臣", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "7899.40"])
+        dialog.add_row_with_checkbox(
+            ["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
+        dialog.add_row_with_checkbox(
+            ["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
+        dialog.add_row_with_checkbox(
+            ["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
+        dialog.add_row_with_checkbox(
+            ["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
+        dialog.add_row_with_checkbox(
+            ["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
+        dialog.add_row_with_checkbox(
+            ["250901000002", "2025-09-01 12:23:11", "郭廷臣", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "7899.40"])
+        dialog.add_row_with_checkbox(
+            ["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
+        dialog.add_row_with_checkbox(
+            ["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
+        dialog.add_row_with_checkbox(
+            ["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
+        dialog.add_row_with_checkbox(
+            ["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
+        dialog.add_row_with_checkbox(
+            ["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
+        # 运行弹窗 阻塞主窗口，直到弹窗关闭
+        if dialog.exec_() == QDialog.Accepted:
+            # 如果点击了“确定”，获取数据并更新主界面
+            self.update_config_text()
+        else:
+            print("用户取消了输入")
+
     def update_config_text(self):
         """ 更新配置显示 """
         print("update_config_text")
@@ -204,21 +268,23 @@ class ExcelMerger(QMainWindow):
         else:
             self.end_str = q_dt.toString(format_pattern)
 
-        self.folder_path_label.setText(f"{self.start_str}-{self.end_str}")
-
     def on_type_changed(self, type_id):
         now = datetime.now()
-        today = now.date()
+        yesterday = get_prev_day()
         if type_id >= 2:
             # 门诊扫码、自助机、住院病人时间选择切换到月
             # 减去 1 个月
             last_month_today = now - relativedelta(months=1)
             self.start_str = f"{last_month_today.strftime('%Y-%m-%d')} 00:00:00"
+            # 禁用
+            self.shouyin_box.setEnabled(False)
+            self.code_edit.setEnabled(False)
         else:
-            self.start_str = f"{today} 00:00:00"
+            self.start_str = f"{yesterday} 00:00:00"
+            self.shouyin_box.setEnabled(True)
+            self.code_edit.setEnabled(True)
         self.dt_edit.setDateTime(QDateTime.fromString(self.start_str, format_pattern))
-        self.end_str = f"{today} 23:59:59"
-        self.folder_path_label.setText(f"{self.start_str}-{self.end_str}")
+        self.end_str = f"{yesterday} 23:59:59"
 
     def his_test_connect_click(self):
         """ 测试his连接 """
@@ -242,9 +308,26 @@ class ExcelMerger(QMainWindow):
             QMessageBox.warning(self, "错误", "用友系统测试连接失败！")
 
     def start_his_export(self):
-        """ 开始his导出 """
+        """ 开始查询His """
+        if not self.start_str or not self.end_str:
+            QMessageBox.warning(self, "错误", "请选择导出的时间")
+            logger.info(f"开始查询His: 请选择导出的时间")
+            return
+        try:
+            # pd.to_datetime 会自动解析格式，.date() 会去掉时分秒
+            is_same_day = pd.to_datetime(self.start_str).date() == pd.to_datetime(self.end_str).date()
+        except Exception:
+            QMessageBox.warning(self, "错误", "请选择导出的时间")
+            logger.info(f"开始查询His: 请选择导出的时间")
+            return
+
+        if not is_same_day:
+            QMessageBox.warning(self, "错误", "时间跨度应该为一天")
+            logger.info(f"开始查询His: 时间跨度应该为一天")
+            return
+
         if self.start_str and self.end_str:
-            logger.info(f"开始his导出: {self.start_str}, {self.end_str}")
+            logger.info(f"开始查询His: {self.start_str}, {self.end_str}")
             progress = QProgressDialog("系统正在处理中，请稍候...", None, 0, 0)
             progress.setWindowTitle("请等待")
             progress.setWindowModality(Qt.WindowModal)
@@ -253,23 +336,16 @@ class ExcelMerger(QMainWindow):
 
             # 强制刷新界面渲染加载窗
             QApplication.processEvents()
-            record_id = self.sqlite_helper.insert_record({
-                "start_time": self.start_str,
-                "end_time": self.end_str,
-                "data_type": str(self.type_group.checkedId())
-            })
-            self.table.refresh_data()
-            # 2. 执行传入的方法
+            # 执行传入的方法
             # 如果 task_func 是 df.to_excel，则这里实际执行 df.to_excel(*args, **kwargs)
-            self.full_path, self.full_path_num = get_his_data(self.config_manager.get_db_config('oracle'), self.start_str, self.end_str, self.type_group.checkedId())
-            # 3. 关闭加载窗
+            shoukuan_df, total_df, full_path = get_his_data(self.config_manager.get_db_config('oracle'), self.start_str, self.end_str, self.type_group.checkedId(), self.shouyin_box.checked_items(), self.code_edit.text().strip())
+            # 关闭加载窗
             progress.close()
 
             logger.info(f"导出地址：{self.full_path}, {self.full_path_num}")
             if self.full_path and self.full_path.strip():
                 # 参数说明：父窗口, 标题, 内容, 按钮组合, 默认选中的按钮
                 # 更新数据库
-                self.record_id = record_id
                 file_name = Path(self.full_path).name
                 self.sqlite_helper.export_his_success(self.record_id, file_name, self.full_path)
                 self.table.refresh_data()
@@ -281,9 +357,7 @@ class ExcelMerger(QMainWindow):
                     logger.info("start_his_export用户点击了‘否’")
             else:
                 QMessageBox.warning(self, "失败", "HIS数据导出失败")
-        else:
-            QMessageBox.warning(self, "错误", "请选择导出的时间")
-            logger.info(f"开始his导出: 请选择导出的时间")
+
 
     def start_yy_import(self, item=None):
         """ 导入用友数据 """
@@ -376,7 +450,6 @@ class ExcelMerger(QMainWindow):
         finally:
             # 3. 关闭加载窗
             progress.close()
-
 
 
 def merge_excel_files(template_path, folder_path, output_path):
@@ -479,6 +552,11 @@ def merge_excel_files(template_path, folder_path, output_path):
     # 保存结果
     output_wb.save(output_path)
     print(f"合并完成，结果已保存至: {output_path}")
+
+def get_prev_day():
+    yesterday = datetime.now() - relativedelta(days=1)
+    return yesterday.strftime('%Y-%m-%d')
+
 
 def exception_hook(exctype, value, tb):
     """全局异常捕获钩子"""

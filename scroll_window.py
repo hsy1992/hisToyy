@@ -42,7 +42,7 @@ class SqlInfiniteTableWidget(QTableView):
 
     def _init_ui(self):
         self.model = QStandardItemModel()
-        self.model.setHorizontalHeaderLabels(("创建时间", "HIS导出范围", "数据类型", "用友凭证号", "导入数量", "状态", "更新时间"))
+        self.model.setHorizontalHeaderLabels(("数据类型", "扎帐时间范围", "收银员", "扎帐单号", "用友凭证号", "导入数量", "状态", "操作时间"))
         self.setModel(self.model)
         self.list_data = []
 
@@ -84,9 +84,9 @@ class SqlInfiniteTableWidget(QTableView):
             self.list_data.extend(list)
             # 直接通过字段名取值
             for item in list:
-                row_items = [QStandardItem(item["create_time"]), QStandardItem(f"{item['start_time']}~\n{item['end_time']}"),
-                             QStandardItem(data_type.get(item['data_type'], "")), QStandardItem(item['import_yy_start']), QStandardItem(str(item['import_yy_num'])),
-                             QStandardItem(self.STATUS_MAP[item['status']]), QStandardItem(item['export_time'])]
+                row_items = [QStandardItem(data_type.get(item['data_type'], "")), QStandardItem(f"{item['start_time']}~\n{item['end_time']}"), QStandardItem(f"{item['shouyin_list']}"),
+                             QStandardItem(f"{item['zz_code']}"), QStandardItem(item['import_yy_start']), QStandardItem(str(item['import_yy_num'])),
+                             QStandardItem(self.STATUS_MAP[item['status']]), QStandardItem(item['create_time'])]
                 self.model.appendRow(row_items)
             self.has_more_data = len(list) >= self.limit
         except Exception as e:

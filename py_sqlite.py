@@ -44,6 +44,8 @@ class SQLiteHelper:
             export_file_path TEXT,
             import_yy_start TEXT,
             import_yy_num INTEGER,
+            shouyin_list TEXT,
+            zz_code TEXT,
             status INTEGER
         );
         """

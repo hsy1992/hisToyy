@@ -93,8 +93,9 @@ TYPE_CONFIG = {
     4: ("门诊扫码", "v_门诊人员缴款书扫码付收入项目", "v_门诊人员缴款书扫码付结算方式", "登记时间", "收款时间"),
 }
 
-def get_his_data(oracle_config, start_str, end_str, type):
+def get_his_data(oracle_config, start_str, end_str, type, shouyin_list, zz_code):
     try:
+        # 链接数据库
         conn = connect_to_oracle(oracle_config.get('user'), oracle_config.get('password'), oracle_config.get('ip'), oracle_config.get('port'),
                                oracle_config.get('service_name'))
         full_path = ""
@@ -120,12 +121,22 @@ def get_his_data(oracle_config, start_str, end_str, type):
             # 详情
             where_clause = f' WHERE "{time_type}" >= TO_DATE(\'{start_str}\', \'YYYY-MM-DD HH24:MI:SS\') ' \
                            f'AND "{time_type}" < TO_DATE(\'{end_str}\', \'YYYY-MM-DD HH24:MI:SS\')'
+            if type == 0 or type == 1:
+                if shouyin_list:
+                    where_clause += f" AND '收款员' IN ({','.join(shouyin_list)})"
+                if zz_code:
+                    where_clause += f" AND '扎账单号' = {zz_code}"
             logger.info(f"查询sql: SELECT * FROM {detail_view}{where_clause}")
             shoukuan_df = pd.read_sql(f"SELECT * FROM {detail_view}{where_clause}", conn)
 
         if total_view:
             where_clause = f' WHERE "{time_type_total}" >= TO_DATE(\'{start_str}\', \'YYYY-MM-DD HH24:MI:SS\') ' \
                            f'AND "{time_type_total}" < TO_DATE(\'{end_str}\', \'YYYY-MM-DD HH24:MI:SS\')' if type != 2 else ''
+            if type == 0 or type == 1:
+                if shouyin_list:
+                    where_clause += f" AND '收款员' IN ({','.join(shouyin_list)})"
+                if zz_code:
+                    where_clause += f" AND '扎账单号' = {zz_code}"
             logger.info(f"查询totalsql: SELECT * FROM {total_view}{where_clause}")
             total_df = pd.read_sql(f"SELECT * FROM {total_view}{where_clause}", conn) if total_view else None
 
@@ -143,10 +154,11 @@ def get_his_data(oracle_config, start_str, end_str, type):
 
         logger.info(f"文件已保存至: {full_path}, 已成功导出 {row_count} 条数据！")
         conn.close()
-        return full_path, len(shoukuan_df)
+        return shoukuan_df, total_df, full_path
     except Exception as e:
+        df_empty = pd.DataFrame()
         logger.info(f"获取数据失败:: {e}")
-        return "", 0
+        return df_empty, df_empty, ''
 
 
 # 定义转换函数
