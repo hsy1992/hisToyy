@@ -192,58 +192,9 @@ class ExcelMerger(QMainWindow):
         else:
             print("用户取消了输入")
 
-    def show_his_data_dialog(self):
+    def show_his_data_dialog(self, start_str, end_str, type, shoukuan_df, total_df):
         # 实例化弹窗
-        dialog = PaymentRecordDialog()
-        # 添加演示数据
-        dialog.add_row_with_checkbox(
-            ["250901000002", "2025-09-01 12:23:11", "郭廷臣", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "7899.40"])
-        dialog.add_row_with_checkbox(
-            ["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
-        dialog.add_row_with_checkbox(
-            ["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
-        dialog.add_row_with_checkbox(
-            ["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
-        dialog.add_row_with_checkbox(
-            ["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
-        dialog.add_row_with_checkbox(
-            ["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
-        dialog.add_row_with_checkbox(
-            ["250901000002", "2025-09-01 12:23:11", "郭廷臣", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "7899.40"])
-        dialog.add_row_with_checkbox(
-            ["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
-        dialog.add_row_with_checkbox(
-            ["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
-        dialog.add_row_with_checkbox(
-            ["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
-        dialog.add_row_with_checkbox(
-            ["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
-        dialog.add_row_with_checkbox(
-            ["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
-        dialog.add_row_with_checkbox(
-            ["250901000002", "2025-09-01 12:23:11", "郭廷臣", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "7899.40"])
-        dialog.add_row_with_checkbox(
-            ["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
-        dialog.add_row_with_checkbox(
-            ["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
-        dialog.add_row_with_checkbox(
-            ["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
-        dialog.add_row_with_checkbox(
-            ["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
-        dialog.add_row_with_checkbox(
-            ["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
-        dialog.add_row_with_checkbox(
-            ["250901000002", "2025-09-01 12:23:11", "郭廷臣", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "7899.40"])
-        dialog.add_row_with_checkbox(
-            ["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
-        dialog.add_row_with_checkbox(
-            ["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
-        dialog.add_row_with_checkbox(
-            ["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
-        dialog.add_row_with_checkbox(
-            ["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
-        dialog.add_row_with_checkbox(
-            ["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
+        dialog = PaymentRecordDialog(start_str, end_str, type, shoukuan_df, total_df, parent=self)
         # 运行弹窗 阻塞主窗口，直到弹窗关闭
         if dialog.exec_() == QDialog.Accepted:
             # 如果点击了“确定”，获取数据并更新主界面
@@ -336,27 +287,12 @@ class ExcelMerger(QMainWindow):
 
             # 强制刷新界面渲染加载窗
             QApplication.processEvents()
-            # 执行传入的方法
-            # 如果 task_func 是 df.to_excel，则这里实际执行 df.to_excel(*args, **kwargs)
+            # 执行查询
             shoukuan_df, total_df, full_path = get_his_data(self.config_manager.get_db_config('oracle'), self.start_str, self.end_str, self.type_group.checkedId(), self.shouyin_box.checked_items(), self.code_edit.text().strip())
             # 关闭加载窗
             progress.close()
-
-            logger.info(f"导出地址：{self.full_path}, {self.full_path_num}")
-            if self.full_path and self.full_path.strip():
-                # 参数说明：父窗口, 标题, 内容, 按钮组合, 默认选中的按钮
-                # 更新数据库
-                file_name = Path(self.full_path).name
-                self.sqlite_helper.export_his_success(self.record_id, file_name, self.full_path)
-                self.table.refresh_data()
-                reply = QMessageBox.question(self, '确认', 'HIS数据导出成功，是否立即打开查看？',
-                                             QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
-                if reply == QMessageBox.Yes:
-                    open_with_default_app(self.full_path)
-                else:
-                    logger.info("start_his_export用户点击了‘否’")
-            else:
-                QMessageBox.warning(self, "失败", "HIS数据导出失败")
+            logger.info(f"导出地址：{full_path}")
+            show_his_data_dialog(self.start_str, self.end_str, self.type_group.checkedId(), shoukuan_df, total_df)
 
 
     def start_yy_import(self, item=None):

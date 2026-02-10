@@ -42,7 +42,7 @@ class SqlInfiniteTableWidget(QTableView):
 
     def _init_ui(self):
         self.model = QStandardItemModel()
-        self.model.setHorizontalHeaderLabels(("数据类型", "扎帐时间范围", "收银员", "扎帐单号", "用友凭证号", "导入数量", "状态", "操作时间"))
+        self.model.setHorizontalHeaderLabels(("数据类型", "扎帐时间范围", "收银员", "扎账单号", "用友凭证号", "导入数量", "状态", "操作时间"))
         self.setModel(self.model)
         self.list_data = []
 

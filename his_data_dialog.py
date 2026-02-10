@@ -1,25 +1,37 @@
 from PyQt5.QtWidgets import (QApplication, QDialog, QVBoxLayout, QHBoxLayout,
                              QLabel, QLineEdit, QPushButton, QTableWidget,
                              QTableWidgetItem, QHeaderView, QDateEdit, QCheckBox, QWidget)
-from PyQt5.QtCore import Qt, QDate
+from PyQt5.QtCore import Qt, QDate, QDateTime
 import sys
 
 
 class PaymentRecordDialog(QDialog):
-    def __init__(self):
+    def __init__(self, start_str, end_str, type, shoukuan_df, total_df, parent=None):
         super().__init__()
         self.setWindowTitle("缴款记录列表")
         self.resize(1000, 600)
+        self.start_str = start_str
+        self.end_str = end_str
+        self.type = type
+        self.shoukuan_df = shoukuan_df
+        self.total_df = total_df
         self.setup_ui()
+        self.init_data()
+
+    def init_data(self):
+        if self.type == 0:
+            # 门诊数据展示
+
+
 
     def setup_ui(self):
         layout = QVBoxLayout(self)
 
         # --- 1. 顶部筛选栏 (日期范围) ---
         filter_layout = QHBoxLayout()
-        self.start_date = QDateEdit(QDate.currentDate().addDays(-1))  # 默认昨天
+        self.start_date = QDateEdit(QDateTime.fromString(self.start_str, "yyyy-MM-dd HH:mm:ss").date())
         self.start_date.setCalendarPopup(True)
-        self.end_date = QDateEdit(QDate.currentDate())
+        self.end_date = QDateEdit(QDateTime.fromString(self.end_str, "yyyy-MM-dd HH:mm:ss").date())
         self.end_date.setCalendarPopup(True)
 
         filter_layout.addWidget(QLabel("扎帐日期:"))
@@ -39,7 +51,7 @@ class PaymentRecordDialog(QDialog):
         # --- 3. 表格区域 ---
         self.table = QTableWidget()
         # 设置列数和表头 (对应图片中的字段)
-        headers = ["", "NO", "登记时间", "收款员", "开始时间", "终止时间", "门诊收费合计"]
+        headers = ["", "NO", "登记时间", "收款员", "开始时间", "终止时间", "收费合计"]
         self.table.setColumnCount(len(headers))
         self.table.setHorizontalHeaderLabels(headers)
 
@@ -59,7 +71,13 @@ class PaymentRecordDialog(QDialog):
         # --- 4. 底部按钮 ---
         btn_layout = QHBoxLayout()
         btn_layout.addStretch()
-        self.btn_confirm = QPushButton("确定")
+        
+        self.btn_cancel = QPushButton("关闭")
+        self.btn_cancel.setFixedWidth(100)
+        self.btn_cancel.clicked.connect(self.reject)
+        btn_layout.addWidget(self.btn_cancel)
+
+        self.btn_confirm = QPushButton("导入")
         self.btn_confirm.setFixedWidth(100)
         self.btn_confirm.clicked.connect(self.accept)  # 点击确定关闭窗口
         btn_layout.addWidget(self.btn_confirm)
@@ -146,6 +164,10 @@ class PaymentRecordDialog(QDialog):
                     if no_item:
                         checked_nos.append(no_item.text())
         return checked_nos
+
+    def build_men_zhen_data(self):
+        """构建门诊数据"""
+        for i, (zz_code, group) in enumerate(self.shoukuan.groupby('扎账单号', sort=True)):
 
 
 if __name__ == "__main__":
