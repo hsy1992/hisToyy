@@ -47,3 +47,28 @@ ORA-12537: TNS:connection closed
 2026-02-09 22:50:57,721 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：0
 2026-02-09 22:51:34,558 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：0
 2026-02-09 22:52:06,123 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：0
+2026-02-10 22:46:03,080 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：0
+2026-02-10 22:46:58,024 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：0
+2026-02-10 22:48:42,177 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：0
+2026-02-10 22:51:25,739 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：0
+2026-02-10 23:04:52,463 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：0
+2026-02-10 23:04:54,196 - INFO - test - 开始查询His: 2026-02-09 00:00:00, 2026-02-09 23:59:59
+2026-02-10 23:04:54,520 - INFO - test - 导出地址：C:\Users\Administrator\Desktop\线上his\门诊收入2026-02-04 00_00_00数据导出20_56_28.xlsx
+2026-02-10 23:12:06,994 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：0
+2026-02-10 23:12:14,085 - INFO - test - 开始查询His: 2026-02-09 00:00:00, 2026-02-09 23:59:59
+2026-02-10 23:12:14,204 - INFO - test - 导出地址：C:\Users\Administrator\Desktop\线上his\门诊收入2026-02-04 00_00_00数据导出20_56_28.xlsx
+2026-02-10 23:13:01,304 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：0
+2026-02-10 23:13:03,034 - INFO - test - 开始查询His: 2026-02-09 00:00:00, 2026-02-09 23:59:59
+2026-02-10 23:13:03,151 - INFO - test - 导出地址：C:\Users\Administrator\Desktop\线上his\门诊收入2026-02-04 00_00_00数据导出20_56_28.xlsx
+2026-02-10 23:13:53,219 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：0
+2026-02-10 23:13:55,160 - INFO - test - 开始查询His: 2026-02-09 00:00:00, 2026-02-09 23:59:59
+2026-02-10 23:13:55,278 - INFO - test - 导出地址：C:\Users\Administrator\Desktop\线上his\门诊收入2026-02-04 00_00_00数据导出20_56_28.xlsx
+2026-02-10 23:39:30,108 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：0
+2026-02-10 23:39:33,953 - INFO - test - 开始查询His: 2026-02-09 00:00:00, 2026-02-09 23:59:59
+2026-02-10 23:39:34,073 - INFO - test - 导出地址：C:\Users\Administrator\Desktop\线上his\门诊收入2026-02-04 00_00_00数据导出20_56_28.xlsx
+2026-02-10 23:39:58,114 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：0
+2026-02-10 23:39:59,574 - INFO - test - 开始查询His: 2026-02-09 00:00:00, 2026-02-09 23:59:59
+2026-02-10 23:39:59,692 - INFO - test - 导出地址：C:\Users\Administrator\Desktop\线上his\门诊收入2026-02-04 00_00_00数据导出20_56_28.xlsx
+2026-02-10 23:40:43,955 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：0
+2026-02-10 23:40:46,729 - INFO - test - 开始查询His: 2026-02-09 00:00:00, 2026-02-09 23:59:59
+2026-02-10 23:40:46,845 - INFO - test - 导出地址：C:\Users\Administrator\Desktop\线上his\门诊收入2026-02-04 00_00_00数据导出20_56_28.xlsx

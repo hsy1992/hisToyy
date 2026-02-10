@@ -40,7 +40,7 @@ def connect_to_sqlserver_test(host, port, db_name, user, password):
         return False
 
 
-def import_data_to_yy(sqlserver_config, record, finished_signal):
+def import_data_to_yy(sqlserver_config, shoukuan_df, total_df, finished_signal):
     """ 导入数据导用友 """
     conn_str = (
         "DRIVER={SQL Server};"  # 使用系统自带驱动
@@ -56,14 +56,14 @@ def import_data_to_yy(sqlserver_config, record, finished_signal):
         #  建立连接
         conn = pyodbc.connect(conn_str)
         logger.info(f"sqlserver 连接成功, {conn_str}")
-        read_excel_real(conn, sqlserver_config, record, finished_signal)
+        read_excel_real(conn, sqlserver_config, shoukuan_df, total_df, finished_signal)
     except Exception as e:
         traceback.print_exc()  # 打印完整的报错路径
         logger.info(f"sqlserver 导入失败: {e}, {conn_str}")
         finished_signal.emit(False, f"失败{e}", {})
 
 
-def read_excel_real(conn, sqlserver_config, record, finished_signal):
+def read_excel_real(conn, sqlserver_config, shoukuan_df, total_df, finished_signal):
     """
     根据配置读取数据
     """
@@ -73,19 +73,19 @@ def read_excel_real(conn, sqlserver_config, record, finished_signal):
     period_list = []
     if data_type == "0":
         # 门诊收入
-        df_empty, period_list = build_menzhen_df(conn, record)
+        df_empty, period_list = build_menzhen_df(conn, shoukuan_df, total_df)
     elif data_type == "1":
         # 住院结算
-        df_empty, period_list = build_zhuyuan_js_df(conn, record)
+        df_empty, period_list = build_zhuyuan_js_df(conn, shoukuan_df, total_df)
     elif data_type == "2":
         # 全院病人费用
-        df_empty, period_list = build_zhuyuan_shouru(conn, record)
+        df_empty, period_list = build_zhuyuan_shouru(conn, shoukuan_df, total_df)
     elif data_type == "3":
         # 门诊自助机
-        df_empty, period_list = build_menzhen_zizhuji(conn, record)
+        df_empty, period_list = build_menzhen_zizhuji(conn, shoukuan_df, total_df)
     elif data_type == "4":
         # 门诊扫码
-        df_empty, period_list = build_menzhen_saoma(conn, record)
+        df_empty, period_list = build_menzhen_saoma(conn, shoukuan_df, total_df)
 
     # for index, row in df_empty.iterrows():
     #     print(f"--- 正在处理第 {index} 行 ---")
@@ -122,15 +122,13 @@ def read_excel_real(conn, sqlserver_config, record, finished_signal):
         finished_signal.emit(False, f"写入失败, 失败{e}", record)
 
 
-def build_menzhen_df(conn, record):
+def build_menzhen_df(conn, shoukuan_df, total_df):
     """
     构建门诊数据
     """
     df_empty = pd.DataFrame()
-    full_path = record['export_file_path']
-    df = pd.read_excel(full_path, sheet_name=['收款数据', '汇总数据'])
-    df_shoukuan = df['收款数据'].replace({np.nan: None})
-    df_total = df['汇总数据'].replace({np.nan: None})
+    df_shoukuan = shoukuan_df.replace({np.nan: None})
+    df_total = total_df.replace({np.nan: None})
     # 自动去除所有列名两端的空格
     df_shoukuan.columns = df_shoukuan.columns.str.strip()
     df_total.columns = df_total.columns.str.strip()
@@ -218,15 +216,13 @@ def build_menzhen_df(conn, record):
     return df_empty, period_list
 
 
-def build_zhuyuan_js_df(conn, record):
+def build_zhuyuan_js_df(conn, shoukuan_df, total_df):
     """
     构建住院结算数据
     """
     df_empty = pd.DataFrame()
-    full_path = record['export_file_path']
-    df = pd.read_excel(full_path, sheet_name=['收款数据', '汇总数据'])
-    df_shoukuan = df['收款数据'].replace({np.nan: None})
-    df_total = df['汇总数据'].replace({np.nan: None})
+    df_shoukuan = shoukuan_df.replace({np.nan: None})
+    df_total = total_df.replace({np.nan: None})
     # 自动去除所有列名两端的空格
     df_shoukuan.columns = df_shoukuan.columns.str.strip()
     df_total.columns = df_total.columns.str.strip()
@@ -324,16 +320,14 @@ def build_zhuyuan_js_df(conn, record):
     return df_empty, period_list
 
 
-def build_zhuyuan_shouru(conn, record):
+def build_zhuyuan_shouru(conn, shoukuan_df, total_df):
     """
     住院收入
     """
     df_empty = pd.DataFrame()
     row_list = []
     period_list = []
-    full_path = record['export_file_path']
-    df = pd.read_excel(full_path, sheet_name=['收款数据'])
-    df_shoukuan = df['收款数据'].replace({np.nan: None})
+    df_shoukuan = shoukuan_df.replace({np.nan: None})
     # 自动去除所有列名两端的空格
     df_shoukuan.columns = df_shoukuan.columns.str.strip()
     # 将日期列转为日期格式（确保排序逻辑正确）
@@ -386,17 +380,15 @@ def build_zhuyuan_shouru(conn, record):
     return df_empty, period_list
 
 
-def build_menzhen_zizhuji(conn, record):
+def build_menzhen_zizhuji(conn, shoukuan_df, total_df):
     """
     门诊自助机
     """
     df_empty = pd.DataFrame()
     row_list = []
     period_list = []
-    full_path = record['export_file_path']
-    df = pd.read_excel(full_path, sheet_name=['收款数据', '汇总数据'])
-    df_shoukuan = df['收款数据'].replace({np.nan: None})
-    df_total = df['汇总数据'].replace({np.nan: None})
+    df_shoukuan = shoukuan_df.replace({np.nan: None})
+    df_total = total_df.replace({np.nan: None})
     # 自动去除所有列名两端的空格
     df_shoukuan.columns = df_shoukuan.columns.str.strip()
     df_total.columns = df_total.columns.str.strip()
@@ -474,17 +466,15 @@ def build_menzhen_zizhuji(conn, record):
         df_empty = pd.concat([df_empty, new_row], ignore_index=True)
     return df_empty, period_list
 
-def build_menzhen_saoma(conn, record):
+def build_menzhen_saoma(conn, shoukuan_df, total_df):
     """
     门诊扫码
     """
     df_empty = pd.DataFrame()
     row_list = []
     period_list = []
-    full_path = record['export_file_path']
-    df = pd.read_excel(full_path, sheet_name=['收款数据', '汇总数据'])
-    df_shoukuan = df['收款数据'].replace({np.nan: None})
-    df_total = df['汇总数据'].replace({np.nan: None})
+    df_shoukuan = shoukuan_df.replace({np.nan: None})
+    df_total = total_df.replace({np.nan: None})
     # 自动去除所有列名两端的空格
     df_shoukuan.columns = df_shoukuan.columns.str.strip()
     df_total.columns = df_total.columns.str.strip()
@@ -731,15 +721,16 @@ def transform_to_yonyou(period, ino_id, inid, dbill_date, user_name, md, mc, cde
 class ImportWorker(QThread):
     finished_signal = pyqtSignal(bool, str, dict)
 
-    def __init__(self, config, record):
+    def __init__(self, config, shoukuan_df, total_df):
         super().__init__()
         self.config = config
-        self.record = record
+        self.shoukuan_df = shoukuan_df
+        self.total_df = total_df
 
     def run(self):
         try:
             # 这里是真正的耗时操作，在子线程运行，不影响界面
-            import_data_to_yy(self.config, self.record, self.finished_signal)
+            import_data_to_yy(self.config, self.shoukuan_df, self.total_df, self.finished_signal)
         except Exception as e:
             self.finished_signal.emit(False, str(e), -1)
 
@@ -769,6 +760,40 @@ def sqlserver_start_import(parent, config, record, callback=None):
         progress.close()
         if callback:
             callback(success, message, int)
+
+        # 清理 worker 引用
+        if hasattr(parent, '_import_worker'):
+            del parent._import_worker
+
+    worker.finished_signal.connect(on_import_finished)
+    worker.start()
+
+# --- 在主界面调用 ---
+def sqlserver_start_import(parent, config, shoukuan_df, total_df, callback=None):
+    """
+    开始导入用友
+    :param parent: 父窗口
+    :param config: 数据库配置
+    :param shoukuan_df: 收款数据
+    :param total_df: 总数数据
+    :param callback: 回调函数，接受两个参数 (success, message)
+    """
+    progress = QProgressDialog("正在写入用友系统...", None, 0, 0, parent)
+    progress.setWindowTitle("请等待")
+    progress.setWindowModality(2)  # Qt.WindowModal
+    progress.setCancelButton(None)
+    progress.show()
+
+    # 创建并启动线程
+    worker = ImportWorker(config, shoukuan_df, total_df)
+
+    # 将worker绑定到parent上，防止被垃圾回收
+    parent._import_worker = worker
+
+    def on_import_finished(success, message, record):
+        progress.close()
+        if callback:
+            callback(success, message, record)
 
         # 清理 worker 引用
         if hasattr(parent, '_import_worker'):

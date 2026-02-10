@@ -165,7 +165,7 @@ class ExcelMerger(QMainWindow):
         start_layout = QHBoxLayout()
         self.start_btn = QPushButton("开始查询")
         self.start_btn.setEnabled(True)
-        self.start_btn.clicked.connect(self.show_his_data_dialog)
+        self.start_btn.clicked.connect(self.start_his_export)
         start_layout.addWidget(self.start_btn)
 
         layout.addLayout(start_layout)
@@ -194,7 +194,7 @@ class ExcelMerger(QMainWindow):
 
     def show_his_data_dialog(self, start_str, end_str, type, shoukuan_df, total_df):
         # 实例化弹窗
-        dialog = PaymentRecordDialog(start_str, end_str, type, shoukuan_df, total_df, parent=self)
+        dialog = PaymentRecordDialog(start_str, end_str, type, shoukuan_df, total_df, self.config_manager, parent=self)
         # 运行弹窗 阻塞主窗口，直到弹窗关闭
         if dialog.exec_() == QDialog.Accepted:
             # 如果点击了“确定”，获取数据并更新主界面
@@ -288,11 +288,15 @@ class ExcelMerger(QMainWindow):
             # 强制刷新界面渲染加载窗
             QApplication.processEvents()
             # 执行查询
-            shoukuan_df, total_df, full_path = get_his_data(self.config_manager.get_db_config('oracle'), self.start_str, self.end_str, self.type_group.checkedId(), self.shouyin_box.checked_items(), self.code_edit.text().strip())
+            # shoukuan_df, total_df, full_path = get_his_data(self.config_manager.get_db_config('oracle'), self.start_str, self.end_str, self.type_group.checkedId(), self.shouyin_box.checked_items(), self.code_edit.text().strip())
+            full_path = r"C:\Users\Administrator\Desktop\线上his\门诊收入2026-02-04 00_00_00数据导出20_56_28.xlsx"
+            df = pd.read_excel(full_path, sheet_name=['收款数据', '汇总数据'])
+            shoukuan_df = df['收款数据']
+            total_df = df['汇总数据']
             # 关闭加载窗
             progress.close()
             logger.info(f"导出地址：{full_path}")
-            show_his_data_dialog(self.start_str, self.end_str, self.type_group.checkedId(), shoukuan_df, total_df)
+            self.show_his_data_dialog(self.start_str, self.end_str, self.type_group.checkedId(), shoukuan_df, total_df)
 
 
     def start_yy_import(self, item=None):

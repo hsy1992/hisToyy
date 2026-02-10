@@ -1,13 +1,16 @@
 from PyQt5.QtWidgets import (QApplication, QDialog, QVBoxLayout, QHBoxLayout,
                              QLabel, QLineEdit, QPushButton, QTableWidget,
-                             QTableWidgetItem, QHeaderView, QDateEdit, QCheckBox, QWidget)
-from PyQt5.QtCore import Qt, QDate, QDateTime
+                             QTableWidgetItem, QHeaderView, QDateEdit, QCheckBox, QWidget, QMessageBox)
+from PyQt5.QtCore import Qt, QDate, QDateTime, pyqtSignal
 import sys
-
+from decimal import Decimal
+from sqlserver_db_connect import sqlserver_start_import
 
 class PaymentRecordDialog(QDialog):
-    def __init__(self, start_str, end_str, type, shoukuan_df, total_df, parent=None):
-        super().__init__()
+    # 导入完成信号
+    import_finish_signal = pyqtSignal(str)
+    def __init__(self, start_str, end_str, type, shoukuan_df, total_df, config_manager, parent=None):
+        super().__init__(parent)
         self.setWindowTitle("缴款记录列表")
         self.resize(1000, 600)
         self.start_str = start_str
@@ -15,13 +18,14 @@ class PaymentRecordDialog(QDialog):
         self.type = type
         self.shoukuan_df = shoukuan_df
         self.total_df = total_df
+        self.config_manager = config_manager
         self.setup_ui()
         self.init_data()
 
     def init_data(self):
         if self.type == 0:
             # 门诊数据展示
-
+            self.build_men_zhen_data()
 
 
     def setup_ui(self):
@@ -31,8 +35,10 @@ class PaymentRecordDialog(QDialog):
         filter_layout = QHBoxLayout()
         self.start_date = QDateEdit(QDateTime.fromString(self.start_str, "yyyy-MM-dd HH:mm:ss").date())
         self.start_date.setCalendarPopup(True)
+        self.start_date.setEnabled(False)
         self.end_date = QDateEdit(QDateTime.fromString(self.end_str, "yyyy-MM-dd HH:mm:ss").date())
         self.end_date.setCalendarPopup(True)
+        self.end_date.setEnabled(False)
 
         filter_layout.addWidget(QLabel("扎帐日期:"))
         filter_layout.addWidget(self.start_date)
@@ -79,17 +85,21 @@ class PaymentRecordDialog(QDialog):
 
         self.btn_confirm = QPushButton("导入")
         self.btn_confirm.setFixedWidth(100)
-        self.btn_confirm.clicked.connect(self.accept)  # 点击确定关闭窗口
+        self.btn_confirm.clicked.connect(self.on_confirm_click)  # 点击确定关闭窗口
         btn_layout.addWidget(self.btn_confirm)
 
         layout.addLayout(btn_layout)
+
 
 
         # 绑定全选复选框的信号
         self.cb_all.stateChanged.connect(self.on_all_checked)
 
         # 修改表格列：增加一列用于放复选框
-        headers = ["", "NO", "登记时间", "收款员", "开始时间", "终止时间", "门诊收费合计"]
+        if self.type == 0:
+            headers = ["", "NO", "收款员", "扎帐时间", "门诊收费合计"]
+        if self.type == 1:
+            headers = ["", "NO", "收款员", "扎帐时间", "住院收费合计"]
         self.table.setColumnCount(len(headers))
         self.table.setHorizontalHeaderLabels(headers)
         # 第一列（勾选列）宽度设固定
@@ -167,40 +177,47 @@ class PaymentRecordDialog(QDialog):
 
     def build_men_zhen_data(self):
         """构建门诊数据"""
-        for i, (zz_code, group) in enumerate(self.shoukuan.groupby('扎账单号', sort=True)):
+        for i, (zz_code, group) in enumerate(self.shoukuan_df.groupby('扎账单号', sort=True)):
+            if not group.empty:
+                group['金额'] = group['金额'].apply(lambda x: Decimal(str(x)) if x is not None else Decimal('0.00'))
+                jine = group['金额'].sum()
+                shouyin = group['收款员'].iloc[0]
+                zz_time = group['扎帐时间'].iloc[0]
+                self.add_row_with_checkbox([zz_code, shouyin, zz_time, str(jine)])
 
+    def on_confirm_click(self):
+        if self.get_checked_rows_data():
+            self._start_import_data_to_yy()
+            logger.info(f"点击了导入按钮")
+            self.accept()
+        else:
+            QMessageBox.warning(self, "提示", "请选择要导入的数据")
+
+
+    def _start_import_data_to_yy(self):
+        """
+        公共用友导入方法
+        """
+        logger.info(f"开始用友导入: {self.start_str}, {self.end_str}, {self.type}")
+        checked_nos = self.get_checked_rows_data()
+        self.shoukuan_df = self.shoukuan_df[self.shoukuan_df['扎账单号'].isin(checked_nos)]
+        self.total_df = self.total_df[self.total_df['扎账单号'].isin(checked_nos)]
+        def on_complete(success, message, record):
+            # 更新本地数据库状态
+            if success:
+                logger.info("导入成功，刷新列表")
+                QMessageBox.information(self, "成功", "导入数据成功")
+            else:
+                logger.info("导入失败，刷新列表")
+                QMessageBox.critical(self, "失败", f"导入失败{message}")
+
+        sqlserver_start_import(self, self.config_manager.get_db_config('sqlserver'), self.shoukuan_df, self.total_df, on_complete)
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
 
     # 这里假设你已经贴入了之前完整的 PaymentRecordDialog 类
     main_win = PaymentRecordDialog()
-
-    # 添加演示数据
-    main_win.add_row_with_checkbox(["250901000002", "2025-09-01 12:23:11", "郭廷臣", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "7899.40"])
-    main_win.add_row_with_checkbox(["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
-    main_win.add_row_with_checkbox(["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
-    main_win.add_row_with_checkbox(["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
-    main_win.add_row_with_checkbox(["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
-    main_win.add_row_with_checkbox(["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
-    main_win.add_row_with_checkbox(["250901000002", "2025-09-01 12:23:11", "郭廷臣", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "7899.40"])
-    main_win.add_row_with_checkbox(["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
-    main_win.add_row_with_checkbox(["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
-    main_win.add_row_with_checkbox(["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
-    main_win.add_row_with_checkbox(["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
-    main_win.add_row_with_checkbox(["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
-    main_win.add_row_with_checkbox(["250901000002", "2025-09-01 12:23:11", "郭廷臣", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "7899.40"])
-    main_win.add_row_with_checkbox(["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
-    main_win.add_row_with_checkbox(["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
-    main_win.add_row_with_checkbox(["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
-    main_win.add_row_with_checkbox(["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
-    main_win.add_row_with_checkbox(["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
-    main_win.add_row_with_checkbox(["250901000002", "2025-09-01 12:23:11", "郭廷臣", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "7899.40"])
-    main_win.add_row_with_checkbox(["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
-    main_win.add_row_with_checkbox(["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
-    main_win.add_row_with_checkbox(["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
-    main_win.add_row_with_checkbox(["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
-    main_win.add_row_with_checkbox(["250901000003", "2025-09-01 12:23:11", "于珈霖", "2025-09-01 12:23:11", "2025-09-01 12:23:11", "33087.31"])
 
     main_win.show()
     sys.exit(app.exec_())
