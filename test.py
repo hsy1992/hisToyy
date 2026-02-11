@@ -9,7 +9,7 @@ from sql_setting_dialog import ConfigDialog
 from config import ConfigManager
 from datetime import datetime, time
 from orcale_db_connect import connect_to_oracle_test, get_his_data
-from sqlserver_db_connect import connect_to_sqlserver_test, import_data_to_yy, sqlserver_start_import
+from sqlserver_db_connect import connect_to_sqlserver_test, import_data_to_yy
 from log_util import logger
 from path_util import open_with_default_app
 import traceback
@@ -323,21 +323,6 @@ class ExcelMerger(QMainWindow):
             # record['data_type'] = '4'
             # record['export_file_path'] = r"C:\Users\Administrator\Desktop\线上his\门诊扫码2026-02-04 00_00_00数据导出20_56_48.xlsx"
 
-            if record['status'] == 4:
-                # 已经导出成功得数据
-                reply = QMessageBox.question(self, "提示", "该条数据已经成功导入到用友，请确认再次导入？",
-                                     QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
-                if reply == QMessageBox.Yes:
-                    self._start_import_data_to_yy(record)
-                else:
-                    logger.info(f"start_yy_import用户点击了‘否’{record}")
-            else:
-                reply = QMessageBox.question(self, '确认', f"是否将该'{this_full_path}'HIS数据导入用友？",
-                                             QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
-                if reply == QMessageBox.Yes:
-                    self._start_import_data_to_yy(record)
-                else:
-                    logger.info("start_yy_import用户点击了‘否’")
         else:
             QMessageBox.warning(self, "失败", "请点击导出HIS数据后进行导入")
 
@@ -357,8 +342,6 @@ class ExcelMerger(QMainWindow):
                 QMessageBox.critical(self, "失败", f"导入失败{message}")
                 self.sqlite_helper.import_yy_result(record["id"], success, "", -1)
             self.table.refresh_data()
-
-        sqlserver_start_import(self, self.config_manager.get_db_config('sqlserver'), record, on_complete)
 
 
     def run_with_loading(parent, task_func):

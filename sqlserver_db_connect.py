@@ -142,69 +142,70 @@ def build_menzhen_df(conn, shoukuan_df, total_df):
         if pd.notnull(zz_code):
             # 从明细表查找该单号的所有数据
             zz_code_result_df = df_shoukuan.query(f'扎账单号 == {zz_code}')
-            # 获取该扎账单号的时间
-            # date_val = pd.to_datetime(zz_code_result_df.iloc[0]['扎帐时间'])
-            period = date_val.month
-            # 每个单号都去获取下凭证
-            start_ino_id = get_next_ino_id(conn, period)
-            row_list = []
-            ino_id = start_ino_id + i
-            period_list.append(str(ino_id))
-            # 贷方对方科目
-            mc_ccode_equal = set()
-            # 借方对方科目
-            md_ccode_equal = set()
-            inid = 0
-            # 重置索引
-            zz_code_result_df = zz_code_result_df.reset_index(drop=True)
-            for index, row in zz_code_result_df.iterrows():
-                inid = index + 1
-                dbill_date = date_val
-                user_name = row['收款员']
-                # 摘要
-                cdigest = f"门诊收入,扎账单号:{'' if pd.isna(row['扎账单号']) else row['扎账单号']},{'' if pd.isna(user_name) else user_name}"
-                md = 0.0
-                # 贷方
-                mc_v = pd.to_numeric(row.get('金额', 0))
-                mc = 0.0 if pd.isna(mc_v) else float(mc_v)
-                # 部门
-                cdept_id = get_dept_code_mz(row['开单科室'], 'his_mz')
-                # 科目
-                ccode = get_men_zhen_ccode(row, 1)
-                ccode = str(ccode or "").strip()
-                if not ccode:
-                    # 抛出内置的“值错误”异常
-                    raise ValueError("错误：科目编码(ccode)不能为空或纯空格！")
+            if not zz_code_result_df.empty:
+                # 获取该扎账单号的时间
+                date_val = pd.to_datetime(zz_code_result_df.iloc[0]['扎帐时间'])
+                period = date_val.month
+                # 每个单号都去获取下凭证
+                start_ino_id = get_next_ino_id(conn, period)
+                row_list = []
+                ino_id = start_ino_id + i
+                period_list.append(str(ino_id))
                 # 贷方对方科目
-                mc_ccode_equal.add(ccode)
-                row_list.append(
-                    transform_to_yonyou(period, ino_id, inid, dbill_date, '李红霞', md, mc, cdept_id, ccode, cdigest))
-                print(
-                    f"period是: {period},inid是: {inid},dbill_date: {dbill_date}, cdigest: {cdigest}, user_name: {user_name}, 借方: {md}, 贷方: {mc}, cdept_id: {cdept_id}, ccode:{ccode}")
-            # 继续去插入汇总数据
-            for index, row in total_group.iterrows():
-                if row['项目'] != '合计':
-                    inid = inid + 1
+                mc_ccode_equal = set()
+                # 借方对方科目
+                md_ccode_equal = set()
+                inid = 0
+                # 重置索引
+                zz_code_result_df = zz_code_result_df.reset_index(drop=True)
+                for index, row in zz_code_result_df.iterrows():
+                    inid = index + 1
+                    dbill_date = date_val
                     user_name = row['收款员']
                     # 摘要
-                    cdigest = f"门诊收入,{user_name}"
-                    # 收款金额
-                    # 借方
-                    md_v = pd.to_numeric(row.get('金额', 0))
-                    md = 0.0 if pd.isna(md_v) else float(md_v)
+                    cdigest = f"门诊收入,扎账单号:{'' if pd.isna(row['扎账单号']) else row['扎账单号']},{'' if pd.isna(user_name) else user_name}"
+                    md = 0.0
                     # 贷方
-                    mc = 0.0
+                    mc_v = pd.to_numeric(row.get('金额', 0))
+                    mc = 0.0 if pd.isna(mc_v) else float(mc_v)
+                    # 部门
+                    cdept_id = get_dept_code_mz(row['开单科室'], 'his_mz')
                     # 科目
-                    ccode = get_men_zhen_ccode(row, 2)
+                    ccode = get_men_zhen_ccode(row, 1)
                     ccode = str(ccode or "").strip()
                     if not ccode:
                         # 抛出内置的“值错误”异常
                         raise ValueError("错误：科目编码(ccode)不能为空或纯空格！")
-                    md_ccode_equal.add(ccode)
+                    # 贷方对方科目
+                    mc_ccode_equal.add(ccode)
                     row_list.append(
-                        transform_to_yonyou(period, ino_id, inid, date_val, '李红霞', md, mc, None, ccode, cdigest))
+                        transform_to_yonyou(period, ino_id, inid, dbill_date, '李红霞', md, mc, cdept_id, ccode, cdigest))
                     print(
-                        f"period是: {period},inid是: {inid},dbill_date: {date_val}, cdigest: {cdigest}, user_name: {user_name}, 借方: {md}, 贷方: {mc}, cdept_id: NONE, ccode:{ccode}")
+                        f"period是: {period},inid是: {inid},dbill_date: {dbill_date}, cdigest: {cdigest}, user_name: {user_name}, 借方: {md}, 贷方: {mc}, cdept_id: {cdept_id}, ccode:{ccode}")
+                # 继续去插入汇总数据
+                for index, row in total_group.iterrows():
+                    if row['项目'] != '合计':
+                        inid = inid + 1
+                        user_name = row['收款员']
+                        # 摘要
+                        cdigest = f"门诊收入,{user_name}"
+                        # 收款金额
+                        # 借方
+                        md_v = pd.to_numeric(row.get('金额', 0))
+                        md = 0.0 if pd.isna(md_v) else float(md_v)
+                        # 贷方
+                        mc = 0.0
+                        # 科目
+                        ccode = get_men_zhen_ccode(row, 2)
+                        ccode = str(ccode or "").strip()
+                        if not ccode:
+                            # 抛出内置的“值错误”异常
+                            raise ValueError("错误：科目编码(ccode)不能为空或纯空格！")
+                        md_ccode_equal.add(ccode)
+                        row_list.append(
+                            transform_to_yonyou(period, ino_id, inid, date_val, '李红霞', md, mc, None, ccode, cdigest))
+                        print(
+                            f"period是: {period},inid是: {inid},dbill_date: {date_val}, cdigest: {cdigest}, user_name: {user_name}, 借方: {md}, 贷方: {mc}, cdept_id: NONE, ccode:{ccode}")
 
             for yongyou_row in row_list:
                 if yongyou_row["md"] > 0:
@@ -230,7 +231,6 @@ def build_zhuyuan_js_df(conn, shoukuan_df, total_df):
     df_shoukuan['扎帐时间'] = pd.to_datetime(df_shoukuan['扎帐时间'])
     period_list = []
 
-    date_val = pd.to_datetime(datetime.now().date().strftime("%Y-%m-%d %H:%M:%S"))
     # 先只找出结账数据
     jiezhang_total_df = df_total[df_total['扎帐类别'].str.contains('结帐', na=False, regex=False)]
 
@@ -239,83 +239,85 @@ def build_zhuyuan_js_df(conn, shoukuan_df, total_df):
         if pd.notnull(zz_code):
             # 从汇总表查找该单号的所有数据
             zz_code_result_df = df_total.query(f'扎账单号 == {zz_code}')
-            # 先只找出结账数据
-            jiezhang_df = zz_code_result_df[zz_code_result_df['扎帐类别'].str.contains('结帐', na=False, regex=False)]
-            period = date_val.month
-            # 每个单号都去获取下凭证
-            start_ino_id = get_next_ino_id(conn, period)
-            row_list = []
-            ino_id = start_ino_id + i
-            period_list.append(str(ino_id))
-            inid = 0
-            # 病人返押金票据冲住院预收款 230502  找出病人返押金票据数据
-            fanya_df = jiezhang_df[jiezhang_df['项目'].str.contains('病人返押金票据', na=False, regex=False)]
-            # 结账退款数据
-            tuikuan_df = jiezhang_df[jiezhang_df['项目'].str.contains('结帐退款', na=False, regex=False)]
-            # 对方科目设置 应收与现金
-            ccode_set = {'121101', '1001'}
-            ccode_set1 = set()
-            # 重置索引
-            tuikuan_df = tuikuan_df.reset_index(drop=True)
-            # 先处理结账退款数据
-            for index, row in tuikuan_df.iterrows():
-                inid = index + 1
-                name = row['收款员']
-                cdigest = f"结算住院费,扎账单号:{zz_code},{'' if pd.isna(name) else name}"
-                # 科目
-                ccode = get_zhu_yuan_ccode2(row)
-                # 其他
-                # 借方
-                md = pd.to_numeric(row.get('金额', 0))
-                # 贷方
-                mc = 0.0
-                ccode_set1.add(ccode)
-                row_list.append(
-                    transform_to_yonyou(period, ino_id, inid, date_val, '李红霞', md, mc, None, ccode, cdigest))
-            # 添加病人返押金票据冲住院预收款 230502 凭证 为负 贷方
-            """
-            病人返押金票据:	260129000018	结帐	刘春丽	2026-01-29 10:49:31	自助微信	37000
-            病人返押金票据:	260129000018	结帐	刘春丽	2026-01-29 10:49:31	支付宝扫码付	50830.04
-            病人返押金票据:	260129000018	结帐	刘春丽	2026-01-29 10:49:31	现金	35100
-            病人返押金票据:	260129000018	结帐	刘春丽	2026-01-29 10:49:31	微信扫码付	145120.24
-            """
-            total_fanya = fanya_df['金额'].sum()
-            if total_fanya > 0:
-                inid = inid + 1
-                name = fanya_df.iloc[0]['收款员']
-                zz_code = fanya_df.iloc[0]['扎账单号']
-                cdigest = f"结算住院费,扎账单号:{zz_code},{'' if pd.isna(name) else name}"
-                # 科目
-                ccode = '230502'
-                md = 0.0
-                # 贷方
-                mc = -pd.to_numeric(total_fanya)
-                row_list.append(
-                    transform_to_yonyou(period, ino_id, inid, date_val, '李红霞', md, mc, None, ccode, cdigest))
-            """
-            贷方 充 121101 应收  结账数据总和
-            """
-            total_jiezhang = jiezhang_df['金额'].sum()
-            if total_jiezhang > 0:
-                inid = inid + 1
-                name = jiezhang_df.iloc[0]['收款员']
-                zz_code = jiezhang_df.iloc[0]['扎账单号']
-                cdigest = f"结算住院费,扎账单号:{zz_code},{'' if pd.isna(name) else name}"
-                # 科目
-                ccode = '121101'
-                md = 0.0
-                # 贷方
-                mc = pd.to_numeric(total_jiezhang)
-                row_list.append(
-                    transform_to_yonyou(period, ino_id, inid, date_val, '李红霞', md, mc, None, ccode, cdigest))
+            if not zz_code_result_df.empty:
+                # 先只找出结账数据
+                jiezhang_df = zz_code_result_df[zz_code_result_df['扎帐类别'].str.contains('结帐', na=False, regex=False)]
+                date_val = pd.to_datetime(zz_code_result_df.iloc[0]['扎帐时间'])
+                period = date_val.month
+                # 每个单号都去获取下凭证
+                start_ino_id = get_next_ino_id(conn, period)
+                row_list = []
+                ino_id = start_ino_id + i
+                period_list.append(str(ino_id))
+                inid = 0
+                # 病人返押金票据冲住院预收款 230502  找出病人返押金票据数据
+                fanya_df = jiezhang_df[jiezhang_df['项目'].str.contains('病人返押金票据', na=False, regex=False)]
+                # 结账退款数据
+                tuikuan_df = jiezhang_df[jiezhang_df['项目'].str.contains('结帐退款', na=False, regex=False)]
+                # 对方科目设置 应收与现金
+                ccode_set = {'121101', '1001'}
+                ccode_set1 = set()
+                # 重置索引
+                tuikuan_df = tuikuan_df.reset_index(drop=True)
+                # 先处理结账退款数据
+                for index, row in tuikuan_df.iterrows():
+                    inid = index + 1
+                    name = row['收款员']
+                    cdigest = f"结算住院费,扎账单号:{zz_code},{'' if pd.isna(name) else name}"
+                    # 科目
+                    ccode = get_zhu_yuan_ccode2(row)
+                    # 其他
+                    # 借方
+                    md = pd.to_numeric(row.get('金额', 0))
+                    # 贷方
+                    mc = 0.0
+                    ccode_set1.add(ccode)
+                    row_list.append(
+                        transform_to_yonyou(period, ino_id, inid, date_val, '李红霞', md, mc, None, ccode, cdigest))
+                # 添加病人返押金票据冲住院预收款 230502 凭证 为负 贷方
+                """
+                病人返押金票据:	260129000018	结帐	刘春丽	2026-01-29 10:49:31	自助微信	37000
+                病人返押金票据:	260129000018	结帐	刘春丽	2026-01-29 10:49:31	支付宝扫码付	50830.04
+                病人返押金票据:	260129000018	结帐	刘春丽	2026-01-29 10:49:31	现金	35100
+                病人返押金票据:	260129000018	结帐	刘春丽	2026-01-29 10:49:31	微信扫码付	145120.24
+                """
+                total_fanya = fanya_df['金额'].sum()
+                if total_fanya > 0:
+                    inid = inid + 1
+                    name = fanya_df.iloc[0]['收款员']
+                    zz_code = fanya_df.iloc[0]['扎账单号']
+                    cdigest = f"结算住院费,扎账单号:{zz_code},{'' if pd.isna(name) else name}"
+                    # 科目
+                    ccode = '230502'
+                    md = 0.0
+                    # 贷方
+                    mc = -pd.to_numeric(total_fanya)
+                    row_list.append(
+                        transform_to_yonyou(period, ino_id, inid, date_val, '李红霞', md, mc, None, ccode, cdigest))
+                """
+                贷方 充 121101 应收  结账数据总和
+                """
+                total_jiezhang = jiezhang_df['金额'].sum()
+                if total_jiezhang > 0:
+                    inid = inid + 1
+                    name = jiezhang_df.iloc[0]['收款员']
+                    zz_code = jiezhang_df.iloc[0]['扎账单号']
+                    cdigest = f"结算住院费,扎账单号:{zz_code},{'' if pd.isna(name) else name}"
+                    # 科目
+                    ccode = '121101'
+                    md = 0.0
+                    # 贷方
+                    mc = pd.to_numeric(total_jiezhang)
+                    row_list.append(
+                        transform_to_yonyou(period, ino_id, inid, date_val, '李红霞', md, mc, None, ccode, cdigest))
 
-            for yongyou_row in row_list:
-                if yongyou_row["md"] > 0.0 or yongyou_row["mc"] < 0.0:
-                    yongyou_row["ccode_equal"] = ",".join(list(ccode_set)[:4])
-                else:
-                    yongyou_row["ccode_equal"] = ",".join(list(ccode_set1)[:4])
-            new_row = pd.DataFrame(row_list)
-            df_empty = pd.concat([df_empty, new_row], ignore_index=True)
+                for yongyou_row in row_list:
+                    if yongyou_row["md"] > 0.0 or yongyou_row["mc"] < 0.0:
+                        yongyou_row["ccode_equal"] = ",".join(list(ccode_set)[:4])
+                    else:
+                        yongyou_row["ccode_equal"] = ",".join(list(ccode_set1)[:4])
+                new_row = pd.DataFrame(row_list)
+                df_empty = pd.concat([df_empty, new_row], ignore_index=True)
 
     return df_empty, period_list
 
@@ -732,41 +734,9 @@ class ImportWorker(QThread):
             # 这里是真正的耗时操作，在子线程运行，不影响界面
             import_data_to_yy(self.config, self.shoukuan_df, self.total_df, self.finished_signal)
         except Exception as e:
-            self.finished_signal.emit(False, str(e), -1)
+            self.finished_signal.emit(False, str(e), {})
 
 
-# --- 在主界面调用 ---
-def sqlserver_start_import(parent, config, record, callback=None):
-    """
-    开始导入用友
-    :param parent: 父窗口
-    :param config: 数据库配置
-    :param record: 记录
-    :param callback: 回调函数，接受两个参数 (success, message)
-    """
-    progress = QProgressDialog("正在写入用友系统...", None, 0, 0, parent)
-    progress.setWindowTitle("请等待")
-    progress.setWindowModality(2)  # Qt.WindowModal
-    progress.setCancelButton(None)
-    progress.show()
-
-    # 创建并启动线程
-    worker = ImportWorker(config, record)
-
-    # 将worker绑定到parent上，防止被垃圾回收
-    parent._import_worker = worker
-
-    def on_import_finished(success, message, int):
-        progress.close()
-        if callback:
-            callback(success, message, int)
-
-        # 清理 worker 引用
-        if hasattr(parent, '_import_worker'):
-            del parent._import_worker
-
-    worker.finished_signal.connect(on_import_finished)
-    worker.start()
 
 # --- 在主界面调用 ---
 def sqlserver_start_import(parent, config, shoukuan_df, total_df, callback=None):
