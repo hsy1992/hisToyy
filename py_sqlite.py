@@ -4,6 +4,9 @@ import os
 from datetime import datetime, time
 from pathlib import Path
 
+from log_util import logger
+
+
 class SQLiteHelper:
     def __init__(self, db_name="app_config.db"):
         self.db_name = db_name
@@ -104,11 +107,11 @@ class SQLiteHelper:
         """
         # 自动添加创建时间
         data['create_time'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        data['status'] = 1
+        data['status'] = 4
         fields = ", ".join(data.keys())
         placeholders = ", ".join(["?"] * len(data))
         sql = f"INSERT INTO sys_export_record ({fields}) VALUES ({placeholders})"
-
+        logger.info(sql)
         with self.get_connection() as conn:
             cursor = conn.cursor()
             cursor.execute(sql, list(data.values()))

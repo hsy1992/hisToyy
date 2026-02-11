@@ -40,7 +40,7 @@ def connect_to_sqlserver_test(host, port, db_name, user, password):
         return False
 
 
-def import_data_to_yy(sqlserver_config, shoukuan_df, total_df, finished_signal):
+def import_data_to_yy(sqlserver_config, shoukuan_df, total_df, record, data_type, finished_signal):
     """ 导入数据导用友 """
     conn_str = (
         "DRIVER={SQL Server};"  # 使用系统自带驱动
@@ -56,18 +56,17 @@ def import_data_to_yy(sqlserver_config, shoukuan_df, total_df, finished_signal):
         #  建立连接
         conn = pyodbc.connect(conn_str)
         logger.info(f"sqlserver 连接成功, {conn_str}")
-        read_excel_real(conn, sqlserver_config, shoukuan_df, total_df, finished_signal)
+        read_excel_real(conn, sqlserver_config, shoukuan_df, total_df, record, str(data_type), finished_signal)
     except Exception as e:
         traceback.print_exc()  # 打印完整的报错路径
         logger.info(f"sqlserver 导入失败: {e}, {conn_str}")
         finished_signal.emit(False, f"失败{e}", {})
 
 
-def read_excel_real(conn, sqlserver_config, shoukuan_df, total_df, finished_signal):
+def read_excel_real(conn, sqlserver_config, shoukuan_df, total_df, record, data_type, finished_signal):
     """
     根据配置读取数据
     """
-    data_type = record['data_type']
     # 创建一个完全空的
     df_empty = pd.DataFrame()
     period_list = []
@@ -79,25 +78,26 @@ def read_excel_real(conn, sqlserver_config, shoukuan_df, total_df, finished_sign
         df_empty, period_list = build_zhuyuan_js_df(conn, shoukuan_df, total_df)
     elif data_type == "2":
         # 全院病人费用
-        df_empty, period_list = build_zhuyuan_shouru(conn, shoukuan_df, total_df)
+        df_empty, period_list = build_zhuyuan_shouru(conn, shoukuan_df, total_df, record)
     elif data_type == "3":
         # 门诊自助机
-        df_empty, period_list = build_menzhen_zizhuji(conn, shoukuan_df, total_df)
+        df_empty, period_list = build_menzhen_zizhuji(conn, shoukuan_df, total_df, record)
     elif data_type == "4":
         # 门诊扫码
-        df_empty, period_list = build_menzhen_saoma(conn, shoukuan_df, total_df)
+        df_empty, period_list = build_menzhen_saoma(conn, shoukuan_df, total_df, record)
 
-    # for index, row in df_empty.iterrows():
-    #     print(f"--- 正在处理第 {index} 行 ---")
-    #     for col in df_empty.columns:
-    #         value = row[col]
-    #         # 打印：列名 | 数据值 | Python类型
-    #         print(f"列名: {col} | 值: {value} | 类型: {type(value)}")
-    #         if isinstance(value, str):
-    #             print(f"警告：第 {col} 个参数超长！长度: {len(value)}")
-    #
-    #     # 为了方便调试，只打印第一行就中断（或者根据需要去掉 break）
-    #     break
+    for index, row in df_empty.iterrows():
+        print(f"--- 正在处理第 {index} 行 ---")
+        for col in df_empty.columns:
+            value = row[col]
+            # 打印：列名 | 数据值 | Python类型
+            print(f"列名: {col} | 值: {value} | 类型: {type(value)}")
+            byte_len = len(str(value).encode('gbk'))
+            if isinstance(value, str) and byte_len > 90:
+                print(f"警告：第 {col} 个参数超长！长度: {len(value)}")
+
+        # 为了方便调试，只打印第一行就中断（或者根据需要去掉 break）
+        break
     try:
         if not df_empty.empty:
             mssql_url = f"mssql+pyodbc://{sqlserver_config.get('user')}:{sqlserver_config.get('password')}@{sqlserver_config.get('ip')}:{sqlserver_config.get('port')}/{'UFDATA_001_2026' if is_build else 'UFDATA_999_2012'}?driver=SQL+Server"
@@ -115,8 +115,13 @@ def read_excel_real(conn, sqlserver_config, shoukuan_df, total_df, finished_sign
                     chunksize=1000,
                 )
             logger.info("所有数据写入成功，事务已自动提交")
+            record['status'] = "4"
             record['import_yy_num'] = len(df_empty)
-            finished_signal.emit(True, f"{','.join(map(str, period_list))}", record)
+            # 用友凭证号
+            record['import_yy_start'] = f"{','.join(map(str, period_list))}"
+            finished_signal.emit(True, "导入成功", record)
+        else:
+            finished_signal.emit(False, "没有需要导入的数据", record)
     except Exception as e:
         logger.info(f"写入失败，事务已回滚。错误详情: {e}")
         finished_signal.emit(False, f"写入失败, 失败{e}", record)
@@ -141,7 +146,7 @@ def build_menzhen_df(conn, shoukuan_df, total_df):
     for i, (zz_code, total_group) in enumerate(df_total.groupby('扎账单号', sort=False)):
         if pd.notnull(zz_code):
             # 从明细表查找该单号的所有数据
-            zz_code_result_df = df_shoukuan.query(f'扎账单号 == {zz_code}')
+            zz_code_result_df = df_shoukuan.query(f'扎账单号 == "{zz_code}"')
             if not zz_code_result_df.empty:
                 # 获取该扎账单号的时间
                 date_val = pd.to_datetime(zz_code_result_df.iloc[0]['扎帐时间'])
@@ -163,7 +168,7 @@ def build_menzhen_df(conn, shoukuan_df, total_df):
                     dbill_date = date_val
                     user_name = row['收款员']
                     # 摘要
-                    cdigest = f"门诊收入,扎账单号:{'' if pd.isna(row['扎账单号']) else row['扎账单号']},{'' if pd.isna(user_name) else user_name}"
+                    cdigest = f"门诊收入,code:{'' if pd.isna(row['扎账单号']) else row['扎账单号']},{'' if pd.isna(user_name) else user_name}"
                     md = 0.0
                     # 贷方
                     mc_v = pd.to_numeric(row.get('金额', 0))
@@ -207,13 +212,13 @@ def build_menzhen_df(conn, shoukuan_df, total_df):
                         print(
                             f"period是: {period},inid是: {inid},dbill_date: {date_val}, cdigest: {cdigest}, user_name: {user_name}, 借方: {md}, 贷方: {mc}, cdept_id: NONE, ccode:{ccode}")
 
-            for yongyou_row in row_list:
-                if yongyou_row["md"] > 0:
-                    yongyou_row["ccode_equal"] = ",".join(list(md_ccode_equal)[:4])
-                else:
-                    yongyou_row["ccode_equal"] = ",".join(list(mc_ccode_equal)[:4])
-            new_row = pd.DataFrame(row_list)
-            df_empty = pd.concat([df_empty, new_row], ignore_index=True)
+                for yongyou_row in row_list:
+                    if yongyou_row["md"] > 0:
+                        yongyou_row["ccode_equal"] = ",".join(list(md_ccode_equal)[:3])
+                    else:
+                        yongyou_row["ccode_equal"] = ",".join(list(mc_ccode_equal)[:3])
+                new_row = pd.DataFrame(row_list)
+                df_empty = pd.concat([df_empty, new_row], ignore_index=True)
     return df_empty, period_list
 
 
@@ -263,7 +268,7 @@ def build_zhuyuan_js_df(conn, shoukuan_df, total_df):
                 for index, row in tuikuan_df.iterrows():
                     inid = index + 1
                     name = row['收款员']
-                    cdigest = f"结算住院费,扎账单号:{zz_code},{'' if pd.isna(name) else name}"
+                    cdigest = f"结算住院费,code:{zz_code},{'' if pd.isna(name) else name}"
                     # 科目
                     ccode = get_zhu_yuan_ccode2(row)
                     # 其他
@@ -286,7 +291,7 @@ def build_zhuyuan_js_df(conn, shoukuan_df, total_df):
                     inid = inid + 1
                     name = fanya_df.iloc[0]['收款员']
                     zz_code = fanya_df.iloc[0]['扎账单号']
-                    cdigest = f"结算住院费,扎账单号:{zz_code},{'' if pd.isna(name) else name}"
+                    cdigest = f"结算住院费,code:{zz_code},{'' if pd.isna(name) else name}"
                     # 科目
                     ccode = '230502'
                     md = 0.0
@@ -302,7 +307,7 @@ def build_zhuyuan_js_df(conn, shoukuan_df, total_df):
                     inid = inid + 1
                     name = jiezhang_df.iloc[0]['收款员']
                     zz_code = jiezhang_df.iloc[0]['扎账单号']
-                    cdigest = f"结算住院费,扎账单号:{zz_code},{'' if pd.isna(name) else name}"
+                    cdigest = f"结算住院费,code:{zz_code},{'' if pd.isna(name) else name}"
                     # 科目
                     ccode = '121101'
                     md = 0.0
@@ -313,16 +318,16 @@ def build_zhuyuan_js_df(conn, shoukuan_df, total_df):
 
                 for yongyou_row in row_list:
                     if yongyou_row["md"] > 0.0 or yongyou_row["mc"] < 0.0:
-                        yongyou_row["ccode_equal"] = ",".join(list(ccode_set)[:4])
+                        yongyou_row["ccode_equal"] = ",".join(list(ccode_set)[:3])
                     else:
-                        yongyou_row["ccode_equal"] = ",".join(list(ccode_set1)[:4])
+                        yongyou_row["ccode_equal"] = ",".join(list(ccode_set1)[:3])
                 new_row = pd.DataFrame(row_list)
                 df_empty = pd.concat([df_empty, new_row], ignore_index=True)
 
     return df_empty, period_list
 
 
-def build_zhuyuan_shouru(conn, shoukuan_df, total_df):
+def build_zhuyuan_shouru(conn, shoukuan_df, total_df, record):
     """
     住院收入
     """
@@ -336,8 +341,9 @@ def build_zhuyuan_shouru(conn, shoukuan_df, total_df):
     df_shoukuan['日期'] = pd.to_datetime(df_shoukuan['日期'])
     # 贷方对方科目
     mc_ccode_equal = set()
-    # 今天时期
-    date_val = pd.to_datetime(datetime.now().date().strftime("%Y-%m-%d %H:%M:%S"))
+    # endtime时间
+    end_time = record['end_time']
+    date_val = pd.to_datetime(end_time).replace(day=28, hour=0, minute=0, second=0, microsecond=0)
     period = date_val.month
     # 只生成一张凭证
     # 每个单号都去获取下凭证
@@ -375,14 +381,14 @@ def build_zhuyuan_shouru(conn, shoukuan_df, total_df):
         # 科目
         ccode = "100201"
         row_df = transform_to_yonyou(period, ino_id, inid, date_val, '李红霞', md, mc, None, ccode, "住院收入")
-        row_df["ccode_equal"] = ",".join(list(mc_ccode_equal)[:4])
+        row_df["ccode_equal"] = ",".join(list(mc_ccode_equal)[:3])
         row_list.append(row_df)
         new_row = pd.DataFrame(row_list)
         df_empty = pd.concat([df_empty, new_row], ignore_index=True)
     return df_empty, period_list
 
 
-def build_menzhen_zizhuji(conn, shoukuan_df, total_df):
+def build_menzhen_zizhuji(conn, shoukuan_df, total_df, record):
     """
     门诊自助机
     """
@@ -399,8 +405,8 @@ def build_menzhen_zizhuji(conn, shoukuan_df, total_df):
     df_total['收款时间'] = pd.to_datetime(df_total['收款时间'])
     # 贷方对方科目
     mc_ccode_equal = set()
-    # 今天时期
-    date_val = pd.to_datetime(datetime.now().date().strftime("%Y-%m-%d %H:%M:%S"))
+    end_time = record['end_time']
+    date_val = pd.to_datetime(end_time).replace(day=28, hour=0, minute=0, second=0, microsecond=0)
     period = date_val.month
     # 只生成一张凭证
     # 每个单号都去获取下凭证
@@ -441,7 +447,7 @@ def build_menzhen_zizhuji(conn, shoukuan_df, total_df):
                 ccode = get_jiesuan_ccode(type)
                 row_df = transform_to_yonyou(period, ino_id, inid, date_val, '李红霞', md, mc, None, ccode,
                                              "自助门诊收入")
-                row_df["ccode_equal"] = ",".join(list(mc_ccode_equal)[:4])
+                row_df["ccode_equal"] = ",".join(list(mc_ccode_equal)[:3])
                 row_list.append(row_df)
         # 预存进 借 100201 应收 贷 230502 预存住院
         yujiao_df = df_total[df_total['项目'].str.contains('住院预交', na=False, regex=False)]
@@ -468,7 +474,7 @@ def build_menzhen_zizhuji(conn, shoukuan_df, total_df):
         df_empty = pd.concat([df_empty, new_row], ignore_index=True)
     return df_empty, period_list
 
-def build_menzhen_saoma(conn, shoukuan_df, total_df):
+def build_menzhen_saoma(conn, shoukuan_df, total_df, record):
     """
     门诊扫码
     """
@@ -485,8 +491,8 @@ def build_menzhen_saoma(conn, shoukuan_df, total_df):
     df_total['收款时间'] = pd.to_datetime(df_total['收款时间'])
     # 贷方对方科目
     mc_ccode_equal = set()
-    # 今天时期
-    date_val = pd.to_datetime(datetime.now().date().strftime("%Y-%m-%d %H:%M:%S"))
+    end_time = record['end_time']
+    date_val = pd.to_datetime(end_time).replace(day=28, hour=0, minute=0, second=0, microsecond=0)
     period = date_val.month
     # 只生成一张凭证
     # 每个单号都去获取下凭证
@@ -527,7 +533,7 @@ def build_menzhen_saoma(conn, shoukuan_df, total_df):
                 # 科目
                 ccode = get_jiesuan_ccode(type)
                 row_df = transform_to_yonyou(period, ino_id, inid, date_val, '李红霞', md, mc, None, ccode, "门诊扫码收入")
-                row_df["ccode_equal"] = ",".join(list(mc_ccode_equal)[:4])
+                row_df["ccode_equal"] = ",".join(list(mc_ccode_equal)[:3])
                 row_list.append(row_df)
         # 预存进 借 100201 应收 贷 230502 预存住院
         yujiao_df = df_total[df_total['项目'].str.contains('住院预交', na=False, regex=False)]
@@ -723,23 +729,25 @@ def transform_to_yonyou(period, ino_id, inid, dbill_date, user_name, md, mc, cde
 class ImportWorker(QThread):
     finished_signal = pyqtSignal(bool, str, dict)
 
-    def __init__(self, config, shoukuan_df, total_df):
+    def __init__(self, config, shoukuan_df, total_df, record, data_type):
         super().__init__()
         self.config = config
         self.shoukuan_df = shoukuan_df
         self.total_df = total_df
+        self.record = record
+        self.data_type = data_type
 
     def run(self):
         try:
             # 这里是真正的耗时操作，在子线程运行，不影响界面
-            import_data_to_yy(self.config, self.shoukuan_df, self.total_df, self.finished_signal)
+            import_data_to_yy(self.config, self.shoukuan_df, self.total_df, self.record, self.data_type, self.finished_signal)
         except Exception as e:
             self.finished_signal.emit(False, str(e), {})
 
 
 
 # --- 在主界面调用 ---
-def sqlserver_start_import(parent, config, shoukuan_df, total_df, callback=None):
+def sqlserver_start_import(parent, config, shoukuan_df, total_df, record, type, callback=None):
     """
     开始导入用友
     :param parent: 父窗口
@@ -755,7 +763,7 @@ def sqlserver_start_import(parent, config, shoukuan_df, total_df, callback=None)
     progress.show()
 
     # 创建并启动线程
-    worker = ImportWorker(config, shoukuan_df, total_df)
+    worker = ImportWorker(config, shoukuan_df, total_df, record, type)
 
     # 将worker绑定到parent上，防止被垃圾回收
     parent._import_worker = worker

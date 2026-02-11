@@ -8,8 +8,8 @@ from PyQt5.QtCore import QDateTime, Qt, QThread, pyqtSignal
 from sql_setting_dialog import ConfigDialog
 from config import ConfigManager
 from datetime import datetime, time
-from orcale_db_connect import connect_to_oracle_test, get_his_data
-from sqlserver_db_connect import connect_to_sqlserver_test, import_data_to_yy
+from orcale_db_connect import connect_to_oracle_test
+from sqlserver_db_connect import connect_to_sqlserver_test
 from log_util import logger
 from path_util import open_with_default_app
 import traceback
@@ -192,13 +192,15 @@ class ExcelMerger(QMainWindow):
         else:
             print("用户取消了输入")
 
-    def show_his_data_dialog(self, start_str, end_str, type, shoukuan_df, total_df):
+    def show_his_data_dialog(self, start_str, end_str, type, shoukuan_df, total_df, full_path, shouyin_list, zz_code):
         # 实例化弹窗
-        dialog = PaymentRecordDialog(start_str, end_str, type, shoukuan_df, total_df, self.config_manager, parent=self)
+        dialog = PaymentRecordDialog(start_str, end_str, type, shoukuan_df, total_df, self.config_manager, full_path, shouyin_list, zz_code, parent=self)
         # 运行弹窗 阻塞主窗口，直到弹窗关闭
         if dialog.exec_() == QDialog.Accepted:
             # 如果点击了“确定”，获取数据并更新主界面
-            self.update_config_text()
+            record = dialog.record
+            self.sqlite_helper.insert_record(record)
+            self.table.refresh_data()
         else:
             print("用户取消了输入")
 
@@ -288,6 +290,7 @@ class ExcelMerger(QMainWindow):
             # 强制刷新界面渲染加载窗
             QApplication.processEvents()
             # 执行查询
+            full_path = ""
             # shoukuan_df, total_df, full_path = get_his_data(self.config_manager.get_db_config('oracle'), self.start_str, self.end_str, self.type_group.checkedId(), self.shouyin_box.checked_items(), self.code_edit.text().strip())
             full_path = r"C:\Users\Administrator\Desktop\线上his\门诊收入2026-02-04 00_00_00数据导出20_56_28.xlsx"
             df = pd.read_excel(full_path, sheet_name=['收款数据', '汇总数据'])
@@ -296,7 +299,7 @@ class ExcelMerger(QMainWindow):
             # 关闭加载窗
             progress.close()
             logger.info(f"导出地址：{full_path}")
-            self.show_his_data_dialog(self.start_str, self.end_str, self.type_group.checkedId(), shoukuan_df, total_df)
+            self.show_his_data_dialog(self.start_str, self.end_str, self.type_group.checkedId(), shoukuan_df, total_df, full_path, self.shouyin_box.checked_items(), self.code_edit.text().strip())
 
 
     def start_yy_import(self, item=None):

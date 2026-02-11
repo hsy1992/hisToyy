@@ -167,5 +167,5 @@ def get_feiyong_menzhen_code(name):
     # 其他门诊费用
     return "4101010110"
 
-# is_build = False
-is_build = True
+is_build = False
+# is_build = True

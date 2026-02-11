@@ -84,8 +84,8 @@ class SqlInfiniteTableWidget(QTableView):
             self.list_data.extend(list)
             # 直接通过字段名取值
             for item in list:
-                row_items = [QStandardItem(data_type.get(item['data_type'], "")), QStandardItem(f"{item['start_time']}~\n{item['end_time']}"), QStandardItem(f"{item['shouyin_list']}"),
-                             QStandardItem(f"{item['zz_code']}"), QStandardItem(item['import_yy_start']), QStandardItem(str(item['import_yy_num'])),
+                row_items = [QStandardItem(data_type.get(item['data_type'], "")), QStandardItem(f"{item['start_time']}~\n{item['end_time']}"), QStandardItem(f"{item['shouyin_list'] if item['shouyin_list'] else '全部'}"),
+                             QStandardItem(f"{item['zz_code'] if item['zz_code'] else '全部'}"), QStandardItem(item['import_yy_start']), QStandardItem(str(item['import_yy_num'])),
                              QStandardItem(self.STATUS_MAP[item['status']]), QStandardItem(item['create_time'])]
                 self.model.appendRow(row_items)
             self.has_more_data = len(list) >= self.limit

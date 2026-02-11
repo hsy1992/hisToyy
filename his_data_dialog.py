@@ -4,12 +4,14 @@ from PyQt5.QtWidgets import (QApplication, QDialog, QVBoxLayout, QHBoxLayout,
 from PyQt5.QtCore import Qt, QDate, QDateTime, pyqtSignal
 import sys
 from decimal import Decimal
+
+from log_util import logger
 from sqlserver_db_connect import sqlserver_start_import
 
 class PaymentRecordDialog(QDialog):
     # 导入完成信号
     import_finish_signal = pyqtSignal(str)
-    def __init__(self, start_str, end_str, type, shoukuan_df, total_df, config_manager, parent=None):
+    def __init__(self, start_str, end_str, type, shoukuan_df, total_df, config_manager, full_path, shouyin_list, zz_code, parent=None):
         super().__init__(parent)
         self.setWindowTitle("缴款记录列表")
         self.resize(1000, 600)
@@ -19,6 +21,10 @@ class PaymentRecordDialog(QDialog):
         self.shoukuan_df = shoukuan_df
         self.total_df = total_df
         self.config_manager = config_manager
+        self.full_path = full_path
+        self.shouyin_list = shouyin_list
+        self.zz_code = zz_code
+        self.record = {}
         self.setup_ui()
         self.init_data()
 
@@ -89,7 +95,6 @@ class PaymentRecordDialog(QDialog):
         btn_layout.addWidget(self.btn_confirm)
 
         layout.addLayout(btn_layout)
-
 
 
         # 绑定全选复选框的信号
@@ -189,7 +194,6 @@ class PaymentRecordDialog(QDialog):
         if self.get_checked_rows_data():
             self._start_import_data_to_yy()
             logger.info(f"点击了导入按钮")
-            self.accept()
         else:
             QMessageBox.warning(self, "提示", "请选择要导入的数据")
 
@@ -200,6 +204,9 @@ class PaymentRecordDialog(QDialog):
         """
         logger.info(f"开始用友导入: {self.start_str}, {self.end_str}, {self.type}")
         checked_nos = self.get_checked_rows_data()
+        self.shoukuan_df['扎账单号'] = self.shoukuan_df['扎账单号'].astype(str).str.replace('.0', '', regex=False).str.strip()
+        self.total_df['扎账单号'] = self.total_df['扎账单号'].astype(str).str.replace('.0', '', regex=False).str.strip()
+        checked_nos = [str(x).replace('.0', '').strip() for x in checked_nos]
         self.shoukuan_df = self.shoukuan_df[self.shoukuan_df['扎账单号'].isin(checked_nos)]
         self.total_df = self.total_df[self.total_df['扎账单号'].isin(checked_nos)]
         def on_complete(success, message, record):
@@ -207,11 +214,19 @@ class PaymentRecordDialog(QDialog):
             if success:
                 logger.info("导入成功，刷新列表")
                 QMessageBox.information(self, "成功", "导入数据成功")
+                self.accept()
             else:
                 logger.info("导入失败，刷新列表")
                 QMessageBox.critical(self, "失败", f"导入失败{message}")
-
-        sqlserver_start_import(self, self.config_manager.get_db_config('sqlserver'), self.shoukuan_df, self.total_df, on_complete)
+        self.record = {
+            "start_time": self.start_str,
+            "end_time": self.end_str,
+            "data_type": str(self.type),
+            "export_file_path": self.full_path,
+            "zz_code": self.zz_code,
+            "shouyin_list": ",".join(self.shouyin_list),
+        }
+        sqlserver_start_import(self, self.config_manager.get_db_config('sqlserver'), self.shoukuan_df, self.total_df, self.record, self.type, on_complete)
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
