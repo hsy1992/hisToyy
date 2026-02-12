@@ -54,8 +54,8 @@ class SqlInfiniteTableWidget(QTableView):
         self.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
         self.setWordWrap(True)
         # 必须设置此策略，否则右键不会触发信号
-        self.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.customContextMenuRequested.connect(self.show_context_menu)
+        # self.setContextMenuPolicy(Qt.CustomContextMenu)
+        # self.customContextMenuRequested.connect(self.show_context_menu)
         # 绑定滚动条
         self.verticalScrollBar().valueChanged.connect(self._handle_scroll)
         # 绑定点击事件

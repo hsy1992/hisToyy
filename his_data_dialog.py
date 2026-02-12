@@ -55,26 +55,18 @@ class PaymentRecordDialog(QDialog):
         layout.addLayout(filter_layout)
 
         # --- 2. 全选控制栏 ---
-        select_layout = QHBoxLayout()
-        self.cb_all = QCheckBox("全选")
-        select_layout.addWidget(self.cb_all)
-        layout.addLayout(select_layout)
+        if self.type < 2:
+            select_layout = QHBoxLayout()
+            self.cb_all = QCheckBox("全选")
+            select_layout.addWidget(self.cb_all)
+            layout.addLayout(select_layout)
+            # 绑定全选复选框的信号
+            self.cb_all.stateChanged.connect(self.on_all_checked)
 
         # --- 3. 表格区域 ---
         self.table = QTableWidget()
-        # 设置列数和表头 (对应图片中的字段)
-        headers = ["", "NO", "登记时间", "收款员", "开始时间", "终止时间", "收费合计"]
-        self.table.setColumnCount(len(headers))
-        self.table.setHorizontalHeaderLabels(headers)
-
-        # 设置第一列宽度（仅容纳复选框即可）
-        self.table.setColumnWidth(0, 40)
-        # 设置其他列自动撑满剩余空间
-        self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         # 样式调整
         self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)  # 自动拉伸
-        # 如果希望第一列不被 Stretch 影响，可以单独指定：
-        self.table.horizontalHeader().setSectionResizeMode(0, QHeaderView.Fixed)
         self.table.setAlternatingRowColors(True)  # 隔行变色
         self.table.setSelectionBehavior(QTableWidget.SelectRows)  # 按行选中
 
@@ -96,19 +88,25 @@ class PaymentRecordDialog(QDialog):
 
         layout.addLayout(btn_layout)
 
-
-        # 绑定全选复选框的信号
-        self.cb_all.stateChanged.connect(self.on_all_checked)
-
         # 修改表格列：增加一列用于放复选框
         if self.type == 0:
             headers = ["", "NO", "收款员", "扎帐时间", "门诊收费合计"]
         if self.type == 1:
             headers = ["", "NO", "收款员", "扎帐时间", "住院收费合计"]
+        if self.type == 2:
+            # 住院收入
+            headers = [ "NO", "收款员", "扎帐时间", "住院收费合计"]
+        if self.type == 3:
+            headers = ["", "NO", "收款员", "扎帐时间", "住院收费合计"]
+        if self.type == 4:
+            headers = ["", "NO", "收款员", "扎帐时间", "住院收费合计"]
         self.table.setColumnCount(len(headers))
         self.table.setHorizontalHeaderLabels(headers)
-        # 第一列（勾选列）宽度设固定
-        self.table.setColumnWidth(0, 40)
+        if self.type < 2:
+            # 第一列（勾选列）宽度设固定
+            self.table.setColumnWidth(0, 40)
+            # 如果希望第一列不被 Stretch 影响，可以单独指定：
+            self.table.horizontalHeader().setSectionResizeMode(0, QHeaderView.Fixed)
 
     def on_all_checked(self, state):
         """全选/取消全选逻辑"""
@@ -128,20 +126,21 @@ class PaymentRecordDialog(QDialog):
         row_idx = self.table.rowCount()
         self.table.insertRow(row_idx)
 
-        # --- 1. 创建居中的复选框容器 ---
-        cb_widget = QWidget()
-        cb_layout = QHBoxLayout(cb_widget)
-        checkbox = QCheckBox()
-        checkbox.setStyleSheet("""
+        if self.type < 2:
+            # --- 1. 创建居中的复选框容器 ---
+            cb_widget = QWidget()
+            cb_layout = QHBoxLayout(cb_widget)
+            checkbox = QCheckBox()
+            checkbox.setStyleSheet("""
             QCheckBox::indicator {
                 width: 15px;   /* 宽度从默认的约13px加大到25px */
                 height: 15px;  /* 高度同步加大 */
             }
         """)
-        cb_layout.addWidget(checkbox)
-        cb_layout.setAlignment(Qt.AlignCenter)  # 居中对齐
-        cb_layout.setContentsMargins(0, 0, 0, 0)
-        self.table.setCellWidget(row_idx, 0, cb_widget)
+            cb_layout.addWidget(checkbox)
+            cb_layout.setAlignment(Qt.AlignCenter)  # 居中对齐
+            cb_layout.setContentsMargins(0, 0, 0, 0)
+            self.table.setCellWidget(row_idx, 0, cb_widget)
 
         # --- 2. 填充其余数据列 ---
         # 注意：data_list 中的数据从第二列 (索引 1) 开始填充
@@ -150,7 +149,10 @@ class PaymentRecordDialog(QDialog):
             clean_val = str(value).replace('.0', '')
             item = QTableWidgetItem(clean_val)
             item.setTextAlignment(Qt.AlignCenter)
-            self.table.setItem(row_idx, col_idx + 1, item)
+            if self.type < 2:
+                self.table.setItem(row_idx, col_idx + 1, item)
+            else:
+                self.table.setItem(row_idx, col_idx, item)
 
     def get_checked_nos(self):
         """获取所有勾选行的单号(NO)"""
