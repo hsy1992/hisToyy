@@ -1,6 +1,7 @@
 import logging
 import os
 import sys
+from datetime import datetime
 
 # 1. 创建日志文件夹
 log_dir = "logs"
@@ -9,7 +10,8 @@ if not os.path.exists(log_dir):
 
 # 2. 配置日志格式
 log_format = '%(asctime)s - %(levelname)s - %(module)s - %(message)s'
-log_file = os.path.join(log_dir, "app.log")
+today = datetime.now().strftime("%Y-%m-%d")
+log_file = os.path.join(log_dir, f"app{today}.log")
 
 logging.basicConfig(
     level=logging.INFO,

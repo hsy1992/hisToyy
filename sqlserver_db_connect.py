@@ -243,7 +243,7 @@ def build_zhuyuan_js_df(conn, shoukuan_df, total_df):
     for i, (zz_code, zz_group) in enumerate(jiezhang_total_df.groupby('扎账单号', sort=False)):
         if pd.notnull(zz_code):
             # 从汇总表查找该单号的所有数据
-            zz_code_result_df = df_total.query(f'扎账单号 == {zz_code}')
+            zz_code_result_df = df_total.query(f'扎账单号 == "{zz_code}"')
             if not zz_code_result_df.empty:
                 # 先只找出结账数据
                 jiezhang_df = zz_code_result_df[zz_code_result_df['扎帐类别'].str.contains('结帐', na=False, regex=False)]

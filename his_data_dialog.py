@@ -32,6 +32,18 @@ class PaymentRecordDialog(QDialog):
         if self.type == 0:
             # 门诊数据展示
             self.build_men_zhen_data()
+        elif self.type == 1:
+            # 住院结算
+            self.build_zhuyuan_js_data()
+        elif self.type == 2:
+            # 住院费用
+            self.build_zhuyuan_fy_data()
+        elif self.type == 3:
+            # 门诊自助机
+            self.build_menzhen_zizhuji_data()
+        elif self.type == 4:
+            # 门诊扫码
+            self.build_menzhen_saoma_data()
 
 
     def setup_ui(self):
@@ -92,14 +104,15 @@ class PaymentRecordDialog(QDialog):
         if self.type == 0:
             headers = ["", "NO", "收款员", "扎帐时间", "门诊收费合计"]
         if self.type == 1:
-            headers = ["", "NO", "收款员", "扎帐时间", "住院收费合计"]
+            headers = ["", "NO", "收款员", "扎帐时间", "住院结算合计"]
         if self.type == 2:
             # 住院收入
-            headers = [ "NO", "收款员", "扎帐时间", "住院收费合计"]
+            headers = ["收入项目", "金额合计"]
         if self.type == 3:
-            headers = ["", "NO", "收款员", "扎帐时间", "住院收费合计"]
+            # 门诊自助机
+            headers = ["收入项目", "金额合计"]
         if self.type == 4:
-            headers = ["", "NO", "收款员", "扎帐时间", "住院收费合计"]
+            headers = ["收入项目", "金额合计"]
         self.table.setColumnCount(len(headers))
         self.table.setHorizontalHeaderLabels(headers)
         if self.type < 2:
@@ -192,8 +205,42 @@ class PaymentRecordDialog(QDialog):
                 zz_time = group['扎帐时间'].iloc[0]
                 self.add_row_with_checkbox([zz_code, shouyin, zz_time, str(jine)])
 
+    def build_zhuyuan_js_data(self):
+        """构建住院结算数据"""
+        for i, (zz_code, group) in enumerate(self.shoukuan_df.groupby('扎账单号', sort=True)):
+            if not group.empty:
+                group['金额'] = group['金额'].apply(lambda x: Decimal(str(x)) if x is not None else Decimal('0.00'))
+                jine = group['金额'].sum()
+                shouyin = group['收款员'].iloc[0]
+                zz_time = group['扎帐时间'].iloc[0]
+                self.add_row_with_checkbox([zz_code, shouyin, zz_time, str(jine)])
+
+    def build_zhuyuan_fy_data(self):
+        """住院费用"""
+        for i, (project, group) in enumerate(self.shoukuan_df.groupby('收入项目', sort=True)):
+            if not group.empty:
+                group['折扣后'] = group['折扣后'].apply(lambda x: Decimal(str(x)) if x is not None else Decimal('0.00'))
+                jine = group['折扣后'].sum()
+                self.add_row_with_checkbox([project, str(jine)])
+
+    def build_menzhen_zizhuji_data(self):
+        """门诊自助机"""
+        for i, (project, group) in enumerate(self.shoukuan_df.groupby('项目', sort=True)):
+            if not group.empty:
+                group['金额'] = group['金额'].apply(lambda x: Decimal(str(x)) if x is not None else Decimal('0.00'))
+                jine = group['金额'].sum()
+                self.add_row_with_checkbox([project if project else "住院预交", str(jine)])
+
+    def build_menzhen_saoma_data(self):
+        """门诊扫码 """
+        for i, (project, group) in enumerate(self.shoukuan_df.groupby('项目', sort=True)):
+            if not group.empty:
+                group['金额'] = group['金额'].apply(lambda x: Decimal(str(x)) if x is not None else Decimal('0.00'))
+                jine = group['金额'].sum()
+                self.add_row_with_checkbox([project if project else "住院预交", str(jine)])
+
     def on_confirm_click(self):
-        if self.get_checked_rows_data():
+        if self.get_checked_rows_data() or self.type > 1:
             self._start_import_data_to_yy()
             logger.info(f"点击了导入按钮")
         else:
@@ -205,12 +252,13 @@ class PaymentRecordDialog(QDialog):
         公共用友导入方法
         """
         logger.info(f"开始用友导入: {self.start_str}, {self.end_str}, {self.type}")
-        checked_nos = self.get_checked_rows_data()
-        self.shoukuan_df['扎账单号'] = self.shoukuan_df['扎账单号'].astype(str).str.replace('.0', '', regex=False).str.strip()
-        self.total_df['扎账单号'] = self.total_df['扎账单号'].astype(str).str.replace('.0', '', regex=False).str.strip()
-        checked_nos = [str(x).replace('.0', '').strip() for x in checked_nos]
-        self.shoukuan_df = self.shoukuan_df[self.shoukuan_df['扎账单号'].isin(checked_nos)]
-        self.total_df = self.total_df[self.total_df['扎账单号'].isin(checked_nos)]
+        if self.type < 2:
+            checked_nos = self.get_checked_rows_data()
+            self.shoukuan_df['扎账单号'] = self.shoukuan_df['扎账单号'].astype(str).str.replace('.0', '', regex=False).str.strip()
+            self.total_df['扎账单号'] = self.total_df['扎账单号'].astype(str).str.replace('.0', '', regex=False).str.strip()
+            checked_nos = [str(x).replace('.0', '').strip() for x in checked_nos]
+            self.shoukuan_df = self.shoukuan_df[self.shoukuan_df['扎账单号'].isin(checked_nos)]
+            self.total_df = self.total_df[self.total_df['扎账单号'].isin(checked_nos)]
         def on_complete(success, message, record):
             # 更新本地数据库状态
             if success:

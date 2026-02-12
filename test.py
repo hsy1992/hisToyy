@@ -8,7 +8,7 @@ from PyQt5.QtCore import QDateTime, Qt, QThread, pyqtSignal
 from sql_setting_dialog import ConfigDialog
 from config import ConfigManager
 from datetime import datetime, time
-from orcale_db_connect import connect_to_oracle_test
+from orcale_db_connect import connect_to_oracle_test, get_his_data
 from sqlserver_db_connect import connect_to_sqlserver_test
 from log_util import logger
 from path_util import open_with_default_app
@@ -22,12 +22,15 @@ from dateutil.relativedelta import relativedelta
 from checkable_combo_box import CheckableComboBox
 from yy_dept_mapper import get_shoukuan
 from his_data_dialog import PaymentRecordDialog
+from orcale_db_connect import HisWorker
 
 format_pattern = "yyyy-MM-dd HH:mm:ss"
 class ExcelMerger(QMainWindow):
 
     def __init__(self):
         super().__init__()
+        self.worker = None
+        self.progress = None
         self.setWindowTitle("用友导入工具")
 
         # 1. 设置窗口的大小
@@ -238,6 +241,8 @@ class ExcelMerger(QMainWindow):
             self.code_edit.setEnabled(True)
         self.dt_edit.setDateTime(QDateTime.fromString(self.start_str, format_pattern))
         self.end_str = f"{yesterday} 23:59:59"
+        self.dt_edit1.setDateTime(QDateTime.fromString(self.end_str, format_pattern))
+
 
     def his_test_connect_click(self):
         """ 测试his连接 """
@@ -274,33 +279,41 @@ class ExcelMerger(QMainWindow):
             logger.info(f"开始查询His: 请选择导出的时间")
             return
 
-        if not is_same_day:
+        if not is_same_day and self.type_group.checkedId() < 2:
             QMessageBox.warning(self, "错误", "时间跨度应该为一天")
             logger.info(f"开始查询His: 时间跨度应该为一天")
             return
 
         if self.start_str and self.end_str:
             logger.info(f"开始查询His: {self.start_str}, {self.end_str}")
-            progress = QProgressDialog("系统正在处理中，请稍候...", None, 0, 0)
-            progress.setWindowTitle("请等待")
-            progress.setWindowModality(Qt.WindowModal)
-            progress.setCancelButton(None)
-            progress.show()
+            self.progress = QProgressDialog("系统正在处理中，请稍候...", None, 0, 0)
+            self.progress.setWindowTitle("请等待")
+            self.progress.setWindowModality(2)
+            self.progress.setCancelButton(None)
+            self.progress.show()
 
-            # 强制刷新界面渲染加载窗
-            QApplication.processEvents()
             # 执行查询
-            full_path = ""
-            # shoukuan_df, total_df, full_path = get_his_data(self.config_manager.get_db_config('oracle'), self.start_str, self.end_str, self.type_group.checkedId(), self.shouyin_box.checked_items(), self.code_edit.text().strip())
-            full_path = r"C:\Users\Administrator\Desktop\线上his\门诊收入2026-02-04 00_00_00数据导出20_56_28.xlsx"
-            df = pd.read_excel(full_path, sheet_name=['收款数据', '汇总数据'])
-            shoukuan_df = df['收款数据']
-            total_df = df['汇总数据']
-            # 关闭加载窗
-            progress.close()
-            logger.info(f"导出地址：{full_path}")
-            self.show_his_data_dialog(self.start_str, self.end_str, self.type_group.checkedId(), shoukuan_df, total_df, full_path, self.shouyin_box.checked_items(), self.code_edit.text().strip())
+            self.worker = HisWorker(self.config_manager.get_db_config('oracle'), self.start_str, self.end_str, self.type_group.checkedId(), self.shouyin_box.checked_items(), self.code_edit.text().strip())
+            self.worker.finished.connect(self.on_his_finished)
+            self.worker.start()
 
+    def on_his_finished(self, shoukuan_df, total_df, full_path):
+        self.progress.close()
+        logger.info(f"导出地址：{full_path}")
+        # full_path = r"C:\Users\Administrator\Desktop\线上his\门诊收入2026-02-04 00_00_00数据导出20_56_28.xlsx"
+        # full_path = r"C:\Users\Administrator\Desktop\线上his\住院结算2026-02-04 00_00_00数据导出20_56_38.xlsx"
+        # full_path = r"C:\Users\Administrator\Desktop\线上his\全院病人费用2026-02-01 00_00_00数据导出20_56_59.xlsx"
+        # full_path = r"C:\Users\Administrator\Desktop\线上his\门诊自助机2026-02-04 00_00_00数据导出20_58_20.xlsx"
+        # full_path = r"C:\Users\Administrator\Desktop\线上his\门诊扫码2026-02-04 00_00_00数据导出20_56_48.xlsx"
+        # df = pd.read_excel(full_path, sheet_name=['收款数据', '汇总数据'])
+        # shoukuan_df = df['收款数据']
+        # total_df = df['汇总数据']
+        if not shoukuan_df.empty:
+            self.show_his_data_dialog(self.start_str, self.end_str, self.type_group.checkedId(), shoukuan_df,
+                                      total_df, full_path, self.shouyin_box.checked_items(),
+                                      self.code_edit.text().strip())
+        else:
+            QMessageBox.warning(self, "失败", "未查到数据")
 
     def start_yy_import(self, item=None):
         """ 导入用友数据 """

@@ -301,3 +301,81 @@ ORA-12537: TNS:connection closed
 2026-02-11 23:26:11,752 - INFO - his_data_dialog - 导入成功，刷新列表
 2026-02-11 23:26:13,080 - INFO - py_sqlite - INSERT INTO sys_export_record (start_time, end_time, data_type, export_file_path, zz_code, shouyin_list, status, import_yy_num, import_yy_start, create_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 2026-02-11 23:26:13,089 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：2
+2026-02-12 21:43:04,731 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：2
+2026-02-12 21:43:12,932 - INFO - test - 开始查询His: 2026-02-11 00:00:00, 2026-02-11 23:59:59
+2026-02-12 21:43:13,130 - INFO - test - 导出地址：C:\Users\Administrator\Desktop\线上his\住院结算2026-02-04 00_00_00数据导出20_56_38.xlsx
+2026-02-12 21:45:02,847 - INFO - his_data_dialog - 开始用友导入: 2026-02-11 00:00:00, 2026-02-11 23:59:59, 1
+2026-02-12 21:45:02,890 - INFO - his_data_dialog - 点击了导入按钮
+2026-02-12 21:45:02,893 - INFO - sqlserver_db_connect - DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-12 21:45:03,019 - INFO - sqlserver_db_connect - sqlserver 连接成功, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-12 21:45:03,065 - INFO - his_data_dialog - 导入失败，刷新列表
+2026-02-12 21:45:35,936 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：2
+2026-02-12 21:45:45,158 - INFO - test - 开始查询His: 2026-02-11 00:00:00, 2026-02-11 23:59:59
+2026-02-12 21:45:45,308 - INFO - test - 导出地址：C:\Users\Administrator\Desktop\线上his\住院结算2026-02-04 00_00_00数据导出20_56_38.xlsx
+2026-02-12 21:45:48,968 - INFO - his_data_dialog - 开始用友导入: 2026-02-11 00:00:00, 2026-02-11 23:59:59, 1
+2026-02-12 21:46:52,735 - INFO - his_data_dialog - 点击了导入按钮
+2026-02-12 21:46:52,735 - INFO - sqlserver_db_connect - DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-12 21:46:52,756 - INFO - sqlserver_db_connect - sqlserver 连接成功, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-12 21:49:01,394 - INFO - his_data_dialog - 导入失败，刷新列表
+2026-02-12 21:49:05,749 - INFO - his_data_dialog - 开始用友导入: 2026-02-11 00:00:00, 2026-02-11 23:59:59, 1
+2026-02-12 21:49:10,453 - INFO - his_data_dialog - 点击了导入按钮
+2026-02-12 21:49:10,454 - INFO - sqlserver_db_connect - DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-12 21:49:10,454 - INFO - sqlserver_db_connect - sqlserver 连接成功, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-12 21:49:58,157 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：2
+2026-02-12 21:51:15,274 - INFO - test - 开始查询His: 2026-02-11 00:00:00, 2026-02-11 23:59:59
+2026-02-12 21:51:15,510 - INFO - test - 导出地址：C:\Users\Administrator\Desktop\线上his\住院结算2026-02-04 00_00_00数据导出20_56_38.xlsx
+2026-02-12 21:51:18,894 - INFO - his_data_dialog - 开始用友导入: 2026-02-11 00:00:00, 2026-02-11 23:59:59, 1
+2026-02-12 21:51:18,906 - INFO - his_data_dialog - 点击了导入按钮
+2026-02-12 21:51:18,906 - INFO - sqlserver_db_connect - DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-12 21:51:18,929 - INFO - sqlserver_db_connect - sqlserver 连接成功, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-12 21:51:19,438 - INFO - sqlserver_db_connect - sqlserver 连接成功, mssql+pyodbc://sa:123456@127.0.0.1:1433/UFDATA_999_2012?driver=SQL+Server
+2026-02-12 21:51:20,201 - INFO - sqlserver_db_connect - 所有数据写入成功，事务已自动提交
+2026-02-12 21:51:20,205 - INFO - his_data_dialog - 导入成功，刷新列表
+2026-02-12 21:51:21,552 - INFO - py_sqlite - INSERT INTO sys_export_record (start_time, end_time, data_type, export_file_path, zz_code, shouyin_list, status, import_yy_num, import_yy_start, create_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-02-12 21:51:21,589 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：3
+2026-02-12 21:53:52,965 - INFO - test - 开始查询His: 2026-02-11 00:00:00, 2026-02-11 23:59:59
+2026-02-12 21:53:53,035 - INFO - test - 导出地址：C:\Users\Administrator\Desktop\线上his\住院结算2026-02-04 00_00_00数据导出20_56_38.xlsx
+2026-02-12 21:57:40,852 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：3
+2026-02-12 21:58:33,738 - INFO - test - 开始查询His: 时间跨度应该为一天
+2026-02-12 21:59:35,775 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：3
+2026-02-12 21:59:40,119 - INFO - test - 开始查询His: 2026-01-12 00:00:00, 2026-02-11 23:59:59
+2026-02-12 21:59:40,195 - INFO - test - 导出地址：C:\Users\Administrator\Desktop\线上his\全院病人费用2026-02-01 00_00_00数据导出20_56_59.xlsx
+2026-02-12 21:59:47,907 - INFO - test - 开始查询His: 2026-01-12 00:00:00, 2026-02-11 23:59:59
+2026-02-12 21:59:47,957 - INFO - test - 导出地址：C:\Users\Administrator\Desktop\线上his\全院病人费用2026-02-01 00_00_00数据导出20_56_59.xlsx
+2026-02-12 22:01:04,812 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：3
+2026-02-12 22:01:28,078 - INFO - test - 开始查询His: 2026-01-12 00:00:00, 2026-02-11 23:59:59
+2026-02-12 22:01:28,153 - INFO - test - 导出地址：C:\Users\Administrator\Desktop\线上his\全院病人费用2026-02-01 00_00_00数据导出20_56_59.xlsx
+2026-02-12 22:01:29,376 - INFO - his_data_dialog - 开始用友导入: 2026-01-12 00:00:00, 2026-02-11 23:59:59, 2
+2026-02-12 22:01:29,385 - INFO - his_data_dialog - 点击了导入按钮
+2026-02-12 22:01:29,385 - INFO - sqlserver_db_connect - DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-12 22:01:29,407 - INFO - sqlserver_db_connect - sqlserver 连接成功, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-12 22:01:29,428 - INFO - sqlserver_db_connect - sqlserver 导入失败: '日期', DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-12 22:01:29,432 - INFO - his_data_dialog - 导入失败，刷新列表
+2026-02-12 22:02:54,389 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：3
+2026-02-12 22:03:05,104 - INFO - test - 开始查询His: 2026-01-12 00:00:00, 2026-02-11 23:59:59
+2026-02-12 22:03:05,182 - INFO - test - 导出地址：C:\Users\Administrator\Desktop\线上his\门诊自助机2026-02-04 00_00_00数据导出20_58_20.xlsx
+2026-02-12 22:03:06,838 - INFO - his_data_dialog - 开始用友导入: 2026-01-12 00:00:00, 2026-02-11 23:59:59, 3
+2026-02-12 22:03:06,848 - INFO - his_data_dialog - 点击了导入按钮
+2026-02-12 22:03:06,848 - INFO - sqlserver_db_connect - DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-12 22:03:06,866 - INFO - sqlserver_db_connect - sqlserver 连接成功, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-12 22:03:07,000 - INFO - sqlserver_db_connect - sqlserver 连接成功, mssql+pyodbc://sa:123456@127.0.0.1:1433/UFDATA_999_2012?driver=SQL+Server
+2026-02-12 22:03:07,085 - INFO - sqlserver_db_connect - 所有数据写入成功，事务已自动提交
+2026-02-12 22:03:07,091 - INFO - his_data_dialog - 导入成功，刷新列表
+2026-02-12 22:03:09,543 - INFO - py_sqlite - INSERT INTO sys_export_record (start_time, end_time, data_type, export_file_path, zz_code, shouyin_list, status, import_yy_num, import_yy_start, create_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-02-12 22:03:09,551 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：4
+2026-02-12 22:04:54,553 - INFO - test - 开始查询His: 2026-01-12 00:00:00, 2026-02-11 23:59:59
+2026-02-12 22:04:54,599 - INFO - test - 导出地址：C:\Users\Administrator\Desktop\线上his\门诊自助机2026-02-04 00_00_00数据导出20_58_20.xlsx
+2026-02-12 22:05:05,166 - INFO - test - 开始查询His: 2026-01-12 00:00:00, 2026-02-11 23:59:59
+2026-02-12 22:05:05,214 - INFO - test - 导出地址：C:\Users\Administrator\Desktop\线上his\门诊自助机2026-02-04 00_00_00数据导出20_58_20.xlsx
+2026-02-12 22:09:43,412 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：4
+2026-02-12 22:10:11,485 - INFO - test - 开始查询His: 2026-01-12 00:00:00, 2026-02-11 23:59:59
+2026-02-12 22:10:11,969 - INFO - test - 导出地址：C:\Users\Administrator\Desktop\线上his\门诊扫码2026-02-04 00_00_00数据导出20_56_48.xlsx
+2026-02-12 22:10:17,816 - INFO - his_data_dialog - 开始用友导入: 2026-01-12 00:00:00, 2026-02-11 23:59:59, 4
+2026-02-12 22:10:17,826 - INFO - his_data_dialog - 点击了导入按钮
+2026-02-12 22:10:17,826 - INFO - sqlserver_db_connect - DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-12 22:10:17,848 - INFO - sqlserver_db_connect - sqlserver 连接成功, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-12 22:10:18,026 - INFO - sqlserver_db_connect - sqlserver 连接成功, mssql+pyodbc://sa:123456@127.0.0.1:1433/UFDATA_999_2012?driver=SQL+Server
+2026-02-12 22:10:18,099 - INFO - sqlserver_db_connect - 所有数据写入成功，事务已自动提交
+2026-02-12 22:10:18,104 - INFO - his_data_dialog - 导入成功，刷新列表
+2026-02-12 22:10:19,815 - INFO - py_sqlite - INSERT INTO sys_export_record (start_time, end_time, data_type, export_file_path, zz_code, shouyin_list, status, import_yy_num, import_yy_start, create_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-02-12 22:10:19,826 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：5

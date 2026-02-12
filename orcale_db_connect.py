@@ -9,6 +9,7 @@ from path_util import resource_path
 from datetime import datetime, time
 from pathlib import Path
 from yongyou_coe import is_build
+from PyQt5.QtCore import QThread, pyqtSignal
 
 def init_oracle():
     try:
@@ -123,9 +124,11 @@ def get_his_data(oracle_config, start_str, end_str, type, shouyin_list, zz_code)
                            f'AND "{time_type}" < TO_DATE(\'{end_str}\', \'YYYY-MM-DD HH24:MI:SS\')'
             if type == 0 or type == 1:
                 if shouyin_list:
-                    where_clause += f" AND '收款员' IN ({','.join(shouyin_list)})"
+                    in_name_list = ",".join([f"'{name}'" for name in shouyin_list])
+                    where_clause += f' AND "收款员" IN ({in_name_list})'
                 if zz_code:
-                    where_clause += f" AND '扎账单号' = {zz_code}"
+                    code = f"'{zz_code}'"
+                    where_clause += f' AND "扎账单号" = {code} '
             logger.info(f"查询sql: SELECT * FROM {detail_view}{where_clause}")
             shoukuan_df = pd.read_sql(f"SELECT * FROM {detail_view}{where_clause}", conn)
 
@@ -134,9 +137,11 @@ def get_his_data(oracle_config, start_str, end_str, type, shouyin_list, zz_code)
                            f'AND "{time_type_total}" < TO_DATE(\'{end_str}\', \'YYYY-MM-DD HH24:MI:SS\')' if type != 2 else ''
             if type == 0 or type == 1:
                 if shouyin_list:
-                    where_clause += f" AND '收款员' IN ({','.join(shouyin_list)})"
+                    in_name_list = ",".join([f"'{name}'" for name in shouyin_list])
+                    where_clause += f' AND "收款员" IN ({in_name_list})'
                 if zz_code:
-                    where_clause += f" AND '扎账单号' = {zz_code}"
+                    code = f"'{zz_code}'"
+                    where_clause += f' AND "扎账单号" = {code} '
             logger.info(f"查询totalsql: SELECT * FROM {total_view}{where_clause}")
             total_df = pd.read_sql(f"SELECT * FROM {total_view}{where_clause}", conn) if total_view else None
 
@@ -160,6 +165,26 @@ def get_his_data(oracle_config, start_str, end_str, type, shouyin_list, zz_code)
         logger.info(f"获取数据失败:: {e}")
         return df_empty, df_empty, ''
 
+class HisWorker(QThread):
+    finished = pyqtSignal(pd.DataFrame, pd.DataFrame, str)  # 任务完成后发送结果信号
+
+    def __init__(self, oracle_config, start_str, end_str, type, shouyin_list, zz_code):
+        super().__init__()
+        self.oracle_config = oracle_config
+        self.start_str = start_str
+        self.end_str = end_str
+        self.type = type
+        self.shouyin_list = shouyin_list
+        self.zz_code = zz_code
+
+    def run(self):
+        try:
+            shoukuan_df, total_df, full_path = get_his_data(self.oracle_config, self.start_str, self.end_str, self.type, self.shouyin_list, self.zz_code)
+            self.finished.emit(shoukuan_df, total_df, full_path)
+        except Exception as e:
+            df_empty = pd.DataFrame()
+            logger.info(f"获取数据失败:: {e}")
+            self.finished.emit(df_empty, df_empty, '')
 
 # 定义转换函数
 def make_dict_factory(cursor):
