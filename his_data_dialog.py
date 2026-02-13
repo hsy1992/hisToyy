@@ -4,7 +4,8 @@ from PyQt5.QtWidgets import (QApplication, QDialog, QVBoxLayout, QHBoxLayout,
 from PyQt5.QtCore import Qt, QDate, QDateTime, pyqtSignal
 import sys
 from decimal import Decimal
-
+import pandas as pd
+from config import ConfigManager
 from log_util import logger
 from sqlserver_db_connect import sqlserver_start_import
 
@@ -158,8 +159,12 @@ class PaymentRecordDialog(QDialog):
         # --- 2. 填充其余数据列 ---
         # 注意：data_list 中的数据从第二列 (索引 1) 开始填充
         for col_idx, value in enumerate(data_list):
-            # 确保单号没有 .0 尾缀
-            clean_val = str(value).replace('.0', '')
+            # 确保单号没有 .0 尾缀（仅当确实以 .0 结尾时才去除）
+            str_val = str(value)
+            if str_val.endswith('.0'):
+                clean_val = str_val[:-2]
+            else:
+                clean_val = str_val
             item = QTableWidgetItem(clean_val)
             item.setTextAlignment(Qt.AlignCenter)
             if self.type < 2:
@@ -198,9 +203,11 @@ class PaymentRecordDialog(QDialog):
     def build_men_zhen_data(self):
         """构建门诊数据"""
         for i, (zz_code, group) in enumerate(self.shoukuan_df.groupby('扎账单号', sort=True)):
-            if not group.empty:
+            if not group.empty and group['收款员'].iloc[0] == '于雷':
                 group['金额'] = group['金额'].apply(lambda x: Decimal(str(x)) if x is not None else Decimal('0.00'))
+                print(group['金额'])
                 jine = group['金额'].sum()
+                print(f"jine========{jine}, {str(jine)}")
                 shouyin = group['收款员'].iloc[0]
                 zz_time = group['扎帐时间'].iloc[0]
                 self.add_row_with_checkbox([zz_code, shouyin, zz_time, str(jine)])
@@ -282,8 +289,14 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
 
     # 这里假设你已经贴入了之前完整的 PaymentRecordDialog 类
-    main_win = PaymentRecordDialog()
-
+    full_path = r"C:\Users\55301\Desktop\门诊收入2026-01-23 00_00_00_2026-01-23 23_59_59导出时间10_10_07.xlsx"
+    df = pd.read_excel(full_path, sheet_name=['收款数据', '汇总数据'])
+    shoukuan_df = df['收款数据']
+    total_df = df['汇总数据']
+    config_manager = ConfigManager()
+    main_win = PaymentRecordDialog("2026-01-23", "2026-01-23", 0, shoukuan_df, total_df,
+     config_manager, full_path, ["gg"], '', parent=None)
+     
     main_win.show()
     sys.exit(app.exec_())
 

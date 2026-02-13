@@ -150,6 +150,8 @@ def build_menzhen_df(conn, shoukuan_df, total_df):
             if not zz_code_result_df.empty:
                 # 获取该扎账单号的时间
                 date_val = pd.to_datetime(zz_code_result_df.iloc[0]['扎帐时间'])
+                if date_val.day >= 21:
+                    date_val = (date_val.replace(day=1) + pd.DateOffset(months=1))
                 period = date_val.month
                 # 每个单号都去获取下凭证
                 start_ino_id = get_next_ino_id(conn, period)
@@ -184,7 +186,7 @@ def build_menzhen_df(conn, shoukuan_df, total_df):
                     # 贷方对方科目
                     mc_ccode_equal.add(ccode)
                     row_list.append(
-                        transform_to_yonyou(period, ino_id, inid, dbill_date, '李红霞', md, mc, cdept_id, ccode, cdigest))
+                        transform_to_yonyou(period, ino_id, inid, dbill_date, '刘畅', md, mc, cdept_id, ccode, "门诊收入"))
                     print(
                         f"period是: {period},inid是: {inid},dbill_date: {dbill_date}, cdigest: {cdigest}, user_name: {user_name}, 借方: {md}, 贷方: {mc}, cdept_id: {cdept_id}, ccode:{ccode}")
                 # 继续去插入汇总数据
@@ -208,7 +210,7 @@ def build_menzhen_df(conn, shoukuan_df, total_df):
                             raise ValueError("错误：科目编码(ccode)不能为空或纯空格！")
                         md_ccode_equal.add(ccode)
                         row_list.append(
-                            transform_to_yonyou(period, ino_id, inid, date_val, '李红霞', md, mc, None, ccode, cdigest))
+                            transform_to_yonyou(period, ino_id, inid, date_val, '刘畅', md, mc, None, ccode, "门诊收入"))
                         print(
                             f"period是: {period},inid是: {inid},dbill_date: {date_val}, cdigest: {cdigest}, user_name: {user_name}, 借方: {md}, 贷方: {mc}, cdept_id: NONE, ccode:{ccode}")
 
@@ -248,6 +250,8 @@ def build_zhuyuan_js_df(conn, shoukuan_df, total_df):
                 # 先只找出结账数据
                 jiezhang_df = zz_code_result_df[zz_code_result_df['扎帐类别'].str.contains('结帐', na=False, regex=False)]
                 date_val = pd.to_datetime(zz_code_result_df.iloc[0]['扎帐时间'])
+                if date_val.day >= 21:
+                    date_val = (date_val.replace(day=1) + pd.DateOffset(months=1))
                 period = date_val.month
                 # 每个单号都去获取下凭证
                 start_ino_id = get_next_ino_id(conn, period)
@@ -278,7 +282,7 @@ def build_zhuyuan_js_df(conn, shoukuan_df, total_df):
                     mc = 0.0
                     ccode_set1.add(ccode)
                     row_list.append(
-                        transform_to_yonyou(period, ino_id, inid, date_val, '李红霞', md, mc, None, ccode, cdigest))
+                        transform_to_yonyou(period, ino_id, inid, date_val, '刘畅', md, mc, None, ccode, cdigest))
                 # 添加病人返押金票据冲住院预收款 230502 凭证 为负 贷方
                 """
                 病人返押金票据:	260129000018	结帐	刘春丽	2026-01-29 10:49:31	自助微信	37000
@@ -298,7 +302,7 @@ def build_zhuyuan_js_df(conn, shoukuan_df, total_df):
                     # 贷方
                     mc = -pd.to_numeric(total_fanya)
                     row_list.append(
-                        transform_to_yonyou(period, ino_id, inid, date_val, '李红霞', md, mc, None, ccode, cdigest))
+                        transform_to_yonyou(period, ino_id, inid, date_val, '刘畅', md, mc, None, ccode, "结算住院费"))
                 """
                 贷方 充 121101 应收  结账数据总和
                 """
@@ -314,7 +318,7 @@ def build_zhuyuan_js_df(conn, shoukuan_df, total_df):
                     # 贷方
                     mc = pd.to_numeric(total_jiezhang)
                     row_list.append(
-                        transform_to_yonyou(period, ino_id, inid, date_val, '李红霞', md, mc, None, ccode, cdigest))
+                        transform_to_yonyou(period, ino_id, inid, date_val, '刘畅', md, mc, None, ccode, "结算住院费"))
 
                 for yongyou_row in row_list:
                     if yongyou_row["md"] > 0.0 or yongyou_row["mc"] < 0.0:
@@ -369,7 +373,7 @@ def build_zhuyuan_shouru(conn, shoukuan_df, total_df, record):
                 raise ValueError("错误：科目编码(ccode)不能为空或纯空格！")
             # 贷方对方科目
             mc_ccode_equal.add(ccode)
-            row_df = transform_to_yonyou(period, ino_id, inid, date_val, '李红霞', md, mc, cdept_id, ccode, "住院收入")
+            row_df = transform_to_yonyou(period, ino_id, inid, date_val, '刘畅', md, mc, cdept_id, ccode, "住院收入")
             row_df["ccode_equal"] = "100201"
             row_list.append(row_df)
         # 最后加一个121101 应收
@@ -380,7 +384,7 @@ def build_zhuyuan_shouru(conn, shoukuan_df, total_df, record):
         mc = 0.0
         # 科目
         ccode = "100201"
-        row_df = transform_to_yonyou(period, ino_id, inid, date_val, '李红霞', md, mc, None, ccode, "住院收入")
+        row_df = transform_to_yonyou(period, ino_id, inid, date_val, '刘畅', md, mc, None, ccode, "住院收入")
         row_df["ccode_equal"] = ",".join(list(mc_ccode_equal)[:3])
         row_list.append(row_df)
         new_row = pd.DataFrame(row_list)
@@ -433,7 +437,7 @@ def build_menzhen_zizhuji(conn, shoukuan_df, total_df, record):
                 # 贷方对方科目
                 mc_ccode_equal.add(ccode)
                 row_list.append(
-                    transform_to_yonyou(period, ino_id, inid, date_val, '李红霞', md, mc, cdept_id, ccode, "自助门诊收入"))
+                    transform_to_yonyou(period, ino_id, inid, date_val, '刘畅', md, mc, cdept_id, ccode, "自助门诊收入"))
         # 自助机收入进 100201
         shoufei_df = df_total[df_total['项目'].str.contains('收费情况', na=False, regex=False)]
         if not shoufei_df.empty:
@@ -445,7 +449,7 @@ def build_menzhen_zizhuji(conn, shoukuan_df, total_df, record):
                 mc = 0.0
                 # 科目
                 ccode = get_jiesuan_ccode(type)
-                row_df = transform_to_yonyou(period, ino_id, inid, date_val, '李红霞', md, mc, None, ccode,
+                row_df = transform_to_yonyou(period, ino_id, inid, date_val, '刘畅', md, mc, None, ccode,
                                              "自助门诊收入")
                 row_df["ccode_equal"] = ",".join(list(mc_ccode_equal)[:3])
                 row_list.append(row_df)
@@ -458,7 +462,7 @@ def build_menzhen_zizhuji(conn, shoukuan_df, total_df, record):
             md = 0.0 if pd.isna(md_v) else float(md_v)
             # 科目
             ccode = "100201"
-            row_df = transform_to_yonyou(period, ino_id, inid, date_val, '李红霞', md, 0.0, None, ccode, "预收医疗款")
+            row_df = transform_to_yonyou(period, ino_id, inid, date_val, '刘畅', md, 0.0, None, ccode, "预收医疗款")
             row_df["ccode_equal"] = "230502"
             row_list.append(row_df)
             # 贷 230502
@@ -467,7 +471,7 @@ def build_menzhen_zizhuji(conn, shoukuan_df, total_df, record):
             mc = 0.0 if pd.isna(mc_v) else float(mc_v)
             # 科目
             ccode = "230502"
-            row_df = transform_to_yonyou(period, ino_id, inid, date_val, '李红霞', 0.0, mc, None, ccode, "预收医疗款")
+            row_df = transform_to_yonyou(period, ino_id, inid, date_val, '刘畅', 0.0, mc, None, ccode, "预收医疗款")
             row_df["ccode_equal"] = "100201"
             row_list.append(row_df)
         new_row = pd.DataFrame(row_list)
@@ -520,7 +524,7 @@ def build_menzhen_saoma(conn, shoukuan_df, total_df, record):
                 # 贷方对方科目
                 mc_ccode_equal.add(ccode)
                 row_list.append(
-                    transform_to_yonyou(period, ino_id, inid, date_val, '李红霞', md, mc, cdept_id, ccode, "门诊扫码收入"))
+                    transform_to_yonyou(period, ino_id, inid, date_val, '刘畅', md, mc, cdept_id, ccode, "门诊扫码收入"))
         # 扫码收入分类
         shoufei_df = df_total[df_total['项目'].str.contains('收费情况', na=False, regex=False)]
         if not shoufei_df.empty:
@@ -532,7 +536,7 @@ def build_menzhen_saoma(conn, shoukuan_df, total_df, record):
                 mc = 0.0
                 # 科目
                 ccode = get_jiesuan_ccode(type)
-                row_df = transform_to_yonyou(period, ino_id, inid, date_val, '李红霞', md, mc, None, ccode, "门诊扫码收入")
+                row_df = transform_to_yonyou(period, ino_id, inid, date_val, '刘畅', md, mc, None, ccode, "门诊扫码收入")
                 row_df["ccode_equal"] = ",".join(list(mc_ccode_equal)[:3])
                 row_list.append(row_df)
         # 预存进 借 100201 应收 贷 230502 预存住院
@@ -543,7 +547,7 @@ def build_menzhen_saoma(conn, shoukuan_df, total_df, record):
             md = 0.0 if pd.isna(md_v) else float(md_v)
             # 科目
             ccode = "100201"
-            row_df = transform_to_yonyou(period, ino_id, inid, date_val, '李红霞', md, 0.0, None, ccode, "预收医疗款")
+            row_df = transform_to_yonyou(period, ino_id, inid, date_val, '刘畅', md, 0.0, None, ccode, "预收医疗款")
             row_df["ccode_equal"] = "230502"
             row_list.append(row_df)
             # 贷 230502
@@ -552,7 +556,7 @@ def build_menzhen_saoma(conn, shoukuan_df, total_df, record):
             mc = 0.0 if pd.isna(mc_v) else float(mc_v)
             # 科目
             ccode = "230502"
-            row_df = transform_to_yonyou(period, ino_id, inid, date_val, '李红霞', 0.0, mc, None, ccode, "预收医疗款")
+            row_df = transform_to_yonyou(period, ino_id, inid, date_val, '刘畅', 0.0, mc, None, ccode, "预收医疗款")
             row_df["ccode_equal"] = "100201"
             row_list.append(row_df)
         new_row = pd.DataFrame(row_list)
@@ -658,7 +662,7 @@ def transform_to_yonyou(period, ino_id, inid, dbill_date, user_name, md, mc, cde
     new_df['ioutyear'] = 0  # 外部凭证会计年度  F76外部会计年度
 
     # --- 4. 外部系统关联字段 (用于追踪HIS来源) ---
-    new_df['coutsysname'] = 'HIS'  # 外部凭证系统名称 F74外部系统名称
+    new_df['coutsysname'] = ''  # 外部凭证系统名称 F74外部系统名称
     new_df['bFlagOut'] = 1  # 是否输出标志 1其他子系统  手动录入
 
     new_df['coutsysver'] = None  # 外部凭证系统版本号 F79外部系统版本
@@ -670,15 +674,15 @@ def transform_to_yonyou(period, ino_id, inid, dbill_date, user_name, md, mc, cde
     new_df['coutbillsign'] = None  # 外部凭证单据类型
     new_df['coutid'] = None  # 外部凭证单据号
 
-    new_df['bvouchedit'] = False  # 凭证是否可修改 True_可修改,False_不可修改
-    new_df['bvouchAddordele'] = False  # 凭证分录是否可增删 True_可增删,False_不可增删
+    new_df['bvouchedit'] = True  # 凭证是否可修改 True_可修改,False_不可修改
+    new_df['bvouchAddordele'] = True  # 凭证分录是否可增删 True_可增删,False_不可增删
     new_df['bvouchmoneyhold'] = False  # 凭证合计金额是否保值 True_必须保值,False_可不保值
-    new_df['bvalueedit'] = False  # 分录数值是否可修改 True_可修改,False_不可修改，金额/数量/外币
-    new_df['bcodeedit'] = False  # 分录科目是否可修改 True_可修改,False_不可修改
+    new_df['bvalueedit'] = True  # 分录数值是否可修改 True_可修改,False_不可修改，金额/数量/外币
+    new_df['bcodeedit'] = True  # 分录科目是否可修改 True_可修改,False_不可修改
     new_df['ccodecontrol'] = False  # 分录受控科目可用状态 Null_均不可用,****_均可用,!_指定不可用,ID_指定可用
-    new_df['bPCSedit'] = False  # 分录往来项是否可修改 True_可修改,False_不可修改，个人/客户/供应商
-    new_df['bDeptedit'] = False  # 分录部门是否可修改
-    new_df['bItemedit'] = False  # 分录项目是否可修改
+    new_df['bPCSedit'] = True  # 分录往来项是否可修改 True_可修改,False_不可修改，个人/客户/供应商
+    new_df['bDeptedit'] = True  # 分录部门是否可修改
+    new_df['bItemedit'] = True  # 分录项目是否可修改
     new_df['bCusSupInput'] = False  # 分录往来项是否必输
     # 自定义项1
     new_df['cDefine1'] = None
@@ -714,12 +718,12 @@ def transform_to_yonyou(period, ino_id, inid, dbill_date, user_name, md, mc, cde
     new_df['cAssistant6_id'] = None
     new_df['cAssistant7_id'] = None
     new_df['coutid'] = None
-    new_df['bvouchedit'] = False  # 允许修改
+    new_df['bvouchedit'] = True  # 允许修改
 
     # --- 5. 补全其他 DDL 中的默认逻辑值 ---
     # 删除 是否核销	银行帐核销标志
     new_df['bdelete'] = False  # 默认先不作废凭证
-    new_df['bvouchAddordele'] = False  # 凭证分录是否可增删	True_可增删,False_不可增删
+    new_df['bvouchAddordele'] = True  # 凭证分录是否可增删	True_可增删,False_不可增删
 
     new_df['assidentify'] = ''
 
@@ -802,5 +806,6 @@ if __name__ == '__main__':
 
     record['data_type'] = '0'
     record['export_file_path'] = r"C:\Users\Administrator\Desktop\线上his\门诊2026-01-29 00_00_00数据导出.xlsx"
+    record['export_file_path'] = r"C:\Users\55301\Desktop\门诊收入2026-01-23 00_00_00_2026-01-23 23_59_59导出时间10_10_07.xlsx"
     config_manager = ConfigManager()
     import_data_to_yy(config_manager.get_db_config('sqlserver'), record, finished_signal)
