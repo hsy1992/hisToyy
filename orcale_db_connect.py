@@ -10,6 +10,7 @@ from datetime import datetime, time
 from pathlib import Path
 from yongyou_coe import is_build
 from PyQt5.QtCore import QThread, pyqtSignal
+import concurrent.futures
 
 def init_oracle():
     try:
@@ -97,8 +98,9 @@ TYPE_CONFIG = {
 def get_his_data(oracle_config, start_str, end_str, type, shouyin_list, zz_code):
     try:
         # 链接数据库
-        conn = connect_to_oracle(oracle_config.get('user'), oracle_config.get('password'), oracle_config.get('ip'), oracle_config.get('port'),
-                               oracle_config.get('service_name'))
+        # 链接数据库 - 并发执行不再需要在此处建立连接
+        # conn = connect_to_oracle(oracle_config.get('user'), oracle_config.get('password'), oracle_config.get('ip'), oracle_config.get('port'),
+        #                        oracle_config.get('service_name'))
         full_path = ""
         row_count = 0
         # 确保export_data文件夹是否存咋
@@ -118,32 +120,73 @@ def get_his_data(oracle_config, start_str, end_str, type, shouyin_list, zz_code)
 
         shoukuan_df = pd.DataFrame()
         total_df = pd.DataFrame()
+        # 构建 SQL 语句 - 不执行
+        sql_detail = ""
+        sql_total = ""
+
         if detail_view:
             # 详情
-            where_clause = f' WHERE "{time_type}" >= TO_DATE(\'{start_str}\', \'YYYY-MM-DD HH24:MI:SS\') ' \
+            where_clause_df = f' WHERE "{time_type}" >= TO_DATE(\'{start_str}\', \'YYYY-MM-DD HH24:MI:SS\') ' \
                            f'AND "{time_type}" < TO_DATE(\'{end_str}\', \'YYYY-MM-DD HH24:MI:SS\')'
             if type == 0 or type == 1:
                 if shouyin_list:
                     in_name_list = ",".join([f"'{name}'" for name in shouyin_list])
-                    where_clause += f' AND "收款员" IN ({in_name_list})'
+                    where_clause_df += f' AND "收款员" IN ({in_name_list})'
                 if zz_code:
                     code = f"'{zz_code}'"
-                    where_clause += f' AND "扎账单号" = {code} '
-            logger.info(f"查询sql: SELECT * FROM {detail_view}{where_clause}")
-            shoukuan_df = pd.read_sql(f"SELECT * FROM {detail_view}{where_clause}", conn)
+                    where_clause_df += f' AND "扎账单号" = {code} '
+            sql_detail = f"SELECT * FROM {detail_view}{where_clause_df}"
+            logger.info(f"构造查询sql: {sql_detail}")
 
         if total_view:
-            where_clause = f' WHERE "{time_type_total}" >= TO_DATE(\'{start_str}\', \'YYYY-MM-DD HH24:MI:SS\') ' \
+            where_clause_total = f' WHERE "{time_type_total}" >= TO_DATE(\'{start_str}\', \'YYYY-MM-DD HH24:MI:SS\') ' \
                            f'AND "{time_type_total}" < TO_DATE(\'{end_str}\', \'YYYY-MM-DD HH24:MI:SS\')' if type != 2 else ''
             if type == 0 or type == 1:
                 if shouyin_list:
                     in_name_list = ",".join([f"'{name}'" for name in shouyin_list])
-                    where_clause += f' AND "收款员" IN ({in_name_list})'
+                    where_clause_total += f' AND "收款员" IN ({in_name_list})'
                 if zz_code:
                     code = f"'{zz_code}'"
-                    where_clause += f' AND "扎账单号" = {code} '
-            logger.info(f"查询totalsql: SELECT * FROM {total_view}{where_clause}")
-            total_df = pd.read_sql(f"SELECT * FROM {total_view}{where_clause}", conn) if total_view else None
+                    where_clause_total += f' AND "扎账单号" = {code} '
+            sql_total = f"SELECT * FROM {total_view}{where_clause_total}"
+            logger.info(f"构造查询totalsql: {sql_total}")
+
+        # 并发执行函数
+        def fetch_data(sql):
+            if not sql:
+                return pd.DataFrame()
+            conn = None
+            try:
+                # 每次执行创建一个新连接
+                conn = connect_to_oracle(oracle_config.get('user'), oracle_config.get('password'), oracle_config.get('ip'),
+                                       oracle_config.get('port'), oracle_config.get('service_name'))
+                if conn is None:
+                    raise Exception("数据库连接返回为空")
+                
+                logger.info(f"并行执行SQL: {sql}")
+                return pd.read_sql(sql, conn)
+            except Exception as e:
+                logger.error(f"SQL执行失败: {e}")
+                return pd.DataFrame()
+            finally:
+                if conn:
+                    try:
+                        conn.close()
+                    except:
+                        pass
+
+        shoukuan_df = pd.DataFrame()
+        total_df = None
+
+        with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
+            future_detail = executor.submit(fetch_data, sql_detail) if sql_detail else None
+            future_total = executor.submit(fetch_data, sql_total) if sql_total else None
+            
+            if future_detail:
+                shoukuan_df = future_detail.result()
+            
+            if future_total:
+                total_df = future_total.result()
 
         # 文件导出处理
         s = datetime.now().strftime("%H:%M:%S")
@@ -158,7 +201,7 @@ def get_his_data(oracle_config, start_str, end_str, type, shouyin_list, zz_code)
                 total_df.to_excel(writer, sheet_name='汇总数据', index=False)
 
         logger.info(f"文件已保存至: {full_path}, 已成功导出 {row_count} 条数据！")
-        conn.close()
+        # conn.close() # 可以在这里移除因为我们已经在 fetch_data 中使用了 with 语句自动关闭连接
         return shoukuan_df, total_df, full_path
     except Exception as e:
         df_empty = pd.DataFrame()

@@ -151,7 +151,7 @@ def build_menzhen_df(conn, shoukuan_df, total_df):
                 # 获取该扎账单号的时间
                 date_val = pd.to_datetime(zz_code_result_df.iloc[0]['扎帐时间'])
                 if date_val.day >= 21:
-                    date_val = (date_val.replace(day=1) + pd.DateOffset(months=1))
+                    date_val = (date_val.replace(day=1, hour=0, minute=0, second=0) + pd.DateOffset(months=1))
                 period = date_val.month
                 # 每个单号都去获取下凭证
                 start_ino_id = get_next_ino_id(conn, period)
@@ -251,7 +251,7 @@ def build_zhuyuan_js_df(conn, shoukuan_df, total_df):
                 jiezhang_df = zz_code_result_df[zz_code_result_df['扎帐类别'].str.contains('结帐', na=False, regex=False)]
                 date_val = pd.to_datetime(zz_code_result_df.iloc[0]['扎帐时间'])
                 if date_val.day >= 21:
-                    date_val = (date_val.replace(day=1) + pd.DateOffset(months=1))
+                    date_val = (date_val.replace(day=1, hour=0, minute=0, second=0) + pd.DateOffset(months=1))
                 period = date_val.month
                 # 每个单号都去获取下凭证
                 start_ino_id = get_next_ino_id(conn, period)
@@ -656,18 +656,18 @@ def transform_to_yonyou(period, ino_id, inid, dbill_date, user_name, md, mc, cde
     new_df['citem_id'] = None  # fitemss**.citemcode F21项目编码
     new_df['citem_class'] = None  # 项目大类编码 fitem.citem_class F68项目大类编码
     new_df['cname'] = None  # 业务员  Person.cPersonName F20业务员
-    new_df['iflagbank'] = 0  # 银行账两清标志 Null_未达,<1-12> =自动两清期间 <13-24> -12=手工两清期间 F71银行两清标志
-    new_df['iflagPerson'] = 0  # 往来账两清标志 Null_未达,<1-12> =自动两清期间 <13-24> -12=手工两清期间 F72往来两清标志
+    new_df['iflagbank'] = None  # 银行账两清标志 Null_未达,<1-12> =自动两清期间 <13-24> -12=手工两清期间 F71银行两清标志
+    new_df['iflagPerson'] = None  # 往来账两清标志 Null_未达,<1-12> =自动两清期间 <13-24> -12=手工两清期间 F72往来两清标志
     new_df['coutaccset'] = None  # 外部凭证账套号  F75外部账套号
-    new_df['ioutyear'] = 0  # 外部凭证会计年度  F76外部会计年度
+    new_df['ioutyear'] = None  # 外部凭证会计年度  F76外部会计年度
 
     # --- 4. 外部系统关联字段 (用于追踪HIS来源) ---
     new_df['coutsysname'] = ''  # 外部凭证系统名称 F74外部系统名称
-    new_df['bFlagOut'] = 1  # 是否输出标志 1其他子系统  手动录入
+    new_df['bFlagOut'] = 0  # 是否输出标志 1其他子系统  手动录入
 
     new_df['coutsysver'] = None  # 外部凭证系统版本号 F79外部系统版本
     new_df['doutbilldate'] = None  # 外部凭证制单日期 F78外部制单日期
-    new_df['ioutperiod'] = 0  # 外部凭证会计期间 F77外部会计期间
+    new_df['ioutperiod'] = None  # 外部凭证会计期间 F77外部会计期间
     new_df['coutsign'] = ''  # 外部凭证业务类型
     new_df['coutno_id'] = None  # 外部凭证业务号
     new_df['doutdate'] = None  # 外部凭证单据日期

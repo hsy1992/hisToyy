@@ -300,7 +300,7 @@ class ExcelMerger(QMainWindow):
     def on_his_finished(self, shoukuan_df, total_df, full_path):
         self.progress.close()
         logger.info(f"导出地址：{full_path}")
-        # full_path = r"C:\Users\Administrator\Desktop\线上his\门诊收入2026-02-04 00_00_00数据导出20_56_28.xlsx"
+        # full_path = r"C:\Users\Administrator\Desktop\线上his\门诊收入2026-01-23 00_00_00_2026-01-23 23_59_59导出时间10_10_07.xlsx"
         # full_path = r"C:\Users\Administrator\Desktop\线上his\住院结算2026-02-04 00_00_00数据导出20_56_38.xlsx"
         # full_path = r"C:\Users\Administrator\Desktop\线上his\全院病人费用2026-02-01 00_00_00数据导出20_56_59.xlsx"
         # full_path = r"C:\Users\Administrator\Desktop\线上his\门诊自助机2026-02-04 00_00_00数据导出20_58_20.xlsx"

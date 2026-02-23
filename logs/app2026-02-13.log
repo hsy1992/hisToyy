@@ -1,0 +1,97 @@
+2026-02-13 21:42:37,970 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：5
+2026-02-13 21:42:44,496 - INFO - test - 开始查询His: 2026-02-12 00:00:00, 2026-02-12 23:59:59
+2026-02-13 21:42:44,507 - INFO - orcale_db_connect - client_path！G:\pythonProject\hisToyy\lib\instantclient_11_21
+2026-02-13 21:42:44,829 - INFO - orcale_db_connect - (DESCRIPTION=
+                       (ADDRESS=(PROTOCOL=TCP)(HOST=118.190.202.74)(PORT=1521))
+                       (CONNECT_DATA=(SID=EE))
+                   )
+2026-02-13 21:42:47,136 - INFO - orcale_db_connect - 数据库连接失败: DPY-4011: the database or network closed the connection
+ORA-12537: TNS:connection closed
+2026-02-13 21:42:47,137 - INFO - orcale_db_connect - 查询sql: SELECT * FROM SYSTEM."zhuyuan" WHERE "扎帐时间" >= TO_DATE('2026-02-12 00:00:00', 'YYYY-MM-DD HH24:MI:SS') AND "扎帐时间" < TO_DATE('2026-02-12 23:59:59', 'YYYY-MM-DD HH24:MI:SS')
+2026-02-13 21:42:47,137 - INFO - orcale_db_connect - 获取数据失败:: 'NoneType' object has no attribute 'cursor'
+2026-02-13 21:42:47,142 - INFO - test - 导出地址：
+2026-02-13 21:45:03,096 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：5
+2026-02-13 21:45:19,942 - INFO - test - 开始查询His: 2026-02-12 00:00:00, 2026-02-12 23:59:59
+2026-02-13 21:45:20,090 - INFO - orcale_db_connect - client_path！G:\pythonProject\hisToyy\lib\instantclient_11_21
+2026-02-13 21:45:20,113 - INFO - orcale_db_connect - (DESCRIPTION=
+                       (ADDRESS=(PROTOCOL=TCP)(HOST=118.190.202.74)(PORT=1521))
+                       (CONNECT_DATA=(SID=EE))
+                   )
+2026-02-13 21:45:22,333 - INFO - orcale_db_connect - 数据库连接失败: DPY-4011: the database or network closed the connection
+ORA-12537: TNS:connection closed
+2026-02-13 21:45:22,334 - INFO - orcale_db_connect - 查询sql: SELECT * FROM SYSTEM."zhuyuan" WHERE "扎帐时间" >= TO_DATE('2026-02-12 00:00:00', 'YYYY-MM-DD HH24:MI:SS') AND "扎帐时间" < TO_DATE('2026-02-12 23:59:59', 'YYYY-MM-DD HH24:MI:SS')
+2026-02-13 21:45:22,334 - INFO - orcale_db_connect - 获取数据失败:: 'NoneType' object has no attribute 'cursor'
+2026-02-13 21:45:22,341 - INFO - test - 导出地址：
+2026-02-13 21:45:49,116 - INFO - his_data_dialog - 开始用友导入: 2026-02-12 00:00:00, 2026-02-12 23:59:59, 0
+2026-02-13 21:45:49,128 - INFO - his_data_dialog - 点击了导入按钮
+2026-02-13 21:45:49,128 - INFO - sqlserver_db_connect - DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-13 21:45:49,211 - INFO - sqlserver_db_connect - sqlserver 连接成功, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-13 21:45:49,714 - INFO - sqlserver_db_connect - sqlserver 连接成功, mssql+pyodbc://sa:123456@127.0.0.1:1433/UFDATA_999_2012?driver=SQL+Server
+2026-02-13 21:45:50,126 - INFO - sqlserver_db_connect - 所有数据写入成功，事务已自动提交
+2026-02-13 21:45:50,129 - INFO - his_data_dialog - 导入成功，刷新列表
+2026-02-13 21:46:45,289 - INFO - py_sqlite - INSERT INTO sys_export_record (start_time, end_time, data_type, export_file_path, zz_code, shouyin_list, status, import_yy_num, import_yy_start, create_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-02-13 21:46:45,334 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：6
+2026-02-13 21:49:01,648 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：6
+2026-02-13 21:51:11,266 - INFO - test - 开始查询His: 2026-02-12 00:00:00, 2026-02-12 23:59:59
+2026-02-13 21:51:11,405 - INFO - orcale_db_connect - client_path！G:\pythonProject\hisToyy\lib\instantclient_11_21
+2026-02-13 21:51:11,424 - INFO - orcale_db_connect - 
+                 (DESCRIPTION =
+                   (ADDRESS =(PROTOCOL=TCP)(HOST =118.190.202.74)(PORT=1521))
+                   (CONNECT_DATA=
+                     (SERVER=DEDICATED)
+                     (SERVICE_NAME=EE))
+                 )
+2026-02-13 21:51:13,677 - INFO - orcale_db_connect - 数据库连接失败: DPY-4011: the database or network closed the connection
+ORA-12537: TNS:connection closed
+2026-02-13 21:51:13,678 - INFO - orcale_db_connect - 查询sql: SELECT * FROM v_门诊人员缴款书收入项目 WHERE "扎帐时间" >= TO_DATE('2026-02-12 00:00:00', 'YYYY-MM-DD HH24:MI:SS') AND "扎帐时间" < TO_DATE('2026-02-12 23:59:59', 'YYYY-MM-DD HH24:MI:SS')
+2026-02-13 21:51:13,678 - INFO - orcale_db_connect - 获取数据失败:: 'NoneType' object has no attribute 'cursor'
+2026-02-13 21:51:13,681 - INFO - test - 导出地址：
+2026-02-13 21:51:18,040 - INFO - his_data_dialog - 开始用友导入: 2026-02-12 00:00:00, 2026-02-12 23:59:59, 0
+2026-02-13 21:51:18,052 - INFO - his_data_dialog - 点击了导入按钮
+2026-02-13 21:51:18,052 - INFO - sqlserver_db_connect - DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-13 21:51:18,069 - INFO - sqlserver_db_connect - sqlserver 连接成功, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-13 21:51:18,076 - INFO - sqlserver_db_connect - sqlserver 导入失败: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]对象名 'UFDATA_001_2026.dbo.GL_accvouch' 无效。 (208) (SQLExecDirectW)"), DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-13 21:51:18,079 - INFO - his_data_dialog - 导入失败，刷新列表
+2026-02-13 21:51:35,207 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：6
+2026-02-13 21:51:46,868 - INFO - test - 开始查询His: 2026-02-12 00:00:00, 2026-02-12 23:59:59
+2026-02-13 21:51:47,018 - INFO - orcale_db_connect - client_path！G:\pythonProject\hisToyy\lib\instantclient_11_21
+2026-02-13 21:51:47,038 - INFO - orcale_db_connect - (DESCRIPTION=
+                       (ADDRESS=(PROTOCOL=TCP)(HOST=118.190.202.74)(PORT=1521))
+                       (CONNECT_DATA=(SID=EE))
+                   )
+2026-02-13 21:51:49,264 - INFO - orcale_db_connect - 数据库连接失败: DPY-4011: the database or network closed the connection
+ORA-12537: TNS:connection closed
+2026-02-13 21:51:49,265 - INFO - orcale_db_connect - 查询sql: SELECT * FROM SYSTEM."zhuyuan" WHERE "扎帐时间" >= TO_DATE('2026-02-12 00:00:00', 'YYYY-MM-DD HH24:MI:SS') AND "扎帐时间" < TO_DATE('2026-02-12 23:59:59', 'YYYY-MM-DD HH24:MI:SS')
+2026-02-13 21:51:49,265 - INFO - orcale_db_connect - 获取数据失败:: 'NoneType' object has no attribute 'cursor'
+2026-02-13 21:51:49,269 - INFO - test - 导出地址：
+2026-02-13 21:51:53,018 - INFO - his_data_dialog - 开始用友导入: 2026-02-12 00:00:00, 2026-02-12 23:59:59, 0
+2026-02-13 21:51:53,029 - INFO - his_data_dialog - 点击了导入按钮
+2026-02-13 21:51:53,029 - INFO - sqlserver_db_connect - DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-13 21:51:53,049 - INFO - sqlserver_db_connect - sqlserver 连接成功, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-02-13 21:51:53,151 - INFO - sqlserver_db_connect - sqlserver 连接成功, mssql+pyodbc://sa:123456@127.0.0.1:1433/UFDATA_999_2012?driver=SQL+Server
+2026-02-13 21:51:53,208 - INFO - sqlserver_db_connect - 所有数据写入成功，事务已自动提交
+2026-02-13 21:51:53,212 - INFO - his_data_dialog - 导入成功，刷新列表
+2026-02-13 21:51:54,893 - INFO - py_sqlite - INSERT INTO sys_export_record (start_time, end_time, data_type, export_file_path, zz_code, shouyin_list, status, import_yy_num, import_yy_start, create_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-02-13 21:51:54,902 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：7
+2026-02-13 22:07:35,413 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：7
+2026-02-13 22:07:52,561 - INFO - test - 开始查询His: 2026-02-12 00:00:00, 2026-02-12 23:59:59
+2026-02-13 22:07:52,574 - INFO - orcale_db_connect - 构造查询sql: SELECT * FROM SYSTEM."zhuyuan" WHERE "扎帐时间" >= TO_DATE('2026-02-12 00:00:00', 'YYYY-MM-DD HH24:MI:SS') AND "扎帐时间" < TO_DATE('2026-02-12 23:59:59', 'YYYY-MM-DD HH24:MI:SS')
+2026-02-13 22:07:52,574 - INFO - orcale_db_connect - 构造查询totalsql: SELECT * FROM SYSTEM."zhuyuan_total" WHERE "扎帐时间" >= TO_DATE('2026-02-12 00:00:00', 'YYYY-MM-DD HH24:MI:SS') AND "扎帐时间" < TO_DATE('2026-02-12 23:59:59', 'YYYY-MM-DD HH24:MI:SS')
+2026-02-13 22:07:52,611 - INFO - orcale_db_connect - client_path！G:\pythonProject\hisToyy\lib\instantclient_11_21
+2026-02-13 22:07:52,630 - INFO - orcale_db_connect - client_path！G:\pythonProject\hisToyy\lib\instantclient_11_21
+2026-02-13 22:07:52,641 - INFO - orcale_db_connect - (DESCRIPTION=
+                       (ADDRESS=(PROTOCOL=TCP)(HOST=118.190.202.74)(PORT=1521))
+                       (CONNECT_DATA=(SID=EE))
+                   )
+2026-02-13 22:07:52,641 - INFO - orcale_db_connect - (DESCRIPTION=
+                       (ADDRESS=(PROTOCOL=TCP)(HOST=118.190.202.74)(PORT=1521))
+                       (CONNECT_DATA=(SID=EE))
+                   )
+2026-02-13 22:07:54,851 - INFO - orcale_db_connect - 数据库连接失败: DPY-4011: the database or network closed the connection
+ORA-12537: TNS:connection closed
+2026-02-13 22:07:54,851 - ERROR - orcale_db_connect - SQL执行失败: 数据库连接返回为空
+2026-02-13 22:07:54,853 - INFO - orcale_db_connect - 数据库连接失败: DPY-4011: the database or network closed the connection
+ORA-12537: TNS:connection closed
+2026-02-13 22:07:54,853 - ERROR - orcale_db_connect - SQL执行失败: 数据库连接返回为空
+2026-02-13 22:07:54,935 - INFO - orcale_db_connect - 文件已保存至: G:\pythonProject\hisToyy\export_data\门诊收入2026-02-12 00_00_00_2026-02-12 23_59_59导出时间22_07_54.xlsx, 已成功导出 0 条数据！
+2026-02-13 22:07:54,940 - INFO - test - 导出地址：G:\pythonProject\hisToyy\export_data\门诊收入2026-02-12 00_00_00_2026-02-12 23_59_59导出时间22_07_54.xlsx

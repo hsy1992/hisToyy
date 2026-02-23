@@ -203,11 +203,9 @@ class PaymentRecordDialog(QDialog):
     def build_men_zhen_data(self):
         """构建门诊数据"""
         for i, (zz_code, group) in enumerate(self.shoukuan_df.groupby('扎账单号', sort=True)):
-            if not group.empty and group['收款员'].iloc[0] == '于雷':
+            if not group.empty:
                 group['金额'] = group['金额'].apply(lambda x: Decimal(str(x)) if x is not None else Decimal('0.00'))
-                print(group['金额'])
                 jine = group['金额'].sum()
-                print(f"jine========{jine}, {str(jine)}")
                 shouyin = group['收款员'].iloc[0]
                 zz_time = group['扎帐时间'].iloc[0]
                 self.add_row_with_checkbox([zz_code, shouyin, zz_time, str(jine)])
