@@ -13,6 +13,7 @@ from log_util import logger
 from py_sqlite import SQLiteHelper
 from yongyou_coe import get_men_zhen_ccode, is_build, get_zhu_yuan_ccode2, get_zhu_yuan_ccode3, get_jiesuan_ccode, get_feiyong_menzhen_code
 from yy_dept_mapper import get_dept_code_mz
+from decimal import Decimal
 
 
 def connect_to_sqlserver_test(host, port, db_name, user, password):
@@ -58,8 +59,7 @@ def import_data_to_yy(sqlserver_config, shoukuan_df, total_df, record, data_type
         logger.info(f"sqlserver 连接成功, {conn_str}")
         read_excel_real(conn, sqlserver_config, shoukuan_df, total_df, record, str(data_type), finished_signal)
     except Exception as e:
-        traceback.print_exc()  # 打印完整的报错路径
-        logger.info(f"sqlserver 导入失败: {e}, {conn_str}")
+        logger.exception(f"sqlserver 导入失败: {e}, {conn_str}")
         finished_signal.emit(False, f"失败{e}", {})
 
 
@@ -86,18 +86,18 @@ def read_excel_real(conn, sqlserver_config, shoukuan_df, total_df, record, data_
         # 门诊扫码
         df_empty, period_list = build_menzhen_saoma(conn, shoukuan_df, total_df, record)
 
-    for index, row in df_empty.iterrows():
-        print(f"--- 正在处理第 {index} 行 ---")
-        for col in df_empty.columns:
-            value = row[col]
-            # 打印：列名 | 数据值 | Python类型
-            print(f"列名: {col} | 值: {value} | 类型: {type(value)}")
-            byte_len = len(str(value).encode('gbk'))
-            if isinstance(value, str) and byte_len > 90:
-                print(f"警告：第 {col} 个参数超长！长度: {len(value)}")
-
-        # 为了方便调试，只打印第一行就中断（或者根据需要去掉 break）
-        break
+    # for index, row in df_empty.iterrows():
+    #     print(f"--- 正在处理第 {index} 行 ---")
+    #     for col in df_empty.columns:
+    #         value = row[col]
+    #         # 打印：列名 | 数据值 | Python类型
+    #         print(f"列名: {col} | 值: {value} | 类型: {type(value)}")
+    #         byte_len = len(str(value).encode('gbk'))
+    #         if isinstance(value, str) and byte_len > 90:
+    #             print(f"警告：第 {col} 个参数超长！长度: {len(value)}")
+    #
+    #     # 为了方便调试，只打印第一行就中断（或者根据需要去掉 break）
+    #     break
     try:
         if not df_empty.empty:
             mssql_url = f"mssql+pyodbc://{sqlserver_config.get('user')}:{sqlserver_config.get('password')}@{sqlserver_config.get('ip')}:{sqlserver_config.get('port')}/{'UFDATA_001_2026' if is_build else 'UFDATA_999_2012'}?driver=SQL+Server"
@@ -238,6 +238,13 @@ def build_zhuyuan_js_df(conn, shoukuan_df, total_df):
     df_shoukuan['扎帐时间'] = pd.to_datetime(df_shoukuan['扎帐时间'])
     period_list = []
 
+    df_shoukuan['金额'] = df_shoukuan['金额'].apply(
+        lambda x: Decimal(str(x).replace(',', '').strip() or '0')
+    )
+    df_total['金额'] = df_total['金额'].apply(
+        lambda x: Decimal(str(x).replace(',', '').strip() or '0')
+    )
+
     # 先只找出结账数据
     jiezhang_total_df = df_total[df_total['扎帐类别'].str.contains('结帐', na=False, regex=False)]
 
@@ -282,7 +289,7 @@ def build_zhuyuan_js_df(conn, shoukuan_df, total_df):
                     mc = 0.0
                     ccode_set1.add(ccode)
                     row_list.append(
-                        transform_to_yonyou(period, ino_id, inid, date_val, '刘畅', md, mc, None, ccode, cdigest))
+                        transform_to_yonyou(period, ino_id, inid, date_val, '刘畅', md, mc, None, ccode, "结算住院费"))
                 # 添加病人返押金票据冲住院预收款 230502 凭证 为负 贷方
                 """
                 病人返押金票据:	260129000018	结帐	刘春丽	2026-01-29 10:49:31	自助微信	37000
