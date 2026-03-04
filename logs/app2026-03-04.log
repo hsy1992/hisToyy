@@ -1,0 +1,293 @@
+2026-03-04 19:16:57,531 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：7
+2026-03-04 19:17:10,455 - INFO - test - 开始查询His: 2026-03-03 00:00:00, 2026-03-03 23:59:59
+2026-03-04 19:17:10,581 - INFO - orcale_db_connect - 构造查询sql: SELECT * FROM v_门诊人员缴款书收入项目 WHERE "扎帐时间" >= TO_DATE('2026-03-03 00:00:00', 'YYYY-MM-DD HH24:MI:SS') AND "扎帐时间" < TO_DATE('2026-03-03 23:59:59', 'YYYY-MM-DD HH24:MI:SS')
+2026-03-04 19:17:10,581 - INFO - orcale_db_connect - 构造查询totalsql: SELECT * FROM v_门诊人员缴款书结算方式 WHERE "扎帐时间" >= TO_DATE('2026-03-03 00:00:00', 'YYYY-MM-DD HH24:MI:SS') AND "扎帐时间" < TO_DATE('2026-03-03 23:59:59', 'YYYY-MM-DD HH24:MI:SS')
+2026-03-04 19:17:10,632 - INFO - orcale_db_connect - client_path！G:\pythonProject\hisToyy\lib\instantclient_11_21
+2026-03-04 19:17:10,902 - INFO - orcale_db_connect - client_path！G:\pythonProject\hisToyy\lib\instantclient_11_21
+2026-03-04 19:17:10,936 - INFO - orcale_db_connect - 
+                 (DESCRIPTION =
+                   (ADDRESS =(PROTOCOL=TCP)(HOST =118.190.202.74)(PORT=1521))
+                   (CONNECT_DATA=
+                     (SERVER=DEDICATED)
+                     (SERVICE_NAME=EE))
+                 )
+2026-03-04 19:17:10,936 - INFO - orcale_db_connect - 
+                 (DESCRIPTION =
+                   (ADDRESS =(PROTOCOL=TCP)(HOST =118.190.202.74)(PORT=1521))
+                   (CONNECT_DATA=
+                     (SERVER=DEDICATED)
+                     (SERVICE_NAME=EE))
+                 )
+2026-03-04 19:17:13,187 - INFO - orcale_db_connect - 数据库连接失败: DPY-4011: the database or network closed the connection
+ORA-12537: TNS:connection closed
+2026-03-04 19:17:13,187 - INFO - orcale_db_connect - 数据库连接失败: DPY-4011: the database or network closed the connection
+ORA-12537: TNS:connection closed
+2026-03-04 19:17:13,187 - ERROR - orcale_db_connect - SQL执行失败: 数据库连接返回为空
+2026-03-04 19:17:13,187 - ERROR - orcale_db_connect - SQL执行失败: 数据库连接返回为空
+2026-03-04 19:17:13,275 - INFO - orcale_db_connect - 文件已保存至: G:\pythonProject\hisToyy\export_data\门诊收入2026-03-03 00_00_00_2026-03-03 23_59_59导出时间19_17_13.xlsx, 已成功导出 0 条数据！
+2026-03-04 19:17:13,279 - INFO - test - 导出地址：G:\pythonProject\hisToyy\export_data\门诊收入2026-03-03 00_00_00_2026-03-03 23_59_59导出时间19_17_13.xlsx
+2026-03-04 19:19:10,432 - INFO - test - 开始查询His: 2026-03-03 00:00:00, 2026-03-03 23:59:59
+2026-03-04 19:19:10,444 - INFO - orcale_db_connect - 构造查询sql: SELECT * FROM v_门诊人员缴款书收入项目 WHERE "扎帐时间" >= TO_DATE('2026-03-03 00:00:00', 'YYYY-MM-DD HH24:MI:SS') AND "扎帐时间" < TO_DATE('2026-03-03 23:59:59', 'YYYY-MM-DD HH24:MI:SS')
+2026-03-04 19:19:10,444 - INFO - orcale_db_connect - 构造查询totalsql: SELECT * FROM v_门诊人员缴款书结算方式 WHERE "扎帐时间" >= TO_DATE('2026-03-03 00:00:00', 'YYYY-MM-DD HH24:MI:SS') AND "扎帐时间" < TO_DATE('2026-03-03 23:59:59', 'YYYY-MM-DD HH24:MI:SS')
+2026-03-04 19:19:10,446 - INFO - orcale_db_connect - client_path！G:\pythonProject\hisToyy\lib\instantclient_11_21
+2026-03-04 19:19:10,446 - INFO - orcale_db_connect - client_path！G:\pythonProject\hisToyy\lib\instantclient_11_21
+2026-03-04 19:19:10,447 - INFO - orcale_db_connect - 
+                 (DESCRIPTION =
+                   (ADDRESS =(PROTOCOL=TCP)(HOST =118.190.202.74)(PORT=1521))
+                   (CONNECT_DATA=
+                     (SERVER=DEDICATED)
+                     (SERVICE_NAME=EE))
+                 )
+2026-03-04 19:19:10,448 - INFO - orcale_db_connect - 
+                 (DESCRIPTION =
+                   (ADDRESS =(PROTOCOL=TCP)(HOST =118.190.202.74)(PORT=1521))
+                   (CONNECT_DATA=
+                     (SERVER=DEDICATED)
+                     (SERVICE_NAME=EE))
+                 )
+2026-03-04 19:19:12,658 - INFO - orcale_db_connect - 数据库连接失败: DPY-4011: the database or network closed the connection
+ORA-12537: TNS:connection closed
+2026-03-04 19:19:12,658 - ERROR - orcale_db_connect - SQL执行失败: 数据库连接返回为空
+2026-03-04 19:19:12,659 - INFO - orcale_db_connect - 数据库连接失败: DPY-4011: the database or network closed the connection
+ORA-12537: TNS:connection closed
+2026-03-04 19:19:12,659 - ERROR - orcale_db_connect - SQL执行失败: 数据库连接返回为空
+2026-03-04 19:19:12,676 - INFO - orcale_db_connect - 文件已保存至: G:\pythonProject\hisToyy\export_data\门诊收入2026-03-03 00_00_00_2026-03-03 23_59_59导出时间19_19_12.xlsx, 已成功导出 0 条数据！
+2026-03-04 19:19:12,680 - INFO - test - 导出地址：G:\pythonProject\hisToyy\export_data\门诊收入2026-03-03 00_00_00_2026-03-03 23_59_59导出时间19_19_12.xlsx
+2026-03-04 19:19:22,777 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：7
+2026-03-04 19:19:25,626 - INFO - test - 开始查询His: 2026-03-03 00:00:00, 2026-03-03 23:59:59
+2026-03-04 19:19:25,638 - INFO - orcale_db_connect - 构造查询sql: SELECT * FROM v_门诊人员缴款书收入项目 WHERE "扎帐时间" >= TO_DATE('2026-03-03 00:00:00', 'YYYY-MM-DD HH24:MI:SS') AND "扎帐时间" < TO_DATE('2026-03-03 23:59:59', 'YYYY-MM-DD HH24:MI:SS')
+2026-03-04 19:19:25,638 - INFO - orcale_db_connect - 构造查询totalsql: SELECT * FROM v_门诊人员缴款书结算方式 WHERE "扎帐时间" >= TO_DATE('2026-03-03 00:00:00', 'YYYY-MM-DD HH24:MI:SS') AND "扎帐时间" < TO_DATE('2026-03-03 23:59:59', 'YYYY-MM-DD HH24:MI:SS')
+2026-03-04 19:19:25,642 - INFO - orcale_db_connect - client_path！G:\pythonProject\hisToyy\lib\instantclient_11_21
+2026-03-04 19:19:25,664 - INFO - orcale_db_connect - client_path！G:\pythonProject\hisToyy\lib\instantclient_11_21
+2026-03-04 19:19:25,666 - INFO - orcale_db_connect - 
+                 (DESCRIPTION =
+                   (ADDRESS =(PROTOCOL=TCP)(HOST =118.190.202.74)(PORT=1521))
+                   (CONNECT_DATA=
+                     (SERVER=DEDICATED)
+                     (SERVICE_NAME=EE))
+                 )
+2026-03-04 19:19:25,667 - INFO - orcale_db_connect - 
+                 (DESCRIPTION =
+                   (ADDRESS =(PROTOCOL=TCP)(HOST =118.190.202.74)(PORT=1521))
+                   (CONNECT_DATA=
+                     (SERVER=DEDICATED)
+                     (SERVICE_NAME=EE))
+                 )
+2026-03-04 19:19:27,865 - INFO - orcale_db_connect - 数据库连接失败: DPY-4011: the database or network closed the connection
+ORA-12537: TNS:connection closed
+2026-03-04 19:19:27,865 - ERROR - orcale_db_connect - SQL执行失败: 数据库连接返回为空
+2026-03-04 19:19:27,911 - INFO - orcale_db_connect - 数据库连接失败: DPY-4011: the database or network closed the connection
+ORA-12537: TNS:connection closed
+2026-03-04 19:19:27,911 - ERROR - orcale_db_connect - SQL执行失败: 数据库连接返回为空
+2026-03-04 19:19:27,952 - INFO - orcale_db_connect - 文件已保存至: G:\pythonProject\hisToyy\export_data\门诊收入2026-03-03 00_00_00_2026-03-03 23_59_59导出时间19_19_27.xlsx, 已成功导出 0 条数据！
+2026-03-04 19:19:27,956 - INFO - test - 导出地址：G:\pythonProject\hisToyy\export_data\门诊收入2026-03-03 00_00_00_2026-03-03 23_59_59导出时间19_19_27.xlsx
+2026-03-04 19:20:08,407 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：7
+2026-03-04 19:20:12,262 - INFO - test - 开始查询His: 2026-02-04 00:00:00, 2026-03-03 23:59:59
+2026-03-04 19:20:12,275 - INFO - orcale_db_connect - 构造查询sql: SELECT * FROM v_全院病人费用汇总住院 WHERE "日期" >= TO_DATE('2026-02-04 00:00:00', 'YYYY-MM-DD HH24:MI:SS') AND "日期" < TO_DATE('2026-03-03 23:59:59', 'YYYY-MM-DD HH24:MI:SS')
+2026-03-04 19:20:12,279 - INFO - orcale_db_connect - client_path！G:\pythonProject\hisToyy\lib\instantclient_11_21
+2026-03-04 19:20:12,300 - INFO - orcale_db_connect - 
+                 (DESCRIPTION =
+                   (ADDRESS =(PROTOCOL=TCP)(HOST =118.190.202.74)(PORT=1521))
+                   (CONNECT_DATA=
+                     (SERVER=DEDICATED)
+                     (SERVICE_NAME=EE))
+                 )
+2026-03-04 19:20:14,556 - INFO - orcale_db_connect - 数据库连接失败: DPY-4011: the database or network closed the connection
+ORA-12537: TNS:connection closed
+2026-03-04 19:20:14,556 - ERROR - orcale_db_connect - SQL执行失败: 数据库连接返回为空
+2026-03-04 19:20:14,592 - INFO - orcale_db_connect - 文件已保存至: G:\pythonProject\hisToyy\export_data\全院病人费用2026-02-04 00_00_00_2026-03-03 23_59_59导出时间19_20_14.xlsx, 已成功导出 0 条数据！
+2026-03-04 19:20:14,596 - INFO - test - 导出地址：G:\pythonProject\hisToyy\export_data\全院病人费用2026-02-04 00_00_00_2026-03-03 23_59_59导出时间19_20_14.xlsx
+2026-03-04 19:20:20,374 - INFO - his_data_dialog - 开始用友导入: 2026-02-04 00:00:00, 2026-03-03 23:59:59, 2
+2026-03-04 19:20:20,383 - INFO - his_data_dialog - 点击了导入按钮
+2026-03-04 19:20:20,383 - INFO - sqlserver_db_connect - DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-03-04 19:20:20,644 - INFO - sqlserver_db_connect - sqlserver 连接成功, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-03-04 19:20:20,659 - ERROR - sqlserver_db_connect - sqlserver 导入失败: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]对象名 'UFDATA_001_2026.dbo.GL_accvouch' 无效。 (208) (SQLExecDirectW)"), DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+Traceback (most recent call last):
+  File "G:\pythonProject\hisToyy\sqlserver_db_connect.py", line 63, in import_data_to_yy
+    read_excel_real(conn, sqlserver_config, shoukuan_df, total_df, record, str(data_type), finished_signal)
+  File "G:\pythonProject\hisToyy\sqlserver_db_connect.py", line 84, in read_excel_real
+    df_empty, period_list = build_zhuyuan_shouru(conn, shoukuan_df, total_df, record)
+  File "G:\pythonProject\hisToyy\sqlserver_db_connect.py", line 366, in build_zhuyuan_shouru
+    ino_id = get_next_ino_id(conn, period)
+  File "G:\pythonProject\hisToyy\sqlserver_db_connect.py", line 590, in get_next_ino_id
+    result = conn.execute(sql).fetchone()
+pyodbc.ProgrammingError: ('42S02', "[42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]对象名 'UFDATA_001_2026.dbo.GL_accvouch' 无效。 (208) (SQLExecDirectW)")
+2026-03-04 19:20:20,663 - INFO - his_data_dialog - 导入失败，刷新列表
+2026-03-04 19:20:54,019 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：7
+2026-03-04 19:20:57,349 - INFO - test - 开始查询His: 2026-02-04 00:00:00, 2026-03-03 23:59:59
+2026-03-04 19:20:57,362 - INFO - orcale_db_connect - 构造查询sql: SELECT * FROM v_全院病人费用汇总住院 WHERE "日期" >= TO_DATE('2026-02-04 00:00:00', 'YYYY-MM-DD HH24:MI:SS') AND "日期" < TO_DATE('2026-03-03 23:59:59', 'YYYY-MM-DD HH24:MI:SS')
+2026-03-04 19:20:57,365 - INFO - orcale_db_connect - client_path！G:\pythonProject\hisToyy\lib\instantclient_11_21
+2026-03-04 19:20:57,388 - INFO - orcale_db_connect - (DESCRIPTION=
+                       (ADDRESS=(PROTOCOL=TCP)(HOST=118.190.202.74)(PORT=1521))
+                       (CONNECT_DATA=(SID=EE))
+                   )
+2026-03-04 19:20:59,584 - INFO - orcale_db_connect - 数据库连接失败: DPY-4011: the database or network closed the connection
+ORA-12537: TNS:connection closed
+2026-03-04 19:20:59,584 - ERROR - orcale_db_connect - SQL执行失败: 数据库连接返回为空
+2026-03-04 19:20:59,621 - INFO - orcale_db_connect - 文件已保存至: G:\pythonProject\hisToyy\export_data\全院病人费用2026-02-04 00_00_00_2026-03-03 23_59_59导出时间19_20_59.xlsx, 已成功导出 0 条数据！
+2026-03-04 19:20:59,624 - INFO - test - 导出地址：G:\pythonProject\hisToyy\export_data\全院病人费用2026-02-04 00_00_00_2026-03-03 23_59_59导出时间19_20_59.xlsx
+2026-03-04 19:21:07,621 - INFO - his_data_dialog - 开始用友导入: 2026-02-04 00:00:00, 2026-03-03 23:59:59, 2
+2026-03-04 19:21:07,629 - INFO - his_data_dialog - 点击了导入按钮
+2026-03-04 19:21:07,629 - INFO - sqlserver_db_connect - DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-03-04 19:21:07,648 - INFO - sqlserver_db_connect - sqlserver 连接成功, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-03-04 19:21:07,903 - INFO - sqlserver_db_connect - sqlserver 连接成功, mssql+pyodbc://sa:123456@127.0.0.1:1433/UFDATA_999_2012?driver=SQL+Server
+2026-03-04 19:21:08,575 - INFO - sqlserver_db_connect - 所有数据写入成功，事务已自动提交
+2026-03-04 19:21:08,580 - INFO - his_data_dialog - 导入成功，刷新列表
+2026-03-04 19:21:47,484 - INFO - py_sqlite - INSERT INTO sys_export_record (start_time, end_time, data_type, export_file_path, zz_code, shouyin_list, status, import_yy_num, import_yy_start, create_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-03-04 19:21:47,493 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：8
+2026-03-04 19:22:38,927 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：8
+2026-03-04 19:22:54,718 - INFO - test - 开始查询His: 2026-02-04 00:00:00, 2026-03-03 23:59:59
+2026-03-04 19:22:54,731 - INFO - orcale_db_connect - 构造查询sql: SELECT * FROM v_门诊人员缴款书自助机收入项目 WHERE "登记时间" >= TO_DATE('2026-02-04 00:00:00', 'YYYY-MM-DD HH24:MI:SS') AND "登记时间" < TO_DATE('2026-03-03 23:59:59', 'YYYY-MM-DD HH24:MI:SS')
+2026-03-04 19:22:54,732 - INFO - orcale_db_connect - 构造查询totalsql: SELECT * FROM v_门诊人员缴款书自助机结算方式 WHERE "收款时间" >= TO_DATE('2026-02-04 00:00:00', 'YYYY-MM-DD HH24:MI:SS') AND "收款时间" < TO_DATE('2026-03-03 23:59:59', 'YYYY-MM-DD HH24:MI:SS')
+2026-03-04 19:22:54,735 - INFO - orcale_db_connect - client_path！G:\pythonProject\hisToyy\lib\instantclient_11_21
+2026-03-04 19:22:54,757 - INFO - orcale_db_connect - client_path！G:\pythonProject\hisToyy\lib\instantclient_11_21
+2026-03-04 19:22:54,759 - INFO - orcale_db_connect - (DESCRIPTION=
+                       (ADDRESS=(PROTOCOL=TCP)(HOST=118.190.202.74)(PORT=1521))
+                       (CONNECT_DATA=(SID=EE))
+                   )
+2026-03-04 19:22:54,762 - INFO - orcale_db_connect - (DESCRIPTION=
+                       (ADDRESS=(PROTOCOL=TCP)(HOST=118.190.202.74)(PORT=1521))
+                       (CONNECT_DATA=(SID=EE))
+                   )
+2026-03-04 19:22:56,949 - INFO - orcale_db_connect - 数据库连接失败: DPY-4011: the database or network closed the connection
+ORA-12537: TNS:connection closed
+2026-03-04 19:22:56,949 - ERROR - orcale_db_connect - SQL执行失败: 数据库连接返回为空
+2026-03-04 19:22:56,972 - INFO - orcale_db_connect - 数据库连接失败: DPY-4011: the database or network closed the connection
+ORA-12537: TNS:connection closed
+2026-03-04 19:22:56,972 - ERROR - orcale_db_connect - SQL执行失败: 数据库连接返回为空
+2026-03-04 19:22:57,016 - INFO - orcale_db_connect - 文件已保存至: G:\pythonProject\hisToyy\export_data\门诊自助机2026-02-04 00_00_00_2026-03-03 23_59_59导出时间19_22_56.xlsx, 已成功导出 0 条数据！
+2026-03-04 19:22:57,021 - INFO - test - 导出地址：G:\pythonProject\hisToyy\export_data\门诊自助机2026-02-04 00_00_00_2026-03-03 23_59_59导出时间19_22_56.xlsx
+2026-03-04 19:23:01,786 - INFO - his_data_dialog - 开始用友导入: 2026-02-04 00:00:00, 2026-03-03 23:59:59, 3
+2026-03-04 19:23:01,795 - INFO - his_data_dialog - 点击了导入按钮
+2026-03-04 19:23:01,795 - INFO - sqlserver_db_connect - DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-03-04 19:23:01,815 - INFO - sqlserver_db_connect - sqlserver 连接成功, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-03-04 19:23:01,958 - INFO - sqlserver_db_connect - sqlserver 连接成功, mssql+pyodbc://sa:123456@127.0.0.1:1433/UFDATA_999_2012?driver=SQL+Server
+2026-03-04 19:23:02,057 - INFO - sqlserver_db_connect - 所有数据写入成功，事务已自动提交
+2026-03-04 19:23:02,061 - INFO - his_data_dialog - 导入成功，刷新列表
+2026-03-04 19:23:04,349 - INFO - py_sqlite - INSERT INTO sys_export_record (start_time, end_time, data_type, export_file_path, zz_code, shouyin_list, status, import_yy_num, import_yy_start, create_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-03-04 19:23:04,359 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：9
+2026-03-04 19:23:06,113 - INFO - test - 开始查询His: 2026-02-04 00:00:00, 2026-03-03 23:59:59
+2026-03-04 19:23:06,128 - INFO - orcale_db_connect - 构造查询sql: SELECT * FROM v_门诊人员缴款书自助机收入项目 WHERE "登记时间" >= TO_DATE('2026-02-04 00:00:00', 'YYYY-MM-DD HH24:MI:SS') AND "登记时间" < TO_DATE('2026-03-03 23:59:59', 'YYYY-MM-DD HH24:MI:SS')
+2026-03-04 19:23:06,128 - INFO - orcale_db_connect - 构造查询totalsql: SELECT * FROM v_门诊人员缴款书自助机结算方式 WHERE "收款时间" >= TO_DATE('2026-02-04 00:00:00', 'YYYY-MM-DD HH24:MI:SS') AND "收款时间" < TO_DATE('2026-03-03 23:59:59', 'YYYY-MM-DD HH24:MI:SS')
+2026-03-04 19:23:06,129 - INFO - orcale_db_connect - client_path！G:\pythonProject\hisToyy\lib\instantclient_11_21
+2026-03-04 19:23:06,129 - INFO - orcale_db_connect - client_path！G:\pythonProject\hisToyy\lib\instantclient_11_21
+2026-03-04 19:23:06,130 - INFO - orcale_db_connect - (DESCRIPTION=
+                       (ADDRESS=(PROTOCOL=TCP)(HOST=118.190.202.74)(PORT=1521))
+                       (CONNECT_DATA=(SID=EE))
+                   )
+2026-03-04 19:23:06,135 - INFO - orcale_db_connect - (DESCRIPTION=
+                       (ADDRESS=(PROTOCOL=TCP)(HOST=118.190.202.74)(PORT=1521))
+                       (CONNECT_DATA=(SID=EE))
+                   )
+2026-03-04 19:23:08,351 - INFO - orcale_db_connect - 数据库连接失败: DPY-4011: the database or network closed the connection
+ORA-12537: TNS:connection closed
+2026-03-04 19:23:08,352 - ERROR - orcale_db_connect - SQL执行失败: 数据库连接返回为空
+2026-03-04 19:23:08,366 - INFO - orcale_db_connect - 数据库连接失败: DPY-4011: the database or network closed the connection
+ORA-12537: TNS:connection closed
+2026-03-04 19:23:08,366 - ERROR - orcale_db_connect - SQL执行失败: 数据库连接返回为空
+2026-03-04 19:23:08,384 - INFO - orcale_db_connect - 文件已保存至: G:\pythonProject\hisToyy\export_data\门诊自助机2026-02-04 00_00_00_2026-03-03 23_59_59导出时间19_23_08.xlsx, 已成功导出 0 条数据！
+2026-03-04 19:23:08,386 - INFO - test - 导出地址：G:\pythonProject\hisToyy\export_data\门诊自助机2026-02-04 00_00_00_2026-03-03 23_59_59导出时间19_23_08.xlsx
+2026-03-04 19:27:16,125 - INFO - his_data_dialog - 开始用友导入: 2026-02-04 00:00:00, 2026-03-03 23:59:59, 3
+2026-03-04 19:27:16,134 - INFO - his_data_dialog - 点击了导入按钮
+2026-03-04 19:27:16,134 - INFO - sqlserver_db_connect - DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-03-04 19:27:16,143 - INFO - sqlserver_db_connect - sqlserver 连接成功, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-03-04 19:27:16,273 - INFO - sqlserver_db_connect - sqlserver 连接成功, mssql+pyodbc://sa:123456@127.0.0.1:1433/UFDATA_999_2012?driver=SQL+Server
+2026-03-04 19:27:16,323 - INFO - sqlserver_db_connect - 所有数据写入成功，事务已自动提交
+2026-03-04 19:27:16,326 - INFO - his_data_dialog - 导入成功，刷新列表
+2026-03-04 19:27:18,618 - INFO - py_sqlite - INSERT INTO sys_export_record (start_time, end_time, data_type, export_file_path, zz_code, shouyin_list, status, import_yy_num, import_yy_start, create_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-03-04 19:27:18,628 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-03-04 19:28:16,875 - INFO - test - 开始查询His: 2026-02-04 00:00:00, 2026-03-03 23:59:59
+2026-03-04 19:28:16,888 - INFO - orcale_db_connect - 构造查询sql: SELECT * FROM v_门诊人员缴款书自助机收入项目 WHERE "登记时间" >= TO_DATE('2026-02-04 00:00:00', 'YYYY-MM-DD HH24:MI:SS') AND "登记时间" < TO_DATE('2026-03-03 23:59:59', 'YYYY-MM-DD HH24:MI:SS')
+2026-03-04 19:28:16,889 - INFO - orcale_db_connect - 构造查询totalsql: SELECT * FROM v_门诊人员缴款书自助机结算方式 WHERE "收款时间" >= TO_DATE('2026-02-04 00:00:00', 'YYYY-MM-DD HH24:MI:SS') AND "收款时间" < TO_DATE('2026-03-03 23:59:59', 'YYYY-MM-DD HH24:MI:SS')
+2026-03-04 19:28:16,889 - INFO - orcale_db_connect - client_path！G:\pythonProject\hisToyy\lib\instantclient_11_21
+2026-03-04 19:28:16,890 - INFO - orcale_db_connect - client_path！G:\pythonProject\hisToyy\lib\instantclient_11_21
+2026-03-04 19:28:16,891 - INFO - orcale_db_connect - (DESCRIPTION=
+                       (ADDRESS=(PROTOCOL=TCP)(HOST=118.190.202.74)(PORT=1521))
+                       (CONNECT_DATA=(SID=EE))
+                   )
+2026-03-04 19:28:16,892 - INFO - orcale_db_connect - (DESCRIPTION=
+                       (ADDRESS=(PROTOCOL=TCP)(HOST=118.190.202.74)(PORT=1521))
+                       (CONNECT_DATA=(SID=EE))
+                   )
+2026-03-04 19:28:19,086 - INFO - orcale_db_connect - 数据库连接失败: DPY-4011: the database or network closed the connection
+ORA-12537: TNS:connection closed
+2026-03-04 19:28:19,086 - ERROR - orcale_db_connect - SQL执行失败: 数据库连接返回为空
+2026-03-04 19:28:19,106 - INFO - orcale_db_connect - 数据库连接失败: DPY-4011: the database or network closed the connection
+ORA-12537: TNS:connection closed
+2026-03-04 19:28:19,107 - ERROR - orcale_db_connect - SQL执行失败: 数据库连接返回为空
+2026-03-04 19:28:19,123 - INFO - orcale_db_connect - 文件已保存至: G:\pythonProject\hisToyy\export_data\门诊自助机2026-02-04 00_00_00_2026-03-03 23_59_59导出时间19_28_19.xlsx, 已成功导出 0 条数据！
+2026-03-04 19:28:19,128 - INFO - test - 导出地址：G:\pythonProject\hisToyy\export_data\门诊自助机2026-02-04 00_00_00_2026-03-03 23_59_59导出时间19_28_19.xlsx
+2026-03-04 19:29:42,187 - INFO - test - 开始查询His: 2026-02-04 00:00:00, 2026-03-03 23:59:59
+2026-03-04 19:29:42,201 - INFO - orcale_db_connect - 构造查询sql: SELECT * FROM v_门诊人员缴款书自助机收入项目 WHERE "登记时间" >= TO_DATE('2026-02-04 00:00:00', 'YYYY-MM-DD HH24:MI:SS') AND "登记时间" < TO_DATE('2026-03-03 23:59:59', 'YYYY-MM-DD HH24:MI:SS')
+2026-03-04 19:29:42,201 - INFO - orcale_db_connect - 构造查询totalsql: SELECT * FROM v_门诊人员缴款书自助机结算方式 WHERE "收款时间" >= TO_DATE('2026-02-04 00:00:00', 'YYYY-MM-DD HH24:MI:SS') AND "收款时间" < TO_DATE('2026-03-03 23:59:59', 'YYYY-MM-DD HH24:MI:SS')
+2026-03-04 19:29:42,202 - INFO - orcale_db_connect - client_path！G:\pythonProject\hisToyy\lib\instantclient_11_21
+2026-03-04 19:29:42,202 - INFO - orcale_db_connect - client_path！G:\pythonProject\hisToyy\lib\instantclient_11_21
+2026-03-04 19:29:42,203 - INFO - orcale_db_connect - (DESCRIPTION=
+                       (ADDRESS=(PROTOCOL=TCP)(HOST=118.190.202.74)(PORT=1521))
+                       (CONNECT_DATA=(SID=EE))
+                   )
+2026-03-04 19:29:42,204 - INFO - orcale_db_connect - (DESCRIPTION=
+                       (ADDRESS=(PROTOCOL=TCP)(HOST=118.190.202.74)(PORT=1521))
+                       (CONNECT_DATA=(SID=EE))
+                   )
+2026-03-04 19:29:44,413 - INFO - orcale_db_connect - 数据库连接失败: DPY-4011: the database or network closed the connection
+ORA-12537: TNS:connection closed
+2026-03-04 19:29:44,413 - ERROR - orcale_db_connect - SQL执行失败: 数据库连接返回为空
+2026-03-04 19:29:44,416 - INFO - orcale_db_connect - 数据库连接失败: DPY-4011: the database or network closed the connection
+ORA-12537: TNS:connection closed
+2026-03-04 19:29:44,416 - ERROR - orcale_db_connect - SQL执行失败: 数据库连接返回为空
+2026-03-04 19:29:44,433 - INFO - orcale_db_connect - 文件已保存至: G:\pythonProject\hisToyy\export_data\门诊自助机2026-02-04 00_00_00_2026-03-03 23_59_59导出时间19_29_44.xlsx, 已成功导出 0 条数据！
+2026-03-04 19:29:44,437 - INFO - test - 导出地址：G:\pythonProject\hisToyy\export_data\门诊自助机2026-02-04 00_00_00_2026-03-03 23_59_59导出时间19_29_44.xlsx
+2026-03-04 19:34:36,242 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-03-04 19:34:41,662 - INFO - test - 开始查询His: 2026-02-04 00:00:00, 2026-03-03 23:59:59
+2026-03-04 19:34:41,676 - INFO - orcale_db_connect - 构造查询sql: SELECT * FROM v_门诊人员缴款书扫码付收入项目 WHERE "登记时间" >= TO_DATE('2026-02-04 00:00:00', 'YYYY-MM-DD HH24:MI:SS') AND "登记时间" < TO_DATE('2026-03-03 23:59:59', 'YYYY-MM-DD HH24:MI:SS')
+2026-03-04 19:34:41,677 - INFO - orcale_db_connect - 构造查询totalsql: SELECT * FROM v_门诊人员缴款书扫码付结算方式 WHERE "收款时间" >= TO_DATE('2026-02-04 00:00:00', 'YYYY-MM-DD HH24:MI:SS') AND "收款时间" < TO_DATE('2026-03-03 23:59:59', 'YYYY-MM-DD HH24:MI:SS')
+2026-03-04 19:34:41,679 - INFO - orcale_db_connect - client_path！G:\pythonProject\hisToyy\lib\instantclient_11_21
+2026-03-04 19:34:41,698 - INFO - orcale_db_connect - client_path！G:\pythonProject\hisToyy\lib\instantclient_11_21
+2026-03-04 19:34:41,700 - INFO - orcale_db_connect - (DESCRIPTION=
+                       (ADDRESS=(PROTOCOL=TCP)(HOST=118.190.202.74)(PORT=1521))
+                       (CONNECT_DATA=(SID=EE))
+                   )
+2026-03-04 19:34:41,704 - INFO - orcale_db_connect - (DESCRIPTION=
+                       (ADDRESS=(PROTOCOL=TCP)(HOST=118.190.202.74)(PORT=1521))
+                       (CONNECT_DATA=(SID=EE))
+                   )
+2026-03-04 19:34:43,932 - INFO - orcale_db_connect - 数据库连接失败: DPY-4011: the database or network closed the connection
+ORA-12537: TNS:connection closed
+2026-03-04 19:34:43,933 - ERROR - orcale_db_connect - SQL执行失败: 数据库连接返回为空
+2026-03-04 19:34:43,934 - INFO - orcale_db_connect - 数据库连接失败: DPY-4011: the database or network closed the connection
+ORA-12537: TNS:connection closed
+2026-03-04 19:34:43,934 - ERROR - orcale_db_connect - SQL执行失败: 数据库连接返回为空
+2026-03-04 19:34:43,977 - INFO - orcale_db_connect - 文件已保存至: G:\pythonProject\hisToyy\export_data\门诊扫码2026-02-04 00_00_00_2026-03-03 23_59_59导出时间19_34_43.xlsx, 已成功导出 0 条数据！
+2026-03-04 19:34:43,983 - INFO - test - 导出地址：G:\pythonProject\hisToyy\export_data\门诊扫码2026-02-04 00_00_00_2026-03-03 23_59_59导出时间19_34_43.xlsx
+2026-03-04 19:36:24,193 - INFO - his_data_dialog - 开始用友导入: 2026-02-04 00:00:00, 2026-03-03 23:59:59, 4
+2026-03-04 19:36:24,201 - INFO - his_data_dialog - 点击了导入按钮
+2026-03-04 19:36:24,201 - INFO - sqlserver_db_connect - DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-03-04 19:36:24,222 - INFO - sqlserver_db_connect - sqlserver 连接成功, DRIVER={SQL Server};SERVER=127.0.0.1,1433;DATABASE=master;UID=sa;PWD=123456;Connect Timeout=5;
+2026-03-04 19:36:24,489 - INFO - sqlserver_db_connect - sqlserver 连接成功, mssql+pyodbc://sa:123456@127.0.0.1:1433/UFDATA_999_2012?driver=SQL+Server
+2026-03-04 19:36:24,590 - INFO - sqlserver_db_connect - 所有数据写入成功，事务已自动提交
+2026-03-04 19:36:24,593 - INFO - his_data_dialog - 导入成功，刷新列表
+2026-03-04 19:36:26,925 - INFO - py_sqlite - INSERT INTO sys_export_record (start_time, end_time, data_type, export_file_path, zz_code, shouyin_list, status, import_yy_num, import_yy_start, create_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-03-04 19:36:26,959 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-03-04 19:38:20,185 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-03-04 19:38:24,272 - INFO - test - 开始查询His: 2026-02-04 00:00:00, 2026-03-03 23:59:59
+2026-03-04 19:38:24,285 - INFO - orcale_db_connect - 构造查询sql: SELECT * FROM v_门诊人员缴款书自助机收入项目 WHERE "登记时间" >= TO_DATE('2026-02-04 00:00:00', 'YYYY-MM-DD HH24:MI:SS') AND "登记时间" < TO_DATE('2026-03-03 23:59:59', 'YYYY-MM-DD HH24:MI:SS')
+2026-03-04 19:38:24,285 - INFO - orcale_db_connect - 构造查询totalsql: SELECT * FROM v_门诊人员缴款书自助机结算方式 WHERE "收款时间" >= TO_DATE('2026-02-04 00:00:00', 'YYYY-MM-DD HH24:MI:SS') AND "收款时间" < TO_DATE('2026-03-03 23:59:59', 'YYYY-MM-DD HH24:MI:SS')
+2026-03-04 19:38:24,289 - INFO - orcale_db_connect - client_path！G:\pythonProject\hisToyy\lib\instantclient_11_21
+2026-03-04 19:38:24,310 - INFO - orcale_db_connect - client_path！G:\pythonProject\hisToyy\lib\instantclient_11_21
+2026-03-04 19:38:24,312 - INFO - orcale_db_connect - (DESCRIPTION=
+                       (ADDRESS=(PROTOCOL=TCP)(HOST=118.190.202.74)(PORT=1521))
+                       (CONNECT_DATA=(SID=EE))
+                   )
+2026-03-04 19:38:24,315 - INFO - orcale_db_connect - (DESCRIPTION=
+                       (ADDRESS=(PROTOCOL=TCP)(HOST=118.190.202.74)(PORT=1521))
+                       (CONNECT_DATA=(SID=EE))
+                   )
+2026-03-04 19:38:26,536 - INFO - orcale_db_connect - 数据库连接失败: DPY-4011: the database or network closed the connection
+ORA-12537: TNS:connection closed
+2026-03-04 19:38:26,536 - ERROR - orcale_db_connect - SQL执行失败: 数据库连接返回为空
+2026-03-04 19:38:26,537 - INFO - orcale_db_connect - 数据库连接失败: DPY-4011: the database or network closed the connection
+ORA-12537: TNS:connection closed
+2026-03-04 19:38:26,537 - ERROR - orcale_db_connect - SQL执行失败: 数据库连接返回为空
+2026-03-04 19:38:26,578 - INFO - orcale_db_connect - 文件已保存至: G:\pythonProject\hisToyy\export_data\门诊自助机2026-02-04 00_00_00_2026-03-03 23_59_59导出时间19_38_26.xlsx, 已成功导出 0 条数据！
+2026-03-04 19:38:26,582 - INFO - test - 导出地址：G:\pythonProject\hisToyy\export_data\门诊自助机2026-02-04 00_00_00_2026-03-03 23_59_59导出时间19_38_26.xlsx

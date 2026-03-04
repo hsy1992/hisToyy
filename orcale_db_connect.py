@@ -223,6 +223,8 @@ class HisWorker(QThread):
     def run(self):
         try:
             shoukuan_df, total_df, full_path = get_his_data(self.oracle_config, self.start_str, self.end_str, self.type, self.shouyin_list, self.zz_code)
+            shoukuan_df = shoukuan_df if shoukuan_df is not None else pd.DataFrame()
+            total_df = total_df if total_df is not None else pd.DataFrame()
             self.finished.emit(shoukuan_df, total_df, full_path)
         except Exception as e:
             df_empty = pd.DataFrame()

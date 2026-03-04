@@ -302,12 +302,16 @@ class ExcelMerger(QMainWindow):
         logger.info(f"导出地址：{full_path}")
         # full_path = r"C:\Users\Administrator\Desktop\线上his\门诊收入2026-01-23 00_00_00_2026-01-23 23_59_59导出时间10_10_07.xlsx"
         # full_path = r"C:\Users\Administrator\Desktop\线上his\住院结算2026-02-04 00_00_00数据导出20_56_38.xlsx"
-        # full_path = r"C:\Users\Administrator\Desktop\线上his\全院病人费用2026-02-01 00_00_00数据导出20_56_59.xlsx"
-        # full_path = r"C:\Users\Administrator\Desktop\线上his\门诊自助机2026-02-04 00_00_00数据导出20_58_20.xlsx"
-        # full_path = r"C:\Users\Administrator\Desktop\线上his\门诊扫码2026-02-04 00_00_00数据导出20_56_48.xlsx"
+        # full_path = r"C:\Users\Administrator\Desktop\线上his\全院病人费用2026-01-21 00_00_00_2026-02-20 23_59_59导出时间19_07_29.xlsx"
+        # full_path = r"C:\Users\Administrator\Desktop\线上his\门诊自助机2026-01-21 00_00_00_2026-02-20 23_59_59导出时间19_08_18.xlsx"
+        # full_path = r"C:\Users\Administrator\Desktop\线上his\门诊扫码2026-01-21 00_00_00_2026-02-20 23_59_59导出时间19_10_05.xlsx"
         # df = pd.read_excel(full_path, sheet_name=['收款数据', '汇总数据'])
         # shoukuan_df = df['收款数据']
         # total_df = df['汇总数据']
+
+        # df = pd.read_excel(full_path, sheet_name=['收款数据'])
+        # shoukuan_df = df['收款数据']
+        # total_df = pd.DataFrame()
         if not shoukuan_df.empty:
             self.show_his_data_dialog(self.start_str, self.end_str, self.type_group.checkedId(), shoukuan_df,
                                       total_df, full_path, self.shouyin_box.checked_items(),
