@@ -15,7 +15,9 @@ from yongyou_coe import get_men_zhen_ccode, is_build, get_zhu_yuan_ccode2, get_z
 from yy_dept_mapper import get_dept_code_mz
 from decimal import Decimal
 
-checkout_day = 22
+checkout_day = 21
+checkout_hour = 9
+checkout_minute = 30
 
 def connect_to_sqlserver_test(host, port, db_name, user, password):
     # 查看你电脑上已有的驱动，选一个填入下面的 DRIVER
@@ -151,7 +153,7 @@ def build_menzhen_df(conn, shoukuan_df, total_df):
             if not zz_code_result_df.empty:
                 # 获取该扎账单号的时间
                 date_val = pd.to_datetime(zz_code_result_df.iloc[0]['扎帐时间'])
-                if date_val.day >= checkout_day:
+                if date_val.day > checkout_day or (date_val.day == checkout_day and (date_val.hour * 60 + date_val.minute) >= (checkout_hour * 60 + checkout_minute)):
                     date_val = (date_val.replace(day=1, hour=0, minute=0, second=0) + pd.DateOffset(months=1))
                 period = date_val.month
                 # 每个单号都去获取下凭证
@@ -258,7 +260,7 @@ def build_zhuyuan_js_df(conn, shoukuan_df, total_df):
                 # 先只找出结账数据
                 jiezhang_df = zz_code_result_df[zz_code_result_df['扎帐类别'].str.contains('结帐', na=False, regex=False)]
                 date_val = pd.to_datetime(zz_code_result_df.iloc[0]['扎帐时间'])
-                if date_val.day >= checkout_day:
+                if date_val.day > checkout_day or (date_val.day == checkout_day and (date_val.hour * 60 + date_val.minute) >= (checkout_hour * 60 + checkout_minute)):
                     date_val = (date_val.replace(day=1, hour=0, minute=0, second=0) + pd.DateOffset(months=1))
                 period = date_val.month
                 # 每个单号都去获取下凭证
