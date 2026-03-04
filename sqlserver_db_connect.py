@@ -15,6 +15,7 @@ from yongyou_coe import get_men_zhen_ccode, is_build, get_zhu_yuan_ccode2, get_z
 from yy_dept_mapper import get_dept_code_mz
 from decimal import Decimal
 
+checkout_day = 22
 
 def connect_to_sqlserver_test(host, port, db_name, user, password):
     # 查看你电脑上已有的驱动，选一个填入下面的 DRIVER
@@ -150,7 +151,7 @@ def build_menzhen_df(conn, shoukuan_df, total_df):
             if not zz_code_result_df.empty:
                 # 获取该扎账单号的时间
                 date_val = pd.to_datetime(zz_code_result_df.iloc[0]['扎帐时间'])
-                if date_val.day >= 21:
+                if date_val.day >= checkout_day:
                     date_val = (date_val.replace(day=1, hour=0, minute=0, second=0) + pd.DateOffset(months=1))
                 period = date_val.month
                 # 每个单号都去获取下凭证
@@ -257,7 +258,7 @@ def build_zhuyuan_js_df(conn, shoukuan_df, total_df):
                 # 先只找出结账数据
                 jiezhang_df = zz_code_result_df[zz_code_result_df['扎帐类别'].str.contains('结帐', na=False, regex=False)]
                 date_val = pd.to_datetime(zz_code_result_df.iloc[0]['扎帐时间'])
-                if date_val.day >= 21:
+                if date_val.day >= checkout_day:
                     date_val = (date_val.replace(day=1, hour=0, minute=0, second=0) + pd.DateOffset(months=1))
                 period = date_val.month
                 # 每个单号都去获取下凭证
@@ -495,8 +496,8 @@ def build_menzhen_saoma(conn, shoukuan_df, total_df, record):
     df_shoukuan = shoukuan_df.replace({np.nan: None})
     df_total = total_df.replace({np.nan: None})
     # 自动去除所有列名两端的空格
-    df_shoukuan.columns = df_shoukuan.columns.str.strip()
-    df_total.columns = df_total.columns.str.strip()
+    # df_shoukuan.columns = df_shoukuan.columns.str.strip()
+    # df_total.columns = df_total.columns.str.strip()
     # 将日期列转为日期格式（确保排序逻辑正确）
     df_shoukuan['登记时间'] = pd.to_datetime(df_shoukuan['登记时间'])
     df_total['收款时间'] = pd.to_datetime(df_total['收款时间'])
