@@ -417,6 +417,13 @@ def build_menzhen_zizhuji(conn, shoukuan_df, total_df, record):
     # 将日期列转为日期格式（确保排序逻辑正确）
     df_shoukuan['登记时间'] = pd.to_datetime(df_shoukuan['登记时间'])
     df_total['收款时间'] = pd.to_datetime(df_total['收款时间'])
+
+    df_shoukuan['金额'] = df_shoukuan['金额'].apply(
+        lambda x: Decimal(str(x).replace(',', '').strip() or '0')
+    )
+    df_total['金额'] = df_total['金额'].apply(
+        lambda x: Decimal(str(x).replace(',', '').strip() or '0')
+    )
     # 贷方对方科目
     mc_ccode_equal = set()
     end_time = record['end_time']
@@ -503,6 +510,12 @@ def build_menzhen_saoma(conn, shoukuan_df, total_df, record):
     # 将日期列转为日期格式（确保排序逻辑正确）
     df_shoukuan['登记时间'] = pd.to_datetime(df_shoukuan['登记时间'])
     df_total['收款时间'] = pd.to_datetime(df_total['收款时间'])
+    df_shoukuan['金额'] = df_shoukuan['金额'].apply(
+        lambda x: Decimal(str(x).replace(',', '').strip() or '0')
+    )
+    df_total['金额'] = df_total['金额'].apply(
+        lambda x: Decimal(str(x).replace(',', '').strip() or '0')
+    )
     # 贷方对方科目
     mc_ccode_equal = set()
     end_time = record['end_time']
