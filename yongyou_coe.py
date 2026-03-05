@@ -156,7 +156,7 @@ def get_jiesuan_ccode(name):
     config = income_dict_common_code.get(name.strip())
     if config:
         return config[0]
-    return "1001"
+    return "100201"
 
 def get_feiyong_menzhen_code(name):
     """

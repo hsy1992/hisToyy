@@ -51,6 +51,22 @@ def get_shoukuan():
         shoukuan_list = [line.strip() for line in f.readlines()]
     return shoukuan_list
 
+def get_shoukuan1():
+    """
+    获取收款员
+    """
+    global shoukuan_list
+    if shoukuan_list:
+        return shoukuan_list
+    shouakuan_path = os.path.join(resource_path("config"), "test.txt")
+    with open(shouakuan_path, 'r', encoding='utf-8') as f:
+        # 使用列表推导式去掉每行末尾的换行符 \n
+        shoukuan_list = [line.strip() for line in f.readlines()]
+    for item in shoukuan_list:
+        cdept_id = get_dept_code_mz(item, 'his_mz')
+        print(cdept_id, item)
+
+
 if __name__ == '__main__':
-    print(get_shoukuan())
+    get_shoukuan1()
 
