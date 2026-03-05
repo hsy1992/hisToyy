@@ -34,7 +34,8 @@ def get_dept_code_mz(dept_name, type):
     filtered_df = df_dept[df_dept[type].str.contains(dept_name, na=False, case=False, regex=False)]
     if filtered_df.empty:
         logger.error(f"未找到该部门:{dept_name}", df_dept[type].str)
-        return None
+        # 抛出内置的“值错误”异常
+        raise ValueError(f"错误：未找到该部门:{dept_name}！请检查bumen.xlsx!!")
     else:
         return filtered_df['cDepCode'].iloc[0]
 
