@@ -384,7 +384,7 @@ def build_zhuyuan_shouru(conn, shoukuan_df, total_df, record):
             # 贷方对方科目
             mc_ccode_equal.add(ccode)
             row_df = transform_to_yonyou(period, ino_id, inid, date_val, '刘畅', md, mc, cdept_id, ccode, "住院收入")
-            row_df["ccode_equal"] = "100201"
+            row_df["ccode_equal"] = "121101"
             row_list.append(row_df)
         # 最后加一个121101 应收
         inid += 1
@@ -393,7 +393,7 @@ def build_zhuyuan_shouru(conn, shoukuan_df, total_df, record):
         # 贷方
         mc = 0.0
         # 科目
-        ccode = "100201"
+        ccode = "121101"
         row_df = transform_to_yonyou(period, ino_id, inid, date_val, '刘畅', md, mc, None, ccode, "住院收入")
         row_df["ccode_equal"] = ",".join(list(mc_ccode_equal)[:3])
         row_list.append(row_df)
