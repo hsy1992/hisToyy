@@ -1,0 +1,28 @@
+2026-04-29 22:40:08,835 - INFO - scroll_window - sql：SELECT * FROM sys_export_record  ORDER BY id DESC LIMIT 10 OFFSET 0，list：10
+2026-04-29 22:40:12,193 - INFO - test - 开始查询His: 2026-04-28 00:00:00, 2026-04-28 23:59:59
+2026-04-29 22:40:12,277 - INFO - orcale_db_connect - 构造查询sql: SELECT * FROM v_门诊人员缴款书收入项目 WHERE "扎帐时间" >= TO_DATE('2026-04-28 00:00:00', 'YYYY-MM-DD HH24:MI:SS') AND "扎帐时间" < TO_DATE('2026-04-28 23:59:59', 'YYYY-MM-DD HH24:MI:SS')
+2026-04-29 22:40:12,278 - INFO - orcale_db_connect - 构造查询totalsql: SELECT * FROM v_门诊人员缴款书结算方式 WHERE "扎帐时间" >= TO_DATE('2026-04-28 00:00:00', 'YYYY-MM-DD HH24:MI:SS') AND "扎帐时间" < TO_DATE('2026-04-28 23:59:59', 'YYYY-MM-DD HH24:MI:SS')
+2026-04-29 22:40:12,331 - INFO - orcale_db_connect - client_path！G:\pythonProject\hisToyy\lib\instantclient_11_21
+2026-04-29 22:40:12,635 - INFO - orcale_db_connect - client_path！G:\pythonProject\hisToyy\lib\instantclient_11_21
+2026-04-29 22:40:12,660 - INFO - orcale_db_connect - 
+                 (DESCRIPTION =
+                   (ADDRESS =(PROTOCOL=TCP)(HOST =118.190.202.74)(PORT=1521))
+                   (CONNECT_DATA=
+                     (SERVER=DEDICATED)
+                     (SERVICE_NAME=EE))
+                 )
+2026-04-29 22:40:12,660 - INFO - orcale_db_connect - 
+                 (DESCRIPTION =
+                   (ADDRESS =(PROTOCOL=TCP)(HOST =118.190.202.74)(PORT=1521))
+                   (CONNECT_DATA=
+                     (SERVER=DEDICATED)
+                     (SERVICE_NAME=EE))
+                 )
+2026-04-29 22:40:14,985 - INFO - orcale_db_connect - 数据库连接失败: DPY-4011: the database or network closed the connection
+ORA-12537: TNS:connection closed
+2026-04-29 22:40:14,985 - INFO - orcale_db_connect - 数据库连接失败: DPY-4011: the database or network closed the connection
+ORA-12537: TNS:connection closed
+2026-04-29 22:40:14,985 - ERROR - orcale_db_connect - SQL执行失败: 数据库连接返回为空
+2026-04-29 22:40:14,985 - ERROR - orcale_db_connect - SQL执行失败: 数据库连接返回为空
+2026-04-29 22:40:15,077 - INFO - orcale_db_connect - 文件已保存至: G:\pythonProject\hisToyy\export_data\门诊收入2026-04-28 00_00_00_2026-04-28 23_59_59导出时间22_40_14.xlsx, 已成功导出 0 条数据！
+2026-04-29 22:40:15,081 - INFO - test - 导出地址：G:\pythonProject\hisToyy\export_data\门诊收入2026-04-28 00_00_00_2026-04-28 23_59_59导出时间22_40_14.xlsx

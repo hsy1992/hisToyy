@@ -14,6 +14,8 @@ from py_sqlite import SQLiteHelper
 from yongyou_coe import get_men_zhen_ccode, is_build, get_zhu_yuan_ccode2, get_zhu_yuan_ccode3, get_jiesuan_ccode, get_feiyong_menzhen_code
 from yy_dept_mapper import get_dept_code_mz
 from decimal import Decimal
+from path_util import resource_path
+import os
 
 checkout_day = 21
 checkout_hour = 9
@@ -103,7 +105,12 @@ def read_excel_real(conn, sqlserver_config, shoukuan_df, total_df, record, data_
     #     break
     try:
         if not df_empty.empty:
-            mssql_url = f"mssql+pyodbc://{sqlserver_config.get('user')}:{sqlserver_config.get('password')}@{sqlserver_config.get('ip')}:{sqlserver_config.get('port')}/{'UFDATA_001_2026' if is_build else 'UFDATA_999_2012'}?driver=SQL+Server"
+            db_config_manager = ConfigManager(os.path.join(resource_path("config"), "db_config.ini"))
+            db_settings = db_config_manager.get_db_config('sqlserver') or {}
+            build_db = db_settings.get('build_db', 'UFDATA_001_2026')
+            test_db = db_settings.get('test_db', 'UFDATA_999_2012')
+            target_db = build_db if is_build else test_db
+            mssql_url = f"mssql+pyodbc://{sqlserver_config.get('user')}:{sqlserver_config.get('password')}@{sqlserver_config.get('ip')}:{sqlserver_config.get('port')}/{target_db}?driver=SQL+Server"
             logger.info(f"sqlserver 连接成功, {mssql_url}")
             # 对于 SQL Server，强烈建议开启 fast_executemany 以提升 to_sql 速度
             engine = create_engine(mssql_url, fast_executemany=True, echo=False)
@@ -593,13 +600,15 @@ def get_next_ino_id(conn, period):
     :param period: 会计期间 (int)
     :param csign: 凭证类别 (str)
     """
+    db_config_manager = ConfigManager('config/db_config.ini')
+    db_settings = db_config_manager.get_db_config('sqlserver') or {}
+    build_db = db_settings.get('build_db', 'UFDATA_001_2026')
+    test_db = db_settings.get('test_db', 'UFDATA_999_2012')
+    target_db = build_db if is_build else test_db
+    
     sql = f"""
-        SELECT MAX(ino_id) FROM [UFDATA_999_2012].[dbo].[GL_accvouch] WHERE [iperiod] = {period};
+        SELECT MAX(ino_id) FROM [{target_db}].[dbo].[GL_accvouch] WHERE [iperiod] = {period};
     """
-    if is_build:
-        sql = f"""
-                SELECT MAX(ino_id) FROM [UFDATA_001_2026].[dbo].[GL_accvouch] WHERE [iperiod] = {period};
-            """
     result = conn.execute(sql).fetchone()
     max_id = result[0] if result and result[0] is not None else 0
     # 如果结果为 None (新月份第一张单)，则返回 1，否则返回 最大值 + 1
