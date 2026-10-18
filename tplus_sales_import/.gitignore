@@ -1,0 +1,26 @@
+# Local configuration; config.ini.example stays versioned.
+/config.ini
+
+# Build tools, packaged applications, and generated specifications.
+/build/
+/dist/
+/releases/
+/.build_env/
+/*.spec
+
+# Task data, database snapshots, logs, and temporary verification output.
+/runtime/
+/logs/
+/backups/
+/.validation/
+/.test_runtime*/
+
+# Python caches.
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Generated comparison evidence; retain Markdown analysis/design documents.
+/docs/online_comparison_20261018/*.csv
+/docs/online_comparison_20261018/*.json
+/docs/performance_dataset_result.json

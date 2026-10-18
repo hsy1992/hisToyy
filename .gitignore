@@ -1,4 +1,18 @@
 build/
 dist/
-./idea/
+.idea/
+idea/
 lib/instantclient_11_21/
+
+# Local connection settings (keep templates in version control).
+/config.ini
+/config/db_config.ini
+
+# Generated business exports and application logs.
+/export_data/
+/logs/
+
+# Python caches.
+__pycache__/
+*.py[cod]
+.pytest_cache/

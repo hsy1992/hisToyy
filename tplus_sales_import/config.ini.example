@@ -1,0 +1,9 @@
+; SQL Server connection; edit manually, then click Test Connection.
+[sqlserver]
+ip = 127.0.0.1
+port = 1433
+database = UFDATA_999_1015
+user = sa
+password =
+; Optional installed ODBC driver. No password is bundled.
+driver = SQL Server Native Client 10.0
