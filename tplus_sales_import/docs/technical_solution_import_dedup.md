@@ -393,3 +393,62 @@ SA_SaleDelivery_b显式写taxFlag=1、isModifiedPrice=1；SA_SaleDelivery和SA_S
 按用户要求，SA_SaleDelivery.pubuserdefnvc1写入源操作员文本，去除首尾空白，源缺失/空白则写空字符串，不代填固定制单人。maker/auditor/agency仍按原确认的范立志、ID51。为避免从多条明细任意取错表头值，将操作员纳入同一源单号的表头一致性校验，冲突则整单失败、其他正常单据继续。
 
 表头自定义字段纳入现有全部表头字段回查及长度校验。源原始5277单未发现同单操作员冲突。101项测试通过，本地只读预检和源首单操作员字段长度/类型验证通过。未更新历史数据，本节覆盖第21节“源操作员尚未配置”的旧状态。
+
+## 23. 2026-10-21 票据类型与收款方式默认值
+
+用户查询目标账套1528445条单据，仅有invoiceType=281（专用发票）、reciveType=7（其它）这一组合，确认后续导入沿用此默认值。两个字段显式写入SA_SaleDelivery表头，不写入明细。原始Excel无对应列，不从客户档案推断或覆盖；isAutoGenerateInvoice继续为0，不生成发票。
+
+导入前一次性查询eap_EnumItem：ID281须唯一存在、idEnum=56、IsDeleted=0；ID7须唯一存在、idEnum=41、IsDeleted=0。不满足则前置校验失败并提示，避免跨账套枚举错误。字段纳入原有表结构校验、提交前全字段回查和提交结果恢复核验。已有单据沿用去重跳过，不补写或更新历史数据。
+
+## 24. 当前会话撤销本次导入
+
+增加“撤销本次导入”按钮，仅最新一次导入中已确认成功的完整单据可撤销；任务有待确认提交则不授予撤销资格。凭据保存在内存，包含原连接配置、源文件、任务ID、成功单据主键/SA编号/源单号及深复制的业务数据。重复跳过、校验失败、未处理单据不纳入清单。
+
+点击后后台连接原账套，在短事务中对目标主明细加UPDLOCK/HOLDLOCK，核对全部已配置业务字段，并记录整行SHA256摘要（包含主明细ID及版本字段）。释放事务锁后显示二次确认窗口：服务器/账套/文件/任务、dbo.SA_SaleDelivery和dbo.SA_SaleDelivery_b名称及数量，以及每单主键、SA编号、用友单号、明细数量。默认取消，不在等待确认期间持有数据库锁。
+
+用户确认后重新取得账套进程锁及行/范围锁，重查业务字段及整行摘要。与确认清单不同则拒绝删除；一致则同一事务先删明细、再删表头，仅使用本次回收的ID，逐表比对DELETE OUTPUT返回的全部ID后提交。启用的目标表触发器和级联外键阻止撤销；其他外键阻止删除时整笔回滚，不自动删除额外业务表。不重置IDENTITY。提交或回滚应答不明则禁用按钮、标记撤销待确认，要求人工核实，不盲目重试。
+
+### 2026-10-21 结清状态
+
+用户确认isCancel补为未清算。按当前账套真实枚举写入SA_SaleDelivery.isCancel=428；eap_EnumItem中名称为“未结清”、Code=NoSettle、idEnum=16、IsDeleted=0。只设置结清状态，不把该字段解释为0/1撤销标志。预检校验枚举唯一存在、类别及未删除状态；默认字段参与原有表结构/精度校验及提交前、提交结果恢复回查。
+
+### 2026-10-21 审核时刻
+
+用户确认表头AuditedTime与创建时间一致。构造载荷时只取一次now，createdtime与AuditedTime同时赋该值；auditeddate仍使用源单据日期。提交前回查及提交结果恢复读取实际createdtime和AuditedTime，要求非空且相等，不使用重建载荷时的新系统时间作绝对值比较，兼容SQL datetime存储舍入。此字段也纳入表结构检查及撤销确认期间的整行摘要核验。
+
+### 2026-10-21 预收与结算默认金额
+
+用户确认SA_SaleDelivery表头origprereceiveamount、PreReceiveAmount、origSettleAmount、settleAmount全部默认0。使用Decimal(0)显式插入，纳入既有字段精度/类型检查、事务提交前全字段回查及断线恢复核验，严格区分NULL与0。只补充新导入载荷，不自动更新已有单据；不向明细表扩展这些默认值，也不改变ReceiveBalance或生成收款、核销单据。
+
+### 2026-10-21 应收应付记账标志
+
+按用户要求修复SA_SaleDelivery.isNoArapBookkeeping默认值：显式写0，沿用原77条线上样本，避免缺省落成NULL。字段随载荷纳入表结构校验、提交前回查及断线提交恢复核验；落库NULL不能视为0。不写入明细，不自动更新已有记录，也不直接操作凭证或应收应付业务表。不能仅凭该字段修正认定“生成预收账款”问题已解决，需在实际账套验证凭证来源与取科目结果。
+
+### 2026-10-21 取消表头操作员映射
+
+按用户最新要求，SA_SaleDelivery.pubuserdefnvc1不再使用源操作员，固定写空字符串（沿用原77条样本的空值形式）。从同单表头一致性签名移除操作员，操作员不同不阻断单据；日期、客户、业务类型和项目一致性仍校验。源操作员保留在原始预览/导出列供追溯，不参与此表头字段赋值。明细pubuserdefnvc1继续写用友单号，pubuserdefnvc2继续写销售标识，固定制单/审核/经手人不变。本节覆盖此前第22节的表头操作员映射规则，不自动清理已入库的旧值。
+
+### 2026-10-21 线上样本补充表头默认值
+
+根据用户提供的SA2026102000001线上导出样本及明确要求，SA_SaleDelivery表头固定写入SaleInvoiceMedia=51014、DistributionMode=57419、saleInvoiceID=281、LogisticsStatus=56134。saleInvoiceID与invoiceType分别显式赋值，不将两者视为同一个字段。沿用既有载荷表结构/类型校验、批量写入、事务提交前回查和断线提交恢复核验；字段值异常应导致回查失败。四个字段仅写表头，不自动补写已有单据，不调用生成发票或凭证流程；原isAutoGenerateInvoice=0保持不变。
+
+### 2026-10-21 累计出库数量映射
+
+用户明确要求saleOutQuantity补齐实际数量。SA_SaleDelivery_b.saleOutQuantity与本行quantity均取已解析的源数量Decimal值，按销售单位表达，保留正负、零和小数，不取绝对值，不用表头合计或其他单据数量。随明细载荷参与表结构/精度校验、批量写入、提交前及断线恢复回查；落库NULL不能视为源数量0。该字段为累计出库数量，写入并不执行实际出库或库存记账流程，不据此认定已有真实出库关联；不自动更新历史数据。
+
+### 2026-10-21 补齐四个表头十进制零值
+
+按用户提供的线上/新单据截图及明确要求，SA_SaleDelivery表头OrigInvoiceTaxAmount、Allowances、origAllowances、thisBalanceIntegral显式使用Decimal(0)。字段随载荷参与表结构、类型/精度校验、批量写入、提交前及断线恢复全字段回查；NULL不视为0。不向SA_SaleDelivery_b写入对应字段，不更新已有单据或重复跳过的单据，不生成关联业务记录。补齐值与线上样本一致，不据此认定预收账款凭证异常的原因已经验证或解决。
+
+### 2026-10-21 普通单据零值标记
+
+用户要求核对并补齐18个0默认值；线上SA2026102000001表头/明细中18项均为0。当前独立导入普通销售及普通销售退货，不实现冲抵原单、期初/年度结转、赠品促销、会员积分、价格跟踪、数电开票或线上支付流程，因此按该场景显式写0：
+
+- SA_SaleDelivery：isCounteractDelivery、isPriceTrace、isBeforeSystemInuse、iscarriedforwardin、ismodifiedcode、PrintCount、IsSeparateByWareHouse、IsAutoWarehouse、SendInfoSource、IsReadOnly、IsDigElectronicInvoice、IsOnlinePay。
+- SA_SaleDelivery_b：isPresent、isManualCost、IsMemberIntegral、IsPromotionPresent、DiscountPriceChange、TaxPriceChange。
+
+数据字典中isCounteractDelivery为“冲抵销货”，不是普通退货开关；普通退货（idbusinesstype=66）仍为0，不能按数量负数将其改成1。iscarriedforwardin为“是否结转来的单据”，不是入库完成标记。isManualCost=0表示不手工确定成本，不代表成本为0或脚本已运行成本核算。isPriceTrace=0表示本次不追踪更新相关档案售价。PrintCount=0为新单据初始打印次数。两个价格改动标记按样本为0，保留既有isModifiedPrice=1，它们为不同字段，不能仅依据字段相似推断应相同。金额为0或退货数量为0不自动标为赠品，isPresent仍为0。
+
+本规则适用于当前导入范围，不能据此覆盖含实际赠品、冲抵、线上支付等额外业务含义的数据。18个字段随载荷参与表结构/类型检查、批量插入、提交前及断线恢复全字段回查，NULL与0严格区分；不补写既有数据，不调用上述业务流程。数据字典未收录的新增字段名称/语义仅按用户确认及线上样本理解，不宣称为跨版本通用默认值。官方销货单帮助说明冲抵退货与普通退货及价格跟踪/手工确定成本行为：https://t.static.chanjet.com/helpfiles/Cloud/StdPro/WebHelp/Content/SA/Sale.htm
+
+成功后源行改为已撤销、保留原ID/编号作为审计线索，保存任务日志并重新导出；结果文件写入失败不将已提交删除描述为数据库失败。选择文件（即使随后加载失败）、开始下一次导入、恢复历史结果、关闭应用均清除撤销资格。退出后不可恢复撤销权限；更改配置文件不会将撤销目标切换到其他账套。

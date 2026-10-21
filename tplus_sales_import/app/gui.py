@@ -1,21 +1,59 @@
 import sys
 import threading
 import time
+import logging
 from log_util import logger, diagnostics
 from collections import Counter
 from pathlib import Path
 
 from PyQt5.QtCore import (QAbstractTableModel, QModelIndex, QSortFilterProxyModel, QThread,
-                          Qt, QUrl, pyqtSignal)
+                          Qt, QUrl, QTimer, pyqtSignal)
 from PyQt5.QtGui import QDesktopServices, QCursor
 from PyQt5.QtWidgets import (QApplication, QComboBox, QFileDialog, QHBoxLayout, QGridLayout, QLabel,
                             QLineEdit, QMainWindow, QMessageBox, QProgressBar, QPushButton,
-                            QScrollArea, QTableView, QVBoxLayout, QWidget)
+                            QScrollArea, QTableView, QVBoxLayout, QWidget, QDialog,
+                            QDialogButtonBox, QTableWidget, QTableWidgetItem, QAbstractItemView)
 
 from .configuration import DatabaseConfig, application_dir
-from .database import PreflightError, SqlRepository
+from .database import CommitUnknown, PreflightError, SqlRepository
 from .engine import ImportEngine
 from .files import TaskJournal, export_report, read_xls
+from .undo import UndoSession
+
+
+class UndoConfirmDialog(QDialog):
+    def __init__(self, session, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("二次确认：撤销本次导入")
+        self.resize(850, 560)
+        layout = QVBoxLayout(self)
+        label = QLabel(
+            f"服务器：{session.config.host}:{session.config.port}\n账套：{session.config.database}"
+            f"\n任务：{session.task_id}\n文件：{session.source}\n\n"
+            f"删除表 dbo.SA_SaleDelivery：{len(session.documents)} 条表头\n"
+            f"删除表 dbo.SA_SaleDelivery_b：{sum(len(doc.rows) for doc in session.documents)} 条明细\n"
+            "以下为本次新增单据；确认后先删明细、再删表头。重复跳过及失败数据不删除。")
+        label.setWordWrap(True)
+        layout.addWidget(label)
+        table = QTableWidget(len(session.documents), 4)
+        table.setHorizontalHeaderLabels(["表头ID", "SA单据编号", "用友单号", "明细条数"])
+        table.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        for index, doc in enumerate(session.documents):
+            for column, value in enumerate((session.mapping[doc.source.strip().casefold()][0],
+                                            doc.code, doc.source, len(doc.rows))):
+                table.setItem(index, column, QTableWidgetItem(str(value)))
+        table.horizontalHeader().setStretchLastSection(True)
+        table.setColumnWidth(1, 190)
+        table.setColumnWidth(2, 280)
+        layout.addWidget(table)
+        buttons = QDialogButtonBox(QDialogButtonBox.Yes | QDialogButtonBox.Cancel)
+        buttons.button(QDialogButtonBox.Yes).setText("确认删除本次导入数据")
+        buttons.button(QDialogButtonBox.Cancel).setText("取消")
+        buttons.button(QDialogButtonBox.Yes).setAutoDefault(False)
+        buttons.button(QDialogButtonBox.Cancel).setDefault(True)
+        buttons.accepted.connect(self.accept)
+        buttons.rejected.connect(self.reject)
+        layout.addWidget(buttons)
 
 
 class RowModel(QAbstractTableModel):
@@ -76,12 +114,14 @@ class TaskWorker(QThread):
     completed = pyqtSignal(object)
     failed = pyqtSignal(str)
 
-    def __init__(self, action, config=None, source=None, rows=None, columns=None, runtime=None, report_args=None):
+    def __init__(self, action, config=None, source=None, rows=None, columns=None, runtime=None, report_args=None,
+                 undo_session=None):
         super().__init__()
         self.action, self.config, self.source = action, config, source
         self.rows, self.columns, self.runtime = rows, columns, runtime
         self.stop = threading.Event()
         self.report_args = report_args
+        self.undo_session = undo_session
 
     def run(self):
         started = time.perf_counter()
@@ -97,6 +137,38 @@ class TaskWorker(QThread):
                     repository.close()
             elif self.action == "export":
                 result = str(export_report(**self.report_args))
+            elif self.action in ("undo_prepare", "undo_delete"):
+                session = self.undo_session
+                self.task_id = session.task_id
+                repository = SqlRepository(session.config)
+                repository.log = logging.LoggerAdapter(logger, {"task_id": session.task_id})
+                try:
+                    repository.open()
+                    if self.action == "undo_prepare":
+                        result = session.prepare(repository)
+                    else:
+                        result = session.execute(repository)
+                finally:
+                    try:
+                        repository.close()
+                    except Exception as exc:
+                        logger.warning("撤销连接关闭失败 %s", diagnostics(exc))
+                if self.action == "undo_delete":
+                    imported_ids = {value[0] for value in session.mapping.values()}
+                    for row in self.rows:
+                        if row.status == "导入成功" and row.header_id in imported_ids:
+                            row.status = "已撤销"
+                            row.notes.append("本次导入数据已撤销删除")
+                    result = dict(result, message="本次导入已撤销", report="")
+                    try:
+                        TaskJournal(self.runtime, session.task_id, session.source, session.config.database).save(
+                            self.rows, "已撤销", result["message"])
+                        result["report"] = str(export_report(self.rows, self.columns, session.source,
+                                                             session.config.database, session.task_id,
+                                                             message=result["message"]))
+                    except Exception as exc:
+                        logger.error("撤销已提交，但结果保存失败 %s", diagnostics(exc))
+                        result["message"] += "；结果保存失败，请重试导出，数据库删除已完成"
             else:
                 engine = ImportEngine(self.config, self.source, self.rows, self.columns,
                                       self.runtime, self.stop, self.progress.emit)
@@ -113,7 +185,18 @@ class TaskWorker(QThread):
                 message = (f"当前Python环境缺少依赖：{module}。\n解释器：{sys.executable}"
                            f"\n请在该解释器中安装依赖后重试，依赖清单：{application_dir() / 'requirements.txt'}")
             self.failed.emit(message)
-        except (ValueError, PreflightError) as exc:
+        except (ValueError, PreflightError, CommitUnknown) as exc:
+            if self.action == "undo_delete" and isinstance(exc, CommitUnknown):
+                for row in self.rows:
+                    if row.status == "导入成功":
+                        row.status = "撤销待确认"
+                        row.notes.append(str(exc))
+                try:
+                    session = self.undo_session
+                    TaskJournal(self.runtime, session.task_id, session.source, session.config.database).save(
+                        self.rows, "撤销待确认", str(exc))
+                except Exception as journal_exc:
+                    logger.error("撤销待确认状态保存失败 %s", diagnostics(journal_exc))
             logger.warning("后台操作未完成 action=%s reason=%s %s", self.action, str(exc), diagnostics(exc))
             self.failed.emit(str(exc))
         except Exception as exc:
@@ -136,6 +219,7 @@ class ImportWindow(QMainWindow):
         self.runtime = application_dir() / "runtime"
         self.config, self.tested, self.source = None, None, None
         self.worker, self.result = None, None
+        self.undo_session, self.pending_undo = None, None
         self.closing = False
         root = QWidget()
         layout = QVBoxLayout(root)
@@ -161,8 +245,10 @@ class ImportWindow(QMainWindow):
         self.save_button = QPushButton("结果另存为")
         self.folder_button = QPushButton("打开输出目录")
         self.restore_button = QPushButton("恢复任务结果")
+        self.undo_button = QPushButton("撤销本次导入")
         for index, button in enumerate((self.test_button, self.choose_button, self.import_button, self.stop_button,
-                                        self.retry_button, self.save_button, self.folder_button, self.restore_button)):
+                                        self.retry_button, self.save_button, self.folder_button, self.restore_button,
+                                        self.undo_button)):
             toolbar.addWidget(button, index // 4, index % 4)
         layout.addLayout(toolbar)
         self.import_gate_label = QLabel()
@@ -176,7 +262,7 @@ class ImportWindow(QMainWindow):
         self.search = QLineEdit()
         self.search.setPlaceholderText("按源用友单号筛选（不改变导入范围）")
         self.status = QComboBox()
-        self.status.addItems(["全部", "待处理", "待写入", "导入成功", "重复跳过", "校验失败", "整单受阻", "写入失败", "待确认", "未处理"])
+        self.status.addItems(["全部", "待处理", "待写入", "导入成功", "已撤销", "撤销待确认", "重复跳过", "校验失败", "整单受阻", "写入失败", "待确认", "未处理"])
         filters.addWidget(self.search)
         filters.addWidget(self.status)
         layout.addLayout(filters)
@@ -211,6 +297,7 @@ class ImportWindow(QMainWindow):
         self.save_button.clicked.connect(lambda: self.start_export(True))
         self.folder_button.clicked.connect(self.open_output)
         self.restore_button.clicked.connect(self.restore_result)
+        self.undo_button.clicked.connect(self.start_undo)
         self.search.textChanged.connect(self.apply_filter)
         self.status.currentTextChanged.connect(self.apply_filter)
         self.reload_config()
@@ -265,6 +352,8 @@ class ImportWindow(QMainWindow):
         self.save_button.setEnabled(not busy and self.result is not None)
         self.restore_button.setEnabled(not busy)
         self.folder_button.setEnabled(not busy and (self.source is not None or self.result is not None))
+        self.undo_button.setEnabled(not busy and not self.closing and self.undo_session is not None
+                                    and self.undo_session.state == "ready")
 
     def start_worker(self, worker, callback):
         self.worker = worker
@@ -286,6 +375,8 @@ class ImportWindow(QMainWindow):
         self.update_buttons()
         if self.closing:
             self.close()
+        elif self.pending_undo is not None:
+            QTimer.singleShot(0, self.confirm_undo)
 
     def on_progress(self, phase, done, total):
         self.phase_label.setText(phase)
@@ -296,6 +387,8 @@ class ImportWindow(QMainWindow):
         self.update_summary()
 
     def on_error(self, message):
+        if self.undo_session is not None and self.undo_session.state == "unknown" and self.result:
+            self.result.update(message=message, report="")
         if self.worker is not None and self.worker.action == "test":
             self.tested = None
             self.connection_label.setText("连接状态：测试失败；可检查配置后重新测试或直接发起导入")
@@ -325,6 +418,7 @@ class ImportWindow(QMainWindow):
         source, _ = QFileDialog.getOpenFileName(self, "选择销货单源文件", str(application_dir()), "Excel 97-2003 (*.xls)")
         if not source:
             return
+        self.clear_undo()
         def complete(payload):
             rows, columns = payload
             self.source, self.result = source, None
@@ -354,13 +448,47 @@ class ImportWindow(QMainWindow):
         self.config_label.setText(current.display())
         self.connection_label.setText("连接状态：导入任务将自动连接 " + current.database)
         self.result = None
+        self.clear_undo()
         self.start_worker(TaskWorker("import", config=current, source=self.source, rows=self.model.rows,
                                      columns=self.model.source_columns, runtime=self.runtime), self.import_complete)
 
     def import_complete(self, result):
         self.result = result
+        if not self.closing:
+            self.undo_session = UndoSession.from_result(self.worker.config, self.source, result)
         self.phase_label.setText((result["message"] or "处理完成") +
                                  ("；结果：" + result["report"] if result["report"] else "；请重试导出或另存为"))
+
+    def clear_undo(self):
+        self.undo_session, self.pending_undo = None, None
+        self.update_buttons()
+
+    def start_undo(self):
+        if self.worker is not None or self.undo_session is None or self.undo_session.state != "ready":
+            return
+        self.phase_label.setText("正在核对本次导入的主明细，核对后显示删除确认清单")
+        def complete(session):
+            self.pending_undo = session
+        self.start_worker(TaskWorker("undo_prepare", config=self.undo_session.config,
+                                     undo_session=self.undo_session), complete)
+
+    def confirm_undo(self):
+        session, self.pending_undo = self.pending_undo, None
+        if self.closing or session is None or session is not self.undo_session or self.worker is not None:
+            return
+        if UndoConfirmDialog(session, self).exec_() != QDialog.Accepted:
+            self.phase_label.setText("已取消撤销，本次导入数据保留")
+            return
+        logger.warning("用户确认撤销 task=%s database=%s headers=%d details=%d", session.task_id,
+                       session.config.database, len(session.documents), sum(len(doc.rows) for doc in session.documents))
+        self.start_worker(TaskWorker("undo_delete", config=session.config, undo_session=session,
+                                     rows=self.model.rows, columns=self.model.source_columns,
+                                     runtime=self.runtime), self.undo_complete)
+
+    def undo_complete(self, result):
+        self.result.update(message=result["message"], report=result["report"])
+        self.phase_label.setText(result["message"] + ("；结果：" + result["report"] if result["report"] else ""))
+        self.clear_undo()
 
     def request_stop(self):
         if self.worker:
@@ -391,6 +519,7 @@ class ImportWindow(QMainWindow):
         path, _ = QFileDialog.getOpenFileName(self, "恢复本机任务结果", str(self.runtime), "任务结果 (*.json)")
         if not path:
             return
+        self.clear_undo()
         try:
             payload, rows = TaskJournal.load(path)
             logger.info("恢复任务结果 file=%s rows=%d", path, len(rows), extra={"task_id": payload["task_id"]})
@@ -426,6 +555,7 @@ class ImportWindow(QMainWindow):
         self.summary_label.setText(f"共{len(self.model.rows)}行 / {len({row.voucher for row in self.model.rows if row.voucher})}单；" + "；".join(f"{name} {count}" for name, count in sorted(counts.items())))
 
     def closeEvent(self, event):
+        self.clear_undo()
         if self.worker is not None:
             self.closing = True
             self.request_stop()

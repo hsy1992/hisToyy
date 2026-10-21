@@ -164,7 +164,7 @@ def export_report(rows, columns, source, database, task_id, folder=None, message
     documents = {}
     for index, row in enumerate(rows):
         documents.setdefault(row.voucher or f"空单号/行{index}", set()).add(row.status)
-    priority = ("待确认", "写入失败", "校验失败", "整单受阻", "未处理", "重复跳过", "导入成功")
+    priority = ("撤销待确认", "待确认", "写入失败", "校验失败", "整单受阻", "未处理", "已撤销", "重复跳过", "导入成功")
     doc_counts = Counter(next((state for state in priority if state in states), "未处理") for states in documents.values())
     for status, count in sorted(doc_counts.items()):
         _append_text_safe(summary, ("单据/" + status, count))

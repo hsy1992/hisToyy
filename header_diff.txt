@@ -1,0 +1,27 @@
+Total cols: 218, Diff count: 25
+
+  0 | code                                | SA...01: SA2026102000001           | SA...03: SA2026102000003          
+ 11 | address                             | SA...01:                           | SA...03: NULL                     
+ 12 | linkMan                             | SA...01:                           | SA...03: NULL                     
+ 21 | contactPhone                        | SA...01:                           | SA...03: NULL                     
+ 25 | auditor                             | SA...01: 于淑梅                       | SA...03: 范立志                      
+ 26 | reviser                             | SA...01: 于淑梅                       | SA...03: NULL                     
+ 30 | docid                               | SA...01: 133175                    | SA...03: NULL                     
+ 31 | OrigTS                              | SA...01: 0x00000000C0A017B6        | SA...03: 0x00000000C0A019FB       
+ 32 | updatedBy                           | SA...01: 18249513776               | SA...03: NULL                     
+ 47 | pubuserdefnvc2                      | SA...01:                           | SA...03: NULL                     
+ 72 | ExternalCode                        | SA...01: XKP0026202610200600       | SA...03: XKP0026202610200602      
+ 74 | ID                                  | SA...01: 1575639                   | SA...03: 1575641                  
+ 95 | auditorid                           | SA...01: 52                        | SA...03: 51                       
+108 | createdtime                         | SA...01: 43:57.7                   | SA...03: 09:45.2                  
+109 | updated                             | SA...01: 44:15.0                   | SA...03: 09:45.2                  
+112 | ExternalVoucherCode                 | SA...01: XKP0026202610200600       | SA...03: XKP0026202610200602      
+126 | ts                                  | SA...01: 0x00000000C0A01666        | SA...03: 0x00000000C0A019F5       
+140 | returnOrderReason                   | SA...01:                           | SA...03: NULL                     
+149 | IsDeliverySource                    | SA...01: 0                         | SA...03: NULL                     
+159 | IsDstRDDelivery                     | SA...01: 0                         | SA...03: NULL                     
+176 | SelfDistributionVoucherDisabled     | SA...01: 0                         | SA...03: NULL                     
+179 | AuditedTime                         | SA...01: 44:14.9                   | SA...03: 09:45.2                  
+183 | DriverCount                         | SA...01: 0                         | SA...03: NULL                     
+185 | IsDistributionBlueGenRed            | SA...01: 0                         | SA...03: NULL                     
+206 | OppositeSideVoucherID               | SA...01:                           | SA...03: NULL                     

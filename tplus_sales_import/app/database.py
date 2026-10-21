@@ -2,6 +2,7 @@
 from collections import defaultdict
 from decimal import Decimal
 from datetime import date, datetime, time as datetime_time
+from hashlib import sha256
 import re
 import time
 import sys
@@ -149,6 +150,14 @@ class SqlRepository:
                 for state in ("disabled", "isdisabled", "isstopped", "isstoped"):
                     if state in record and record[state] not in (0, False):
                         errors.append(f"固定配置已停用或状态未知：{table}.id={identifier}")
+        for field, identifier, enum_group in (("invoiceType", 281, 56), ("reciveType", 7, 41),
+                                               ("isCancel", 428, 16)):
+            records = self.query(
+                "SELECT ID,idEnum,IsDeleted FROM dbo.eap_EnumItem WHERE ID=?", identifier)
+            if len(records) != 1:
+                errors.append(f"固定枚举缺失或不唯一：{field}，eap_EnumItem.ID={identifier}")
+            elif records[0]["idEnum"] != enum_group or records[0]["IsDeleted"] not in (0, False):
+                errors.append(f"固定枚举类别不符、已删除或状态未知：{field}，eap_EnumItem.ID={identifier}")
         triggers = self.query("SELECT name FROM sys.triggers WHERE parent_id IN (OBJECT_ID('dbo.SA_SaleDelivery'),OBJECT_ID('dbo.SA_SaleDelivery_b')) AND is_disabled=0")
         if triggers:
             errors.append("目标主明细表存在未经验证的触发器，暂不写入，以免生成额外业务单据")
@@ -322,7 +331,11 @@ class SqlRepository:
 
     def verify_batch(self, documents, mapping):
         expected = {mapping[key(doc.source)][0]: build_payload(doc) for doc in documents}
-        header_columns = [name for name in next(iter(expected.values()))[0] if name not in ("createdtime", "updated")]
+        header_columns = [name for name in next(iter(expected.values()))[0]
+                          if name not in ("createdtime", "updated", "AuditedTime")]
+        # Rebuilding payloads uses a new wall-clock time. Compare stored timestamps
+        # to each other so SQL datetime rounding and commit recovery remain valid.
+        header_read_columns = header_columns + ["createdtime", "AuditedTime"]
         columns = [name for name in next(iter(expected.values()))[1][0] if name not in ("createdtime", "updated")]
         detail_groups, heads = defaultdict(list), {}
         for block in chunks(list(expected), 1000):
@@ -331,7 +344,7 @@ class SqlRepository:
                                  " FROM dbo.SA_SaleDelivery_b WHERE idSaleDeliveryDTO IN (" + marks + ")", *block)
             for record in records:
                 detail_groups[record.pop("idSaleDeliveryDTO")].append(record)
-            head_records = self.query("SELECT ID," + ",".join(quote(name) for name in header_columns) +
+            head_records = self.query("SELECT ID," + ",".join(quote(name) for name in header_read_columns) +
                                       " FROM dbo.SA_SaleDelivery WHERE ID IN (" + marks + ")", *block)
             for record in head_records:
                 heads[record.pop("ID")] = record
@@ -349,10 +362,98 @@ class SqlRepository:
             head = heads.get(identifier)
             if head is None or any(bind_value(head[name]) != bind_value(header[name]) for name in header_columns):
                 return False
+            if head["createdtime"] is None or head["AuditedTime"] != head["createdtime"]:
+                return False
         return True
 
     def verify_document(self, document, identifier):
         return self.verify_batch([document], {key(document.source): (identifier, document.code)})
+
+    def _undo_snapshot(self, mapping):
+        snapshot = {"SA_SaleDelivery": [], "SA_SaleDelivery_b": []}
+        identifiers = [value[0] for value in mapping.values()]
+        for block in chunks(identifiers, 1000):
+            marks = ",".join("?" for _ in block)
+            # Locks protect both existing rows and new details throughout the transaction.
+            for table, column in (("SA_SaleDelivery", "ID"), ("SA_SaleDelivery_b", "idSaleDeliveryDTO")):
+                records = self.query("SELECT * FROM dbo." + quote(table) +
+                                     " WITH (UPDLOCK,HOLDLOCK) WHERE " + quote(column) +
+                                     " IN (" + marks + ")", *block)
+                for record in records:
+                    normalized = {key(name): bytes(value) if isinstance(value, memoryview) else value
+                                  for name, value in record.items()}
+                    fingerprint = sha256(repr(sorted(normalized.items())).encode("utf-8")).digest()
+                    snapshot[table].append((normalized["id"], fingerprint))
+        for records in snapshot.values():
+            records.sort(key=lambda row: row[0])
+        return snapshot
+
+    def _undo_guard(self):
+        if self.query("SELECT name FROM sys.triggers WHERE parent_id IN "
+                      "(OBJECT_ID('dbo.SA_SaleDelivery'),OBJECT_ID('dbo.SA_SaleDelivery_b')) AND is_disabled=0"):
+            raise PreflightError("目标表存在启用的触发器，无法安全撤销")
+        if self.query("SELECT name FROM sys.foreign_keys WHERE referenced_object_id IN "
+                      "(OBJECT_ID('dbo.SA_SaleDelivery'),OBJECT_ID('dbo.SA_SaleDelivery_b')) "
+                      "AND is_disabled=0 AND delete_referential_action<>0"):
+            raise PreflightError("目标表存在级联删除或更新的外键，无法安全撤销")
+
+    def _undo_transaction(self, documents, mapping, expected=None):
+        connection = self.connection
+        connection.autocommit = False
+        ended, committing = False, False
+        try:
+            self._undo_guard()
+            actual = self._undo_snapshot(mapping)
+            if len(actual["SA_SaleDelivery"]) != len(documents) or not self.verify_batch(documents, mapping):
+                raise PreflightError("本次导入的主明细已缺失或内容发生变化，未执行删除")
+            if expected is None:
+                connection.rollback()
+                ended = True
+                return actual
+            if actual != expected:
+                raise PreflightError("确认期间主明细数据发生变化，请重新核对撤销清单")
+            counts = {}
+            # Both tables are deleted in ONE transaction. Never reset IDENTITY.
+            for table, column in (("SA_SaleDelivery_b", "idSaleDeliveryDTO"), ("SA_SaleDelivery", "ID")):
+                deleted = []
+                for block in chunks([value[0] for value in mapping.values()], 1000):
+                    marks = ",".join("?" for _ in block)
+                    records = self.query("DELETE FROM dbo." + quote(table) +
+                                         " OUTPUT DELETED.ID WHERE " + quote(column) +
+                                         " IN (" + marks + ")", *block)
+                    deleted.extend(next(iter(record.values())) for record in records)
+                if sorted(deleted) != [row[0] for row in expected[table]]:
+                    raise SystemFailure("撤销删除数量或ID不一致，整笔撤销回滚")
+                counts[table] = len(deleted)
+            self.log.warning("撤销删除校验通过 headers=%d details=%d，准备提交",
+                             counts["SA_SaleDelivery"], counts["SA_SaleDelivery_b"])
+            committing = True
+            connection.commit()
+            ended = True
+            return counts
+        except Exception as exc:
+            self.log.warning("撤销事务异常 committing=%s %s", committing, diagnostics(exc))
+            try:
+                connection.rollback()
+                ended = True
+            except Exception as rollback_exc:
+                self.log.error("撤销回滚结果不明 %s", diagnostics(rollback_exc))
+                raise CommitUnknown("撤销结果待确认，请人工查询主明细；不会自动重复删除") from None
+            if committing:
+                raise CommitUnknown("撤销提交结果待确认，请人工查询主明细；不会自动重复删除") from None
+            raise
+        finally:
+            if ended:
+                try:
+                    connection.autocommit = True
+                except Exception:
+                    pass
+
+    def prepare_undo(self, documents, mapping):
+        return self._undo_transaction(documents, mapping)
+
+    def delete_import(self, documents, mapping, snapshot):
+        return self._undo_transaction(documents, mapping, snapshot)
 
     def reconnect(self):
         try:

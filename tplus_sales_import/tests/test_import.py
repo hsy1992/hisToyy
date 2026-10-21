@@ -142,6 +142,7 @@ def test_amount_based_net_unit_price_and_confirmed_business_flags(quantity, gros
     doc.code = "SA2026101200078"
     header, details = build_payload(doc)
     detail = details[0]
+    assert detail["saleOutQuantity"] == detail["quantity"] == Decimal(quantity)
     assert detail["origDiscountPrice"] == detail["discountPrice"] == Decimal(net_price)
     assert detail["origDiscountPrice"].as_tuple().exponent == -8
     assert detail["origTaxPrice"] == Decimal(source_price)
@@ -149,6 +150,28 @@ def test_amount_based_net_unit_price_and_confirmed_business_flags(quantity, gros
     assert detail["RefundDifferenceFlag"] == 51185
     assert header["agency"] == "范立志" and header["agencyid"] == 51
     assert header["isCarriedForwardOut"] == 0
+    assert header["invoiceType"] == 281 and header["reciveType"] == 7
+    assert header["SaleInvoiceMedia"] == 51014
+    assert header["DistributionMode"] == 57419
+    assert header["saleInvoiceID"] == 281
+    assert header["LogisticsStatus"] == 56134
+    for name in ("isCounteractDelivery", "isPriceTrace", "isBeforeSystemInuse",
+                 "iscarriedforwardin", "ismodifiedcode", "PrintCount",
+                 "IsSeparateByWareHouse", "IsAutoWarehouse", "SendInfoSource",
+                 "IsReadOnly", "IsDigElectronicInvoice", "IsOnlinePay"):
+        assert header[name] == 0
+    for name in ("isPresent", "isManualCost", "IsMemberIntegral", "IsPromotionPresent",
+                 "DiscountPriceChange", "TaxPriceChange"):
+        assert detail[name] == 0
+    assert header["isCancel"] == 428
+    assert header["isNoArapBookkeeping"] == 0
+    assert "isNoArapBookkeeping" not in detail
+    assert header["AuditedTime"] == header["createdtime"]
+    for field in ("origprereceiveamount", "PreReceiveAmount", "origSettleAmount", "settleAmount",
+                  "OrigInvoiceTaxAmount", "Allowances", "origAllowances", "thisBalanceIntegral"):
+        assert type(header[field]) is Decimal and header[field] == Decimal(0)
+        assert field not in detail
+    assert header["isAutoGenerateInvoice"] == 0
     for payload in (header, detail):
         assert payload["DataSource"] == 2497 and payload["isSaleOut"] == 15
     assert header["origTaxAmount"] == detail["origDiscountAmount"] + detail["origTax"]
@@ -171,29 +194,29 @@ def test_detail_public_and_private_source_fields_match_each_original_line():
     for row, detail in zip(rows, details):
         assert detail["pubuserdefnvc1"] == detail["priuserdefnvc2"] == "SOURCE-001"
         assert detail["pubuserdefnvc2"] == detail["priuserdefnvc3"] == row.values["销售标识"]
-    assert header["pubuserdefnvc1"] == "源操作员"
+    assert header["pubuserdefnvc1"] == ""
 
 
-@pytest.mark.parametrize("operator,expected", [("  窦秀秀C  ", "窦秀秀C"), ("", ""), (None, "")])
-def test_source_operator_is_written_to_header_without_changing_fixed_users(operator, expected):
+@pytest.mark.parametrize("operator", ["  窦秀秀C  ", "", None])
+def test_header_ignores_source_operator_without_changing_fixed_users(operator):
     row = source_row(**{"操作员": operator})
     doc = validate_rows([row], cache(), threading.Event(), lambda *args: None)[0]
     assert doc.ready
     header, details = build_payload(doc)
-    assert header["pubuserdefnvc1"] == expected
+    assert header["pubuserdefnvc1"] == ""
     assert header["maker"] == header["auditor"] == header["agency"] == "范立志"
     assert header["makerid"] == header["auditorid"] == header["agencyid"] == 51
     assert details[0]["pubuserdefnvc1"] == row.voucher
 
 
-def test_conflicting_header_operators_block_only_the_affected_document():
+def test_different_source_operators_do_not_block_documents():
     rows = [source_row("A", number=2, **{"操作员": "甲"}),
             source_row("A", number=3, **{"操作员": "乙"}),
             source_row("B", number=4, **{"操作员": "丙"})]
     docs = validate_rows(rows, cache(), threading.Event(), lambda *args: None)
-    assert not docs[0].ready and docs[1].ready
-    assert all(row.status == "校验失败" for row in rows[:2])
-    assert all(any("操作员不一致" in reason for reason in row.reasons) for row in rows[:2])
+    assert all(doc.ready for doc in docs)
+    assert all(not row.reasons for row in rows)
+    assert all(build_payload(doc)[0]["pubuserdefnvc1"] == "" for doc in docs)
 
 
 def test_zero_return_base_unit_project_null_and_quantity_text():
@@ -208,7 +231,7 @@ def test_zero_return_base_unit_project_null_and_quantity_text():
     assert details[0]["origTaxAmount"] == Decimal("-0.019")
     assert header["auditeddate"] == date(2026, 10, 12)
     assert header["isAutoGenerateSaleOut"] == header["IsAutoSaleOut"] == 1
-    assert "saleInvoiceID" not in header and "docid" not in header
+    assert header["saleInvoiceID"] == 281 and "docid" not in header
     assert decimal_text(Decimal("10.0000")) == "10"
 
 
