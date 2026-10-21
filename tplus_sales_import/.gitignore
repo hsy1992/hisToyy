@@ -6,6 +6,7 @@
 /dist/
 /releases/
 /.build_env/
+/.build_env_win7/
 /*.spec
 
 # Task data, database snapshots, logs, and temporary verification output.

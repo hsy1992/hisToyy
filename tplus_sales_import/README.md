@@ -51,6 +51,8 @@ runtime下保存无密码任务JSON，含原行、结果和写入意图；写入
 
 ## 本机打包环境及验证
 
+Win7 打包优先使用 [Win7 构建记录与步骤](docs/win7_build.md) 及 `requirements-win7-build.txt`：官方 Python 3.8.10 x64、固定依赖版本，并清理 Anaconda 等无关 DLL 搜索路径。`.build_env_win7/` 仅本机使用，其他机器按说明重建，不复制虚拟环境。
+
 当前Anaconda含冲突的旧pathlib分发包，没有卸载或修改全局环境。已在本目录.build_env中离线构造独立打包环境，并生成EXE。如需在相同环境重建，可执行：
 
 ```powershell
