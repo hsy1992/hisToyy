@@ -53,12 +53,16 @@ def schema_contract():
 
 class ImportEngine:
     def __init__(self, config, source, rows, columns, runtime_dir, stop, progress,
-                 repository_factory=SqlRepository, batch_limit=5000):
+                 repository_factory=SqlRepository, batch_limit=5000, api_client=None):
         self.config, self.source, self.rows, self.columns = config, str(source), rows, columns
         self.stop, self.progress = stop, progress
         self.task_id = datetime.now().strftime("%Y%m%d_%H%M%S") + "_" + uuid.uuid4().hex[:8]
         self.journal = TaskJournal(runtime_dir, self.task_id, source, config.database)
         self.factory, self.batch_limit = repository_factory, batch_limit
+        if api_client is None:
+            from .tplus_api import TPlusApiClient
+            api_client = TPlusApiClient(getattr(config, "api", None) or getattr(config, "tplus_api", None))
+        self.api_client = api_client
         self.repository = None
         self.message = ""
         self.report = None
@@ -127,6 +131,21 @@ class ImportEngine:
                                 for row in doc.rows:
                                     row.status = "未处理"
                                     row.reasons.append(self.message)
+                        elif eligible and getattr(getattr(self.config, "api", None), "enabled", True):
+                            # 前置获取 Token，若获取失败则直接阻断，不进行数据库插入
+                            self.progress("获取 T+ 接口授权", 0, 0)
+                            token_ok, token_msg = self.api_client.get_token()
+                            if not token_ok:
+                                self.log.error("T+ API认证失败，直接阻断写入 reason=%s", token_msg)
+                                self.message = "T+ API认证失败，未写入数据库：" + token_msg
+                                for doc in eligible:
+                                    for row in doc.rows:
+                                        row.status = "未处理"
+                                        row.reasons.append(self.message)
+                            else:
+                                eligible = self.allocate_codes(eligible)
+                                self.checkpoint("已校验及去重")
+                                self.write_documents(eligible)
                         else:
                             eligible = self.allocate_codes(eligible)
                             self.checkpoint("已校验及去重")
@@ -282,6 +301,8 @@ class ImportEngine:
                 row.status, row.header_id = "导入成功", mapping[key(doc.source)]
         self.log.info("批次提交成功 batch=%d documents=%d rows=%d elapsed_seconds=%.3f", batch_id, len(batch), sum(len(doc.rows) for doc in batch), time.perf_counter() - batch_started)
         self.checkpoint("本批提交成功")
+        if getattr(getattr(self.config, "api", None), "enabled", True):
+            self.approve_batch(batch, mapping)
 
     def recover_batch(self, batch):
         self.log.warning("开始核实断线提交结果 documents=%d", len(batch))
@@ -317,3 +338,52 @@ class ImportEngine:
             self.log.error("断线提交结果核验失败 %s", diagnostics(exc))
             self.halt = True
             self.message = "无法核实提交结果，相关单据保持待确认；重新导入前须查询目标账套"
+
+    def approve_batch(self, batch, mapping):
+        """采用线程池并发数 3 审批单据；记录审批失败数据，最后批量删除草稿记录。"""
+        from concurrent.futures import ThreadPoolExecutor, as_completed
+
+        doc_tasks = []
+        for doc in batch:
+            header_id = mapping.get(key(doc.source))
+            if header_id is not None:
+                doc_tasks.append((doc, header_id, doc.code))
+
+        if not doc_tasks:
+            return
+
+        self.log.info("开始审批批次单据 documents=%d 并发数=3", len(doc_tasks))
+        failed_docs = []
+        done_count = 0
+
+        with ThreadPoolExecutor(max_workers=3) as executor:
+            future_to_doc = {
+                executor.submit(self.api_client.audit_voucher, sa_code, header_id): (doc, header_id)
+                for doc, header_id, sa_code in doc_tasks
+            }
+            for future in as_completed(future_to_doc):
+                doc, header_id = future_to_doc[future]
+                done_count += 1
+                self.progress("API审批单据", done_count, len(doc_tasks))
+                try:
+                    success, msg = future.result()
+                    if not success:
+                        failed_docs.append((doc, header_id, msg))
+                except Exception as exc:
+                    failed_docs.append((doc, header_id, str(exc)))
+
+        if failed_docs:
+            failed_ids = [header_id for _, header_id, _ in failed_docs]
+            self.log.warning("检测到审批失败单据 count=%d，从数据库中批量删除", len(failed_ids))
+            try:
+                self.repository.delete_failed_vouchers(failed_ids)
+            except Exception as exc:
+                self.log.error("批量删除失败单据异常 %s", diagnostics(exc))
+
+            # 保持现有的失败数据导出逻辑：标记为审批失败并记录具体原因
+            for doc, header_id, reason in failed_docs:
+                for row in doc.rows:
+                    row.status = "审批失败"
+                    row.header_id = None  # 数据库记录已删除
+                    row.reasons.append(f"T+ API审批失败：{reason}")
+            self.checkpoint("审批失败单据已清理并标记")

@@ -7,3 +7,13 @@ user = sa
 password =
 ; Optional installed ODBC driver. No password is bundled.
 driver = SQL Server Native Client 10.0
+
+; T+ 局域网 API 审批配置
+[tplus_api]
+url = http://192.168.1.51:7777
+account = 300216
+user = 18249513776
+password =
+app_key = 8f442ec3-713e-4133-b64c-5d2d828c5426
+app_secret = jjy3uh
+enabled = true

@@ -86,8 +86,10 @@ class TransactionRepository(SqlRepository):
     def query(self, *args): return []
     def find_existing(self, *args): return {}
     def verify_batch(self, docs, mapping): return self.verified
-    def bulk_insert(self, cursor, table, records, output=False):
+    def bulk_insert(self, cursor, table, records, output=False, output_cols=None):
         self.received.append((table, records))
+        if output_cols:
+            return [(item.get("idSaleDeliveryDTO"), item["code"], 200 + n) for n, item in enumerate(records)]
         if output:
             # Deliberately reverse OUTPUT order.
             return [(item["ExternalCode"], 100 + n, item["code"]) for n, item in reversed(list(enumerate(records)))]
@@ -177,9 +179,16 @@ def test_header_verification_covers_all_configured_business_fields(field):
         stored_details[0][detail_field] = None if detail_field in ZERO_DETAIL_FLAGS or detail_field == "saleOutQuantity" else "WRONG-SOURCE"
     repo = SqlRepository(config(), connector=lambda *args: None)
 
+    stored_arap = [dict(ID=4200 + n, voucherID=42) for n in range(len(details))]
+
     def query(sql, *params):
         selected = [name.strip("[]") for name in sql.split(" FROM ")[0][len("SELECT "):].split(",")]
-        records = stored_details if "FROM dbo.SA_SaleDelivery_b" in sql else [stored_header]
+        if "FROM dbo.ARAP_Detail" in sql:
+            records = stored_arap
+        elif "FROM dbo.SA_SaleDelivery_b" in sql:
+            records = stored_details
+        else:
+            records = [stored_header]
         return [{name: row[name] for name in selected} for row in records]
 
     repo.query = query

@@ -32,7 +32,8 @@ class UndoConfirmDialog(QDialog):
             f"\n任务：{session.task_id}\n文件：{session.source}\n\n"
             f"删除表 dbo.SA_SaleDelivery：{len(session.documents)} 条表头\n"
             f"删除表 dbo.SA_SaleDelivery_b：{sum(len(doc.rows) for doc in session.documents)} 条明细\n"
-            "以下为本次新增单据；确认后先删明细、再删表头。重复跳过及失败数据不删除。")
+            f"删除表 dbo.ARAP_Detail：{sum(len(doc.rows) for doc in session.documents)} 条往来明细\n"
+            "以下为本次新增单据；确认后先删往来明细、再删存货明细、最后删表头。重复跳过及失败数据不删除。")
         label.setWordWrap(True)
         layout.addWidget(label)
         table = QTableWidget(len(session.documents), 4)
@@ -132,9 +133,19 @@ class TaskWorker(QThread):
             elif self.action == "test":
                 repository = SqlRepository(self.config)
                 try:
-                    result = repository.open()
+                    db_name = repository.open()
                 finally:
                     repository.close()
+                api_cfg = getattr(self.config, "api", None)
+                if api_cfg and api_cfg.enabled:
+                    from .tplus_api import TPlusApiClient
+                    client = TPlusApiClient(api_cfg)
+                    ok, token_msg = client.get_token()
+                    if not ok:
+                        raise PreflightError(f"数据库连接成功（{db_name}），但 T+ API 认证查询失败：{token_msg}")
+                    result = f"{db_name}，T+ API认证通过"
+                else:
+                    result = db_name
             elif self.action == "export":
                 result = str(export_report(**self.report_args))
             elif self.action in ("undo_prepare", "undo_delete"):

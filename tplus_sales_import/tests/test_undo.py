@@ -30,7 +30,7 @@ class UndoRepository(SqlRepository):
     """Transactional in-memory store, including independent historical data."""
     def __init__(self, receipt):
         super().__init__(config(), connector=lambda *args: None)
-        self.store = {"SA_SaleDelivery": [], "SA_SaleDelivery_b": []}
+        self.store = {"ARAP_Detail": [], "SA_SaleDelivery_b": [], "SA_SaleDelivery": []}
         self.commands = []
         self.failure = None
         self.triggers, self.cascades = False, False
@@ -39,10 +39,14 @@ class UndoRepository(SqlRepository):
             identifier = receipt.mapping[key(doc.source)][0]
             self.store["SA_SaleDelivery"].append(dict(header, ID=identifier, ts=b"version1"))
             for index, detail in enumerate(details):
-                self.store["SA_SaleDelivery_b"].append(dict(detail, ID=identifier * 10 + index,
+                detail_id = identifier * 10 + index
+                self.store["SA_SaleDelivery_b"].append(dict(detail, ID=detail_id,
                                                            idSaleDeliveryDTO=identifier))
+                self.store["ARAP_Detail"].append(dict(ID=identifier * 100 + index, voucherID=identifier,
+                                                      voucherDetailID=detail_id))
         self.store["SA_SaleDelivery"].append(dict(ID=999, ExternalCode="ORIGINAL"))
         self.store["SA_SaleDelivery_b"].append(dict(ID=9990, idSaleDeliveryDTO=999))
+        self.store["ARAP_Detail"].append(dict(ID=99900, voucherID=999))
         owner = self
 
         class Connection:
@@ -78,8 +82,12 @@ class UndoRepository(SqlRepository):
             return [dict(name="trigger")] if self.triggers else []
         if "sys.foreign_keys" in sql:
             return [dict(name="cascade")] if self.cascades else []
-        table = "SA_SaleDelivery_b" if "SA_SaleDelivery_b" in sql else "SA_SaleDelivery"
-        column = "idSaleDeliveryDTO" if table.endswith("_b") else "ID"
+        if "ARAP_Detail" in sql:
+            table, column = "ARAP_Detail", "voucherID"
+        elif "SA_SaleDelivery_b" in sql:
+            table, column = "SA_SaleDelivery_b", "idSaleDeliveryDTO"
+        else:
+            table, column = "SA_SaleDelivery", "ID"
         selected = [row for row in self.store[table] if row[column] in params]
         if sql.startswith("DELETE"):
             if table == "SA_SaleDelivery" and self.failure in ("header", "rollback"):
@@ -113,11 +121,12 @@ def test_prepare_never_deletes_and_confirmed_undo_preserves_historical_rows():
     assert repo.store == before and repo.connection.commits == 0
     assert not any(sql.startswith("DELETE") for sql, _ in repo.commands)
     counts = receipt.execute(repo)
-    assert counts == {"SA_SaleDelivery": 2, "SA_SaleDelivery_b": 2}
+    assert counts == {"SA_SaleDelivery": 2, "SA_SaleDelivery_b": 2, "ARAP_Detail": 2}
     assert repo.store == {"SA_SaleDelivery": [dict(ID=999, ExternalCode="ORIGINAL")],
-                          "SA_SaleDelivery_b": [dict(ID=9990, idSaleDeliveryDTO=999)]}
+                          "SA_SaleDelivery_b": [dict(ID=9990, idSaleDeliveryDTO=999)],
+                          "ARAP_Detail": [dict(ID=99900, voucherID=999)]}
     deletes = [sql for sql, _ in repo.commands if sql.startswith("DELETE")]
-    assert "[SA_SaleDelivery_b]" in deletes[0] and "[SA_SaleDelivery]" in deletes[1]
+    assert "[ARAP_Detail]" in deletes[0] and "[SA_SaleDelivery_b]" in deletes[1] and "[SA_SaleDelivery]" in deletes[2]
     assert receipt.state == "done" and repo.connection.commits == 1
     with pytest.raises(PreflightError):
         receipt.execute(repo)

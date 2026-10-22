@@ -264,7 +264,12 @@ def build_payload(document):
                   pubuserdefnvc1="",
                   idcustomer=first["customers"]["id"], idsettlecustomer=first["customers"]["id"],
                   idproject=first["project_id"], idbusinesstype=first["business"]["id"],
-                  maker="范立志", makerid=51, auditor="范立志", auditorid=51, voucherState=189,
+                  maker="范立志", makerid=51,
+                  # --- 原直接审核字段（已注释保留）：---
+                  # auditor="范立志", auditorid=51, voucherState=189,
+                  # ------------------------------------
+                  # --- 现改为未审核状态（待 API 审批触发）：---
+                  auditor="", auditorid=None, voucherState=181,
                   agency="范立志", agencyid=51, isCarriedForwardOut=0,
                   idcurrency=4, idmarketingOrgan=1, iddepartment=None, idclerk=None, idrdstyle=24,
                   isAutoGenerateSaleOut=1, IsAutoSaleOut=1, isAutoGenerateInvoice=0,
@@ -275,9 +280,13 @@ def build_payload(document):
                   iscarriedforwardin=0, ismodifiedcode=0, PrintCount=0,
                   IsSeparateByWareHouse=0, IsAutoWarehouse=0, SendInfoSource=0,
                   IsReadOnly=0, IsDigElectronicInvoice=0, IsOnlinePay=0,
-                  DataSource=2497, isSaleOut=15,
-                  voucherdate=first["date"], madedate=first["date"], auditeddate=first["date"],
-                  createdtime=now, AuditedTime=now, updated=now, exchangeRate=Decimal(1),
+                  # --- 原直接出库与审核时间（已注释保留）：---
+                  # isSaleOut=15,
+                  # auditeddate=first["date"], AuditedTime=now,
+                  # ----------------------------------------
+                  DataSource=2497, isSaleOut=0,
+                  voucherdate=first["date"], madedate=first["date"], auditeddate=None,
+                  createdtime=now, AuditedTime=None, updated=now, exchangeRate=Decimal(1),
                   discountRate=Decimal(1), discountAmount=Decimal(0), discountsAndAllowances=None,
                   origprereceiveamount=Decimal(0), PreReceiveAmount=Decimal(0),
                   origSettleAmount=Decimal(0), settleAmount=Decimal(0),
@@ -300,10 +309,14 @@ def build_payload(document):
         details.append(dict(code=f"{index:04d}", idinventory=p["inventory"]["id"],
                             idproject=p["project_id"], idbaseunit=p["unit"]["id"], idunit=p["unit"]["id"],
                             idwarehouse=p["warehouse"]["id"], quantity=p["quantity"], baseQuantity=p["quantity"],
-                            saleOutQuantity=p["quantity"],
+                            # --- 原直接出库标记（已注释保留）：---
+                            # saleOutQuantity=p["quantity"],
+                            # isSaleOut=15,
+                            # ------------------------------------
+                            saleOutQuantity=Decimal(0),
                             compositionQuantity=decimal_text(p["quantity"]) + str(p["unit"]["name"]),
                             discountRate=Decimal(1), taxRate=p["rate"],
-                            taxFlag=1, isModifiedPrice=1, DataSource=2497, isSaleOut=15,
+                            taxFlag=1, isModifiedPrice=1, DataSource=2497, isSaleOut=0,
                             RefundDifferenceFlag=51185,
                             isPresent=0, isManualCost=0, IsMemberIntegral=0,
                             IsPromotionPresent=0, DiscountPriceChange=0, TaxPriceChange=0,
@@ -314,3 +327,77 @@ def build_payload(document):
                             pubuserdefnvc1=row.voucher, pubuserdefnvc2=str(row.values.get("销售标识", "")),
                             createdtime=now, updated=now))
     return header, details
+
+
+def build_arap_payloads(document, header_id, detail_id_map, now=None):
+    if now is None:
+        now = datetime.now()
+    arap_records = []
+    first = document.rows[0].parsed
+    doc_date = first["date"]
+    for index, row in enumerate(document.rows):
+        p = row.parsed
+        detail_id = detail_id_map.get((header_id, f"{index:04d}"))
+        if detail_id is None:
+            raise ValueError(f"未找到对应的存货明细ID：header={header_id}, line={index}")
+        inv = p.get("inventory", {})
+        rec = dict(
+            year=doc_date.year,
+            period=doc_date.month,
+            voucherCode=document.code,
+            businessCode=document.code,
+            voucherID=header_id,
+            businessID=header_id,
+            voucherDetailID=detail_id,
+            detailtype="inventory",
+            detailID=inv.get("id"),
+            detailCode=inv.get("code", ""),
+            detailName=inv.get("name", ""),
+            Detailspecification=inv.get("specification") or "",
+            voucherDate=doc_date,
+            registerDate=doc_date,
+            idpartner=p["customers"]["id"],
+            idnosettlepartner=p["customers"]["id"],
+            idcurrency=4,
+            exchangeRate=Decimal(1),
+            idbusitype=p["business"]["id"],
+            IdMarketingOrgan=1,
+            idproject=p["project_id"],
+            IdDetailProject=p["project_id"],
+            Quantity=p["quantity"],
+            TaxPrice=p["price"],
+            OrigTaxPrice=p["price"],
+            amount=p["gross"],
+            origAmount=p["gross"],
+            cashAmount=Decimal(0),
+            origCashAmount=Decimal(0),
+            settleAmount=Decimal(0),
+            origSettleAmount=Decimal(0),
+            inAllowances=Decimal(0),
+            origInAllowances=Decimal(0),
+            isArFlag=1,
+            flag=-1,
+            auditFlag=1,
+            auditBussinessFlag=1,
+            BookFlag=2212,
+            bussinessFlag="0",
+            DataSource=2497,
+            RefundDifferenceFlag=51185,
+            ExternalVoucherCode=document.source,
+            detailPriuserdefnvc2=document.source,
+            detailPriuserdefnvc3=str(row.values.get("销售标识", "")),
+            headPubuserdefnvc1="",
+            headPubuserdefnvc2="",
+            OppositeSideVoucherID="",
+            isCarriedForwardIn=0,
+            isCarriedForwardOut=0,
+            isRollInFlag=0,
+            prepayFlag=0,
+            idarapvouchertype=104,
+            idvouchertype=104,
+            vouchertimestamp=str(int(now.timestamp())),
+            createdTime=now
+        )
+        arap_records.append(rec)
+    return arap_records
+

@@ -60,3 +60,36 @@ def test_driver_inventory_failure_does_not_prevent_connection_attempt(monkeypatc
     with pytest.raises(RuntimeError, match="connection attempted"):
         repo.open()
     connect.assert_called_once()
+
+
+def test_config_gbk_ansi_encoding_fallback_success(tmp_path):
+    path = tmp_path / "config_gbk.ini"
+    content = "[sqlserver]\nip=127.0.0.1\nport=1433\ndatabase=UFDATA_300216\nuser=sa\npassword=123\n; 中文注释说明测试\n[tplus_api]\nuser=于淑梅\n"
+    # 用 GBK 写入
+    path.write_bytes(content.encode("gbk"))
+    cfg = DatabaseConfig.load(path)
+    assert cfg.database == "UFDATA_300216"
+    assert cfg.api.user == "于淑梅"
+
+
+def test_config_reads_app_key_and_app_secret(tmp_path):
+    path = tmp_path / "config_appkey.ini"
+    content = (
+        "[sqlserver]\n"
+        "ip=127.0.0.1\n"
+        "port=1433\n"
+        "database=UFDATA_300216\n"
+        "user=sa\n"
+        "password=123\n"
+        "[tplus_api]\n"
+        "url=http://192.168.1.51:7777\n"
+        "account=300216\n"
+        "user=18249513776\n"
+        "password=pass\n"
+        "app_key=8f442ec3-713e-4133-b64c-5d2d828c5426\n"
+        "app_secret=jjy3uh\n"
+    )
+    path.write_text(content, encoding="utf-8")
+    cfg = DatabaseConfig.load(path)
+    assert cfg.api.app_key == "8f442ec3-713e-4133-b64c-5d2d828c5426"
+    assert cfg.api.app_secret == "jjy3uh"

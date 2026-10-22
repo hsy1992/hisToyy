@@ -8,7 +8,7 @@ import time
 import sys
 from log_util import logger, diagnostics
 
-from .domain import MasterCache, build_payload, key, valid_source_code
+from .domain import MasterCache, build_payload, build_arap_payloads, key, valid_source_code
 
 
 class PreflightError(Exception):
@@ -101,7 +101,7 @@ class SqlRepository:
         tables = {}
         queries = {
             "customers": "SELECT id,code,name,disabled,taxRate FROM dbo.AA_PartnerEntity",
-            "inventory": "SELECT id,code,name,disabled,idunit,isSingleUnit FROM dbo.AA_InventoryEntity",
+            "inventory": "SELECT id,code,name,disabled,idunit,isSingleUnit,specification FROM dbo.AA_InventoryEntity",
             "warehouse": "SELECT id,code,name,disabled FROM dbo.AA_Warehouse",
             "unit": "SELECT id,code,name,disabled FROM dbo.AA_Unit",
             "business": "SELECT id,code,name,disabled FROM dbo.AA_BusiType",
@@ -170,8 +170,16 @@ class SqlRepository:
             raise PreflightError("；".join(errors))
 
     def validate_payload(self, table, payload):
+        if table not in self.schema:
+            meta = self.query("""SELECT c.name,t.name AS type_name,c.max_length,c.precision,c.scale,
+                       c.is_nullable,c.is_identity,c.is_computed,c.default_object_id
+                       FROM sys.columns c JOIN sys.types t ON t.user_type_id=c.user_type_id
+                       WHERE c.object_id=OBJECT_ID(?)""", "dbo." + table)
+            self.schema[table] = {key(c["name"]): c for c in meta}
         for name, value in payload.items():
-            col = self.schema[table][key(name)]
+            col = self.schema[table].get(key(name))
+            if not col:
+                continue
             if value is None:
                 if not col["is_nullable"]:
                     raise DocumentError(table + "." + name + "不能为空")
@@ -236,7 +244,7 @@ class SqlRepository:
             maximum = max(maximum, int(code[-5:]))
         return maximum
 
-    def bulk_insert(self, cursor, table, payloads, output=False):
+    def bulk_insert(self, cursor, table, payloads, output=False, output_cols=None):
         if not payloads:
             return []
         names = list(payloads[0])
@@ -247,11 +255,13 @@ class SqlRepository:
                 self.validate_payload(table, item)
                 values.extend(bind_value(item[name]) for name in names)
             sql = "INSERT INTO dbo." + quote(table) + " (" + ",".join(quote(name) for name in names) + ") "
-            if output:
+            if output_cols:
+                sql += "OUTPUT " + ",".join("INSERTED." + quote(c) for c in output_cols) + " "
+            elif output:
                 sql += "OUTPUT INSERTED.ExternalCode,INSERTED.ID,INSERTED.code "
             sql += "VALUES " + ",".join("(" + ",".join("?" for _ in names) + ")" for _ in block)
             cursor.execute(sql, *values)
-            if output:
+            if output or output_cols:
                 result.extend(cursor.fetchall())
         return result
 
@@ -303,7 +313,19 @@ class SqlRepository:
                 for item in items:
                     item["idSaleDeliveryDTO"] = identifier
                 details.extend(items)
+            # 暂时注释掉 ARAP_Detail 导入，仅保留 SA_SaleDelivery 和 SA_SaleDelivery_b 导入
             self.bulk_insert(cursor, "SA_SaleDelivery_b", details)
+            # detail_returned = self.bulk_insert(cursor, "SA_SaleDelivery_b", details,
+            #                                    output_cols=["idSaleDeliveryDTO", "code", "ID"])
+            # detail_mapping = {(dto_id, item_code): detail_id for dto_id, item_code, detail_id in detail_returned}
+            # if len(detail_mapping) != len(details):
+            #     raise SystemFailure("批量明细ID回收数量不一致")
+            # arap_records = []
+            # now = datetime.now()
+            # for doc in documents:
+            #     identifier = mapping[key(doc.source)][0]
+            #     arap_records.extend(build_arap_payloads(doc, identifier, detail_mapping, now=now))
+            # self.bulk_insert(cursor, "ARAP_Detail", arap_records)
             if not self.verify_batch(documents, mapping):
                 raise SystemFailure("主明细逐单对账失败，整批回滚")
             committing = True
@@ -337,7 +359,7 @@ class SqlRepository:
         # to each other so SQL datetime rounding and commit recovery remain valid.
         header_read_columns = header_columns + ["createdtime", "AuditedTime"]
         columns = [name for name in next(iter(expected.values()))[1][0] if name not in ("createdtime", "updated")]
-        detail_groups, heads = defaultdict(list), {}
+        detail_groups, heads, arap_counts = defaultdict(list), {}, defaultdict(int)
         for block in chunks(list(expected), 1000):
             marks = ",".join("?" for _ in block)
             records = self.query("SELECT idSaleDeliveryDTO," + ",".join(quote(name) for name in columns) +
@@ -348,6 +370,11 @@ class SqlRepository:
                                       " FROM dbo.SA_SaleDelivery WHERE ID IN (" + marks + ")", *block)
             for record in head_records:
                 heads[record.pop("ID")] = record
+            # arap_records = self.query("SELECT ID,voucherID FROM dbo.ARAP_Detail WHERE voucherID IN (" + marks + ")", *block)
+            # for record in arap_records:
+            #     vid = record.get("voucherID") or record.get("voucherid")
+            #     if vid is not None:
+            #         arap_counts[vid] += 1
         for identifier, (header, details) in expected.items():
             records = detail_groups[identifier]
             if len(records) != len(details):
@@ -362,20 +389,27 @@ class SqlRepository:
             head = heads.get(identifier)
             if head is None or any(bind_value(head[name]) != bind_value(header[name]) for name in header_columns):
                 return False
-            if head["createdtime"] is None or head["AuditedTime"] != head["createdtime"]:
+            # --- 原直接审核时校验 AuditedTime（已注释保留）：---
+            # if head["createdtime"] is None or head["AuditedTime"] != head["createdtime"]:
+            #     return False
+            # -----------------------------------------------
+            # 现待审核草稿状态：createdtime 必须为有效时间，AuditedTime 应为 None
+            if not isinstance(head["createdtime"], (datetime, date)) or head["AuditedTime"] is not None:
                 return False
+            # if arap_counts.get(identifier, 0) != len(details):
+            #     return False
         return True
 
     def verify_document(self, document, identifier):
         return self.verify_batch([document], {key(document.source): (identifier, document.code)})
 
     def _undo_snapshot(self, mapping):
-        snapshot = {"SA_SaleDelivery": [], "SA_SaleDelivery_b": []}
+        snapshot = {"ARAP_Detail": [], "SA_SaleDelivery_b": [], "SA_SaleDelivery": []}
         identifiers = [value[0] for value in mapping.values()]
         for block in chunks(identifiers, 1000):
             marks = ",".join("?" for _ in block)
             # Locks protect both existing rows and new details throughout the transaction.
-            for table, column in (("SA_SaleDelivery", "ID"), ("SA_SaleDelivery_b", "idSaleDeliveryDTO")):
+            for table, column in (("ARAP_Detail", "voucherID"), ("SA_SaleDelivery_b", "idSaleDeliveryDTO"), ("SA_SaleDelivery", "ID")):
                 records = self.query("SELECT * FROM dbo." + quote(table) +
                                      " WITH (UPDLOCK,HOLDLOCK) WHERE " + quote(column) +
                                      " IN (" + marks + ")", *block)
@@ -390,10 +424,10 @@ class SqlRepository:
 
     def _undo_guard(self):
         if self.query("SELECT name FROM sys.triggers WHERE parent_id IN "
-                      "(OBJECT_ID('dbo.SA_SaleDelivery'),OBJECT_ID('dbo.SA_SaleDelivery_b')) AND is_disabled=0"):
+                      "(OBJECT_ID('dbo.SA_SaleDelivery'),OBJECT_ID('dbo.SA_SaleDelivery_b'),OBJECT_ID('dbo.ARAP_Detail')) AND is_disabled=0"):
             raise PreflightError("目标表存在启用的触发器，无法安全撤销")
         if self.query("SELECT name FROM sys.foreign_keys WHERE referenced_object_id IN "
-                      "(OBJECT_ID('dbo.SA_SaleDelivery'),OBJECT_ID('dbo.SA_SaleDelivery_b')) "
+                      "(OBJECT_ID('dbo.SA_SaleDelivery'),OBJECT_ID('dbo.SA_SaleDelivery_b'),OBJECT_ID('dbo.ARAP_Detail')) "
                       "AND is_disabled=0 AND delete_referential_action<>0"):
             raise PreflightError("目标表存在级联删除或更新的外键，无法安全撤销")
 
@@ -413,8 +447,8 @@ class SqlRepository:
             if actual != expected:
                 raise PreflightError("确认期间主明细数据发生变化，请重新核对撤销清单")
             counts = {}
-            # Both tables are deleted in ONE transaction. Never reset IDENTITY.
-            for table, column in (("SA_SaleDelivery_b", "idSaleDeliveryDTO"), ("SA_SaleDelivery", "ID")):
+            # Delete in order of dependencies: ARAP_Detail -> SA_SaleDelivery_b -> SA_SaleDelivery
+            for table, column in (("ARAP_Detail", "voucherID"), ("SA_SaleDelivery_b", "idSaleDeliveryDTO"), ("SA_SaleDelivery", "ID")):
                 deleted = []
                 for block in chunks([value[0] for value in mapping.values()], 1000):
                     marks = ",".join("?" for _ in block)
@@ -425,8 +459,8 @@ class SqlRepository:
                 if sorted(deleted) != [row[0] for row in expected[table]]:
                     raise SystemFailure("撤销删除数量或ID不一致，整笔撤销回滚")
                 counts[table] = len(deleted)
-            self.log.warning("撤销删除校验通过 headers=%d details=%d，准备提交",
-                             counts["SA_SaleDelivery"], counts["SA_SaleDelivery_b"])
+            self.log.warning("撤销删除校验通过 headers=%d details=%d arap=%d，准备提交",
+                             counts["SA_SaleDelivery"], counts["SA_SaleDelivery_b"], counts["ARAP_Detail"])
             committing = True
             connection.commit()
             ended = True
@@ -454,6 +488,19 @@ class SqlRepository:
 
     def delete_import(self, documents, mapping, snapshot):
         return self._undo_transaction(documents, mapping, snapshot)
+
+    def delete_failed_vouchers(self, identifiers):
+        """批量删除审批失败的草稿单据（明细与表头）。"""
+        if not identifiers:
+            return
+        self.log.warning("开始批量删除审批失败单据 count=%d", len(identifiers))
+        for block in chunks(identifiers, 1000):
+            marks = ",".join("?" for _ in block)
+            try:
+                self.connection.execute("DELETE FROM dbo.SA_SaleDelivery_b WHERE idSaleDeliveryDTO IN (" + marks + ")", *block)
+                self.connection.execute("DELETE FROM dbo.SA_SaleDelivery WHERE ID IN (" + marks + ")", *block)
+            except Exception as exc:
+                self.log.error("批量删除审批失败单据异常 identifiers=%s %s", block, diagnostics(exc))
 
     def reconnect(self):
         try:

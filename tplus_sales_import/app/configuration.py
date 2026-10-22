@@ -13,6 +13,23 @@ def application_dir():
 
 
 @dataclass(frozen=True)
+class TPlusApiConfig:
+    url: str = "http://192.168.1.15:7777"
+    account: str = "999"
+    user: str = "范立志"
+    password: str = field(default="", repr=False)
+    app_key: str = ""
+    app_secret: str = field(default="", repr=False)
+    enabled: bool = False
+
+    def __post_init__(self):
+        if self.password:
+            register_secret(self.password)
+        if self.app_secret:
+            register_secret(self.app_secret)
+
+
+@dataclass(frozen=True)
 class DatabaseConfig:
     host: str
     port: int
@@ -20,6 +37,7 @@ class DatabaseConfig:
     user: str
     password: str = field(repr=False)
     driver: str = "SQL Server Native Client 10.0"
+    api: TPlusApiConfig = field(default_factory=TPlusApiConfig)
 
     def __post_init__(self):
         register_secret(self.password)
@@ -36,16 +54,24 @@ class DatabaseConfig:
     @classmethod
     def load(cls, path):
         parser = configparser.ConfigParser(interpolation=None)
-        try:
-            loaded = parser.read(str(path), encoding="utf-8-sig")
-        except configparser.Error as exc:
-            line = getattr(exc, "lineno", None)
-            location = f"（第{line}行）" if line else ""
-            # Parser messages can contain the original password line. Do not
-            # expose them in UI/logs before secrets have even been parsed.
-            raise ValueError("配置文件语法错误" + location + "：请检查节名、重复键或重复节 [" + type(exc).__name__ + "]") from None
+        loaded = None
+        for encoding in ("utf-8-sig", "utf-8", "gb18030", "gbk"):
+            try:
+                loaded = parser.read(str(path), encoding=encoding)
+                if loaded:
+                    break
+            except UnicodeDecodeError:
+                continue
+            except configparser.Error as exc:
+                line = getattr(exc, "lineno", None)
+                location = f"（第{line}行）" if line else ""
+                # Parser messages can contain the original password line. Do not
+                # expose them in UI/logs before secrets have even been parsed.
+                raise ValueError("配置文件语法错误" + location + "：请检查节名、重复键或重复节 [" + type(exc).__name__ + "]") from None
         if not loaded:
-            raise ValueError("找不到配置文件：" + str(path))
+            if not Path(path).exists():
+                raise ValueError("找不到配置文件：" + str(path))
+            raise ValueError("配置文件无法按常见编码（UTF-8/GBK）解码，请使用 UTF-8 编码保存：" + str(path))
         if not parser.has_section("sqlserver"):
             raise ValueError("配置文件缺少 [sqlserver]")
         section = parser["sqlserver"]
@@ -59,9 +85,22 @@ class DatabaseConfig:
             raise ValueError("数据库端口必须在1至65535之间")
         if any(not section[key].strip() for key in ("ip", "database", "user")):
             raise ValueError("服务器、数据库名称及用户不能为空")
+        api_config = TPlusApiConfig()
+        if parser.has_section("tplus_api"):
+            api_sec = parser["tplus_api"]
+            api_config = TPlusApiConfig(
+                url=api_sec.get("url", "http://192.168.1.15:7777").strip(),
+                account=api_sec.get("account", "999").strip(),
+                user=api_sec.get("user", "范立志").strip(),
+                password=api_sec.get("password", "").strip(),
+                app_key=api_sec.get("app_key", "").strip(),
+                app_secret=api_sec.get("app_secret", "").strip(),
+                enabled=api_sec.getboolean("enabled", True),
+            )
         return cls(section["ip"].strip(), port, section["database"].strip(),
                    section["user"].strip(), section["password"],
-                   section.get("driver", "SQL Server Native Client 10.0").strip())
+                   section.get("driver", "SQL Server Native Client 10.0").strip(),
+                   api_config)
 
     @staticmethod
     def quote(value):
