@@ -33,7 +33,7 @@
 - 源含税金额G以Decimal原值写入，不截断、不四舍五入；N=四舍五入(G/(1+r),2，ROUND_HALF_UP)；T=G-N，税额保留差额所需的小数位，保证G=N+T，正负采用同一规则，表头汇总最终明细。原含税单价保留，折扣率1；数量非零时未税单价=四舍五入(G/数量/(1+r),8)。零数量继续导入，未税单价使用源单价/(1+r)四舍五入8位，避免除零；不为零金额自动设置0.0001单价。目标字段容纳不了原值精度时标记整单失败，不静默改金额。
 - 明细taxFlag=1、isModifiedPrice=1；表头和明细显式写入DataSource=2497、isSaleOut=15，并参与写入核对。这些字段不执行生成出库单、发票或凭证的业务操作。新版规则仅用于后续导入，已有单据仍按源用友单号跳过，不自动更新历史金额或标记。
 - 表头agency=范立志、agencyid=51、isCarriedForwardOut=0；明细RefundDifferenceFlag=51185。提交前与断线恢复核验覆盖全部已配置表头业务字段（排除实际创建/更新时间），并核对日期与所有明细配置字段。
-- 明细同时保存两组源追溯字段：priuserdefnvc2/pubuserdefnvc1均为用友单号，priuserdefnvc3/pubuserdefnvc2均为该行销售标识；四个字段均参与字段精度校验和提交前核对。表头pubuserdefnvc1写源“操作员”（去除首尾空白，源空则留空），与固定制单/审核/经手人分开；同单操作员不一致标记整单失败。
+- 明细同时保存两组源追溯字段：priuserdefnvc2/pubuserdefnvc1均为用友单号，priuserdefnvc3/pubuserdefnvc2均为该行销售标识；四个字段均参与字段精度校验和提交前核对。表头pubuserdefnvc1固定写空字符串，不再映射源“操作员”，同单操作员不同不阻断导入；固定制单/审核/经手人沿用原配置。
 - 原币与本币按样本exchangeRate=1填写；本程序限定该账套样本口径，未实现外币汇率转换。目标固定配置、数据结构及人员档案缺失时不执行写入。
 
 ## 恢复与限制
@@ -89,3 +89,27 @@ EXE自检：`TplusSalesImport.exe --self-test 输出目录`，只创建示例界
 连接诊断：每次测试连接或开始导入连接前，日志打印当前进程位数及pyodbc可见的全部ODBC驱动；配置驱动不在列表中则额外提示核对驱动名称和位数。该列表不触发数据库查询，也不会自动替换用户配置的驱动。
 
 窗口启动尺寸：按鼠标所在屏幕的可用宽度与高度各取2/3，居中普通显示，不自动最大化；多屏使用所在屏幕坐标，高DPI由Qt逻辑尺寸适配。按钮分两排，小屏幕内容超出时可滚动，窗口仍可手动缩放。
+
+销货单表头默认写入invoiceType=281（专用发票）、reciveType=7（其它），不自动生成发票。导入前一次性检查eap_EnumItem中的两个ID唯一存在、类别分别为56/41且未删除；异常则阻止本次导入并提示。两个字段参与提交前回查及提交结果恢复核验，已有单据仍按去重规则跳过。
+
+按2026-10-21用户确认的线上样本，表头同时固定写入SaleInvoiceMedia=51014、DistributionMode=57419、saleInvoiceID=281、LogisticsStatus=56134。四个字段参与既有表结构/类型校验、提交前回查及提交结果恢复核验；不向明细写入，不更新已有单据，不调用生成发票流程。
+
+当前导入普通销售/普通销售退货，表头显式写0：isCounteractDelivery、isPriceTrace、isBeforeSystemInuse、iscarriedforwardin、ismodifiedcode、PrintCount、IsSeparateByWareHouse、IsAutoWarehouse、SendInfoSource、IsReadOnly、IsDigElectronicInvoice、IsOnlinePay；明细显式写0：isPresent、isManualCost、IsMemberIntegral、IsPromotionPresent、DiscountPriceChange、TaxPriceChange。与线上SA2026102000001样本一致，参与提交前及恢复回查，NULL不视为0。isCounteractDelivery指冲抵销货，普通退货仍为0；iscarriedforwardin指是否结转来的单据。零金额/零数量不自动标记赠品；保留isModifiedPrice=1，不据此改变两个价格改动标记。不自动计算成本、追踪更新售价或生成支付/发票记录。
+
+表头OrigInvoiceTaxAmount、Allowances、origAllowances、thisBalanceIntegral按线上样本及用户要求显式写Decimal(0)，参与表结构/精度校验和提交、恢复回查；NULL不视为0。仅用于后续新导入，不更新已有数据，不扩展到明细。这是默认值补齐，尚未证明可解决凭证生成预收账款的问题。
+
+按用户要求，明细saleOutQuantity直接写本行源数量quantity（销售单位），保留负数、零及小数精度，不取绝对值，不使用整单合计。参与提交及恢复回查。该字段记录累计出库数量，赋值本身不生成出库单或库存流水，不自动更新已有单据。
+
+表头isCancel默认写入428（eap_EnumItem名称“未结清”，即未清算状态），不按0/1布尔值处理。导入预检要求该枚举唯一存在、idEnum=16且未删除；该字段参与提交前回查和恢复核验。
+
+表头AuditedTime与createdtime使用同一个实际创建时间写入。回查及提交结果恢复时核验数据库中两者非空且相等，避免重建载荷时取新时间产生误判；auditeddate继续使用源单据日期。
+
+表头origprereceiveamount、PreReceiveAmount、origSettleAmount、settleAmount均显式写入Decimal(0)，表示本次导入未使用预收且未结算。四个字段参与表结构/精度校验、提交前回查及提交结果恢复核验，NULL不视为0。明细对应结算字段及表头ReceiveBalance仍沿用原规则。
+
+表头isNoArapBookkeeping显式默认0，与原77条线上样本一致，参与表结构校验及提交前、提交结果恢复核验，NULL不视为0。不自动补写已有单据；此字段对凭证取科目的实际影响须在T+中验证。
+
+“撤销本次导入”只在当前应用会话的最新导入任务包含已确认成功单据时启用。部分成功或停止后已提交的部分也可撤销，但存在待确认提交则禁用。点击后先后台核对，二次确认窗口列出服务器、账套、源文件、任务、两张表名称及数量、每张单据的表头ID/SA编号/用友单号/明细数；取消不删除。
+
+确认后按本次回收的主键ID定位，同一事务先删SA_SaleDelivery_b再删SA_SaleDelivery；校验已配置业务字段和确认前后的整行摘要（含明细ID及数据库版本字段），不一致则拒绝删除。启用的触发器或级联外键会阻止撤销，普通外键约束失败则整笔回滚，不额外删除其他业务表。成功后状态改为“已撤销”，保存任务结果并重新导出。提交/回滚结果不明则标记“撤销待确认”并禁用，需人工核实，不自动重复删除。
+
+撤销资格仅保存在内存；选择另一个XLS（含重新选择同一文件）、开始新导入、恢复任务结果或关闭应用都会清除资格。取消选择文件不清除；恢复历史任务结果不会恢复删除权限。撤销始终使用本次导入时的连接配置；不更新重复跳过的数据，不重置自增主键或修改已分配编号。

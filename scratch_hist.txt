@@ -1,0 +1,86 @@
+=== LINE 235 (MODEL/PLANNER_RESPONSE) ===
+在 T+ 系统的【单据生凭证】中，销货单借方科目本应生成**“应收账款”**，却依然生成为**“预收账款”**，其根本原因在于以下 **3 个关键点**：
+
+---
+
+### 一、 核心根因：已入库单据的立账字段在数据库中仍为 `NULL`
+
+虽然您刚才已在 Python 源码（[`domain.py`](file:///g:/pythonProject/hisToyy/tplus_sales_import/app/domain.py#L271)）中补充了字段，但**数据库中当前存有的 5,166 张单据并没有被自动更新**！
+
+经实测当前数据库查询：
+```text
+全表 5,243 条单据统计：
+isNoArapBookkeeping （是否不进行往来立账）：0 = 77 条，NULL = 5,166 条
+origprereceiveamount（原币预收款金额）  ：0 = 77 条，NULL = 5,166 条
+```
+* **原理解析**：T+ 的【单据生凭证】引擎在读取销货单时，依据 `isNoArapBookkeeping`（是否不进行往来立账）和 `origprereceiveamount`（预收金额）判断立账类型。
+* 当这批单据字段为 **`NULL`** 时，系统无法识别为“正常应收立账单据”，生凭证规则直接走到了兜底的预收或未结算逻辑，从而派生出【预收账款】。
+
+---
+
+### 二、 次要原因：T+【科目设置】模板与收款方式 `reciveType=7`
+
+1. **收款方式 `reciveType = 7`（其它）**：
+   * 脚本写入的收款方式为 `7`（对应枚举名称为“其它”）。
+   * 在部分 T+ 凭证模板配置中，“其它”由于不是明确的赊销/账期收款，如果没有配对专门的应收规则，会被归入通用预收往来科目。
+2. **生凭证模板配置规则**：
+   * 在 T+【单据生凭证】界面顶部，点击 **【科目设置】** $\to$ 选择 **【销货单】**：
+   * 检查借方分录对应的科目来源是【应收账款】、【按客户档案默认科目】还是直接写死了【预收账款】。
+
+---
+
+### 三、 快速解决与验证步骤
+
+#### 步骤 1：在数据库中执行以下 SQL，将已入库单据的字段从 NULL 修复为 0
+将数据库中已有单据的立账与预收字段修
+
+=== LINE 236 (USER_EXPLICIT/USER_INPUT) ===
+<USER_REQUEST>
+当前脚本对 SA_SaleDelivery 表头显式设置：
+- isNoArapBookkeeping = 0
+- origprereceiveamount = Decimal(0) 但还是不行
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-10-21T22:20:15+08:00.
+</ADDITIONAL_METADATA>
+
+=== LINE 259 (MODEL/PLANNER_RESPONSE) ===
+即使在脚本中显式配置了 `isNoArapBookkeeping = 0` 和 `origprereceiveamount = Decimal(0)`，在 T+ 【单据生凭证】中借方依然生成“预收账款”，根据 T+ 系统的底层取数逻辑，**核心根因集中在以下 3 个关键节点**：
+
+---
+
+### 一、 致命盲区：当前正在测试生凭证的单据，数据库中字段仍为 `NULL`
+
+我们刚才在数据库中直接抽查了 19:54 批量入库的单据（例如 `SA2026101205243`）：
+* **实测结果**：数据库中该单据的 `isNoArapBookkeeping`、`origprereceiveamount`、`PreReceiveAmount`、`origSettleAmount`、`settleAmount` **全部仍为 `NULL`**！
+* **原因**：您在 Python 源码中修改的代码只会在**“未来新执行导入的任务”**中生效，**不会自动刷写数据库中已经存在的这 5,166 张单据**。如果您是在 T+ 界面直接勾选之前导入的单据生凭证，T+ 读取到的底层物理数据依然全是 `NULL`。
+
+> **立竿见影的验证**：在数据库中执行以下命令，把其中一条（如 `SA2026101205243`）刷为 0，然后去前台重新生凭证看科目是否变化：
+```sql
+UPDATE dbo.SA_SaleDelivery
+SET 
+    isNoArapBookkeeping = 0,
+    origprereceiveamount = 0,
+    PreReceiveAmount = 0,
+    origSettleAmount = 0,
+    settleAmount = 0
+WHERE code = 'SA2026101205243';
+```
+
+---
+
+### 二、 核心业务开关：收款方式 `reciveType = 7`（其它）
+
+在 T+ 系统中，销货单走“应收账款”还是“预收账款”，表头的 **`reciveType`（收款方式）** 具有极高的权重：
+* 当前脚本固定写入：`reciveType = 7`（对应枚举名称为 **“其它”**）。
+* **业务逻辑冲突**：
+  * 在 T+ 的业务模型中，标准的赊销立账单据通常要求收款方式为：
+
+=== LINE 260 (USER_EXPLICIT/USER_INPUT) ===
+<USER_REQUEST>
+reciveType 这里也是7可以是应收
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-10-21T22:28:07+08:00.
+</ADDITIONAL_METADATA>
+

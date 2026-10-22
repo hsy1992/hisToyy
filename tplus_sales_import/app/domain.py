@@ -224,7 +224,7 @@ def validate_rows(rows, cache, stop, progress):
     for document in documents.values():
         signatures = {(row.parsed.get("date"),
                        key(row.values.get("客户编码")), key(row.values.get("业务类型")),
-                       key(row.values.get("项目编码")), key(row.values.get("操作员"))) for row in document.rows}
+                       key(row.values.get("项目编码"))) for row in document.rows}
         conflict = len(signatures) != 1
         ids = [key(row.values.get("销售标识")) for row in document.rows]
         duplicate_line = len([v for v in ids if v]) != len(set(v for v in ids if v))
@@ -239,7 +239,7 @@ def validate_rows(rows, cache, stop, progress):
             if index in duplicate_originals:
                 row.reasons.append("同一单据存在重复原始明细，未自动删行")
             if conflict:
-                row.reasons.append("同一源单号的日期、客户、业务类型、项目或操作员不一致")
+                row.reasons.append("同一源单号的日期、客户、业务类型或项目不一致")
             if duplicate_line:
                 row.reasons.append("同一单据有重复销售标识，未自动删行")
             if row.reasons:
@@ -261,16 +261,28 @@ def build_payload(document):
     first = document.rows[0].parsed
     now = datetime.now()
     header = dict(code=document.code, ExternalCode=document.source, ExternalVoucherCode=document.source,
-                  pubuserdefnvc1=str(document.rows[0].values.get("操作员") or "").strip(),
+                  pubuserdefnvc1="",
                   idcustomer=first["customers"]["id"], idsettlecustomer=first["customers"]["id"],
                   idproject=first["project_id"], idbusinesstype=first["business"]["id"],
                   maker="范立志", makerid=51, auditor="范立志", auditorid=51, voucherState=189,
                   agency="范立志", agencyid=51, isCarriedForwardOut=0,
                   idcurrency=4, idmarketingOrgan=1, iddepartment=None, idclerk=None, idrdstyle=24,
                   isAutoGenerateSaleOut=1, IsAutoSaleOut=1, isAutoGenerateInvoice=0,
+                  invoiceType=281, reciveType=7, isCancel=428, isNoArapBookkeeping=0,
+                  SaleInvoiceMedia=51014, DistributionMode=57419, saleInvoiceID=281,
+                  LogisticsStatus=56134,
+                  isCounteractDelivery=0, isPriceTrace=0, isBeforeSystemInuse=0,
+                  iscarriedforwardin=0, ismodifiedcode=0, PrintCount=0,
+                  IsSeparateByWareHouse=0, IsAutoWarehouse=0, SendInfoSource=0,
+                  IsReadOnly=0, IsDigElectronicInvoice=0, IsOnlinePay=0,
                   DataSource=2497, isSaleOut=15,
                   voucherdate=first["date"], madedate=first["date"], auditeddate=first["date"],
-                  createdtime=now, updated=now, exchangeRate=Decimal(1),
+                  createdtime=now, AuditedTime=now, updated=now, exchangeRate=Decimal(1),
+                  discountRate=Decimal(1), discountAmount=Decimal(0), discountsAndAllowances=None,
+                  origprereceiveamount=Decimal(0), PreReceiveAmount=Decimal(0),
+                  origSettleAmount=Decimal(0), settleAmount=Decimal(0),
+                  OrigInvoiceTaxAmount=Decimal(0), Allowances=Decimal(0),
+                  origAllowances=Decimal(0), thisBalanceIntegral=Decimal(0),
                   origAmount=sum((row.parsed["net"] for row in document.rows), Decimal(0)),
                   origTaxAmount=sum((row.parsed["gross"] for row in document.rows), Decimal(0)))
     header["amount"] = header["origAmount"]
@@ -288,10 +300,13 @@ def build_payload(document):
         details.append(dict(code=f"{index:04d}", idinventory=p["inventory"]["id"],
                             idproject=p["project_id"], idbaseunit=p["unit"]["id"], idunit=p["unit"]["id"],
                             idwarehouse=p["warehouse"]["id"], quantity=p["quantity"], baseQuantity=p["quantity"],
+                            saleOutQuantity=p["quantity"],
                             compositionQuantity=decimal_text(p["quantity"]) + str(p["unit"]["name"]),
                             discountRate=Decimal(1), taxRate=p["rate"],
                             taxFlag=1, isModifiedPrice=1, DataSource=2497, isSaleOut=15,
                             RefundDifferenceFlag=51185,
+                            isPresent=0, isManualCost=0, IsMemberIntegral=0,
+                            IsPromotionPresent=0, DiscountPriceChange=0, TaxPriceChange=0,
                             origTaxPrice=p["price"], taxPrice=p["price"], origDiscountPrice=net_price,
                             discountPrice=net_price, origDiscountAmount=p["net"], discountAmount=p["net"],
                             origTax=p["tax"], tax=p["tax"], origTaxAmount=p["gross"], taxAmount=p["gross"],

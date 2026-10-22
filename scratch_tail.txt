@@ -1,0 +1,311 @@
+=== LINE 301: MODEL / PLANNER_RESPONSE ===
+经检索**用友畅捷通官方服务社区、知识库及实施顾问实战案例**，在 T+ 系统中，销货单通过【单据生凭证】时借方未走“应收账款”而走成“预收账款”，官方与行业普遍指出的**核心原因主要有以下 4 种**：
+
+---
+
+### 一、 核心根因：客户档案分类绑定的“受控科目”不同（发生率最高）
+
+**【官方机制】**：
+在 T+ 的【单据生凭证】中，销货单借方的往来科目并不是在单据上写死的，而是由**【客户档案】及其所属的【客户分类】在后台绑定的“受控科目”**决定的。
+* **为什么线上样本是“应收”？**
+  * 您提供的线上文件客户是 `107329`（黑龙江省安舒...），该客户所属的分类在 T+ 【科目设置】中明确绑定了 **`1122 应收账款`**。
+* **为什么导入数据生成了“预收”？**
+  * 如果您新导入的明细数据使用的**不是同一个客户**，或者目标客户所属的客户分类（例如零售、电商或特定预收客户分类），在系统后台被指定为了 **`2203 预收账款`**，系统就会严格按照客户档案将借方科目带出为预收账款。
+
+---
+
+### 二、 业务联动：该客户往来账上存在未核销的“预收账款余额”
+
+**【官方知识库案例】**：
+* 当某一客户在系统中之前录入过预收性质的收款单（或订金），且**账面仍挂有未核销的预收账款余额**时；
+* T+ 的智能凭证中心在对该客户的销货单生凭证时，部分版本或配置会开启**“优先冲抵预收余额”**逻辑，系统自动判定该单据用于冲销前期的预付款，从而在凭证借方直接体现 **【预收账款】**（直接做借方冲减），而非挂新的应收账款。
+
+---
+
+### 三、 财务单据生凭证模板的【科目设置】规则
+
+进入 T+ 【单据生凭证】界面顶部的 **【科目设置】**，检查销货单凭证模板的分录取数逻辑：
+1. **借方科目来源**：
+   * 是否勾选了“优先按客户档案受控科目带出”？
+   * 还是被管理员针对特定业务类型（如普通销售 `65`）或特定部门，规则直接指定到了“预收账款”？
+2. **科目辅助核算检查**：
+   * 在会计科目字典中，`应收账款` 是否完整启用了“客户往来辅助核算”。如果未启用客户辅助核算，生单引擎在无法挂接客户明细时，也可能触发异常回退至通用预收往来科目。
+
+---
+
+### 四、 单据表头金额闭环（两份文件的纯比对关键）
+
+根据畅捷通凭证接口规范，销货单要被判定为标准“纯赊销应收”，表头金额必须构成算术平衡：
+$$\text{应收金额} = \text{价税合计} - \text{现结金额} - \text{预收金额} - \text{折让金额}$$
+* 在您提供的线上文件中：`origAmount(35.4) + origTaxAmount(40.0)`，其余 `origprereceiveamount`、`origSettleAmount`、`Allowances`、`OrigInvoiceTaxAmount` 均为严格的 **`0.00`**；
+* 脚本之前在构建表头时，折让 `Allowances` 与发票税额 `OrigInvoiceTaxAmount` 未显式给 `0`（为 `NULL`）。如果算式中含有 `NULL`，在某些 T+ 底层运算中会导致未结应收金额算不出，从而破坏应收判定。
+
+---
+
+### 建议核对指引：
+1. **核对客户**：检查新导入单据的客户，与线上能生应收的 `107329` 客户是否属于同一分类；
+2. **查验余额**：在【往来管理】/【客户账表】中，查看该客户名下是否本来就挂着预付款余额；
+3. **补齐折让0值**：在脚本 `build_payload` 中将 `Allowances=Decimal(0)` 和 `OrigInvoiceTaxAmount=Decimal(0)` 补齐，确保数值闭环。
+
+=== LINE 302: USER_EXPLICIT / USER_INPUT ===
+<USER_REQUEST>
+是同样一个客户
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-10-21T22:43:21+08:00.
+</ADDITIONAL_METADATA>
+
+=== LINE 311: MODEL / PLANNER_RESPONSE ===
+既然是**同一个客户（`107329`）**，且两边 **`reciveType = 7` 完全一致**，说明排除了客户档案和收款方式的影响。
+
+严格脱离当前数据库，**纯粹将您发来的这俩真实文件（表头 + 明细）与当前导入脚本源码进行 1 对 1 地毯式核对**，以下字段差异直接关联到凭证走向：
+
+---
+
+### 一、 核心财务结算金额字段差异（线上均为 0，脚本未写为 NULL）
+
+在您提供的线上表头中，与财务结算、核销算式紧密关联的以下几个金额字段，**线上文件全部为精确的 `0.00000000000000`**，但当前脚本的 `header` 中**完全未写入（落库或构建结果为 `NULL`）**：
+
+| 表 | 字段名 | 线上文件值 | 当前脚本状态 | 对生凭证的致命影响 |
+| :--- | :--- | :--- | :--- | :--- |
+| **表头** | `Allowances` | `0.00000000000000` | **未配置（NULL）** | **折让金额**。在 ERP 凭证引擎中：$$\text{应收金额} = \text{价税合计} - \text{预收} - \text{现结} - \text{折让}$$若 `Allowances` 为 `NULL`，算式解析失败或结果为空，无法生成应收。 |
+| **表头** | `origAllowances` | `0.00000000000000` | **未配置（NULL）** | **原币折让金额**。 |
+| **表头** | `OrigInvoiceTaxAmount` | `0.00000000000000` | **未配置（NULL）** | **发票税额**。发票立账核验字段。 |
+| **表头** | `thisBalanceIntegral` | `0.00000000000000` | **未配置（NULL）** | **结算积分抵扣**。 |
+
+---
+
+### 二、 出库执行数量差异（线上已出库，脚本为未出库）
+
+在商业会计与 T+ 进销存财税逻辑中，**“是否已实际发货出库”是确认“应收账款”的前提条件**（未发货出库的单据在财务准则上属于预售业务）：
+
+| 表 | 字段名 | 线上文件值 | 当前脚本状态 | 财务与业务含义差异 |
+| :--- | :--- | :--- | :--- | :--- |
+| **明细** | `saleOutQuantity` | **`1.00000000000000`** | **未配置（NULL）** | **已出库数量**。线上单据数量为 1，已出库数
+<truncated 312 bytes>
+*未配置（NULL）** | **出库成本价与金额**。线上有成本，生凭证可同时做 `借:主营业务成本 贷:库存商品`。 |
+
+> **财务逻辑剖析**：
+> 线上这笔单据是**“已完成出库且含成本”**的完整销货单，系统判定货物所有权已转移，确认【应收账款】并结转成本。
+> 而脚本写入的单据 `saleOutQuantity` 为 NULL（未发货出库状态），在 T+ 的部分财务校验中，**未发货的款项被判定为“合同定金/预收开单”**，从而在凭证中落入【预收账款】。
+
+---
+
+### 三、 表头单据来源与流转控制标记（线上为 0，脚本未写）
+
+线上表头文件中的这几项开关全部为 `0`，脚本当前未写入：
+* `isSaleInvoiceNoFromSaleInvoice = 0`（发票号来源）
+* `isAutoGenerateFromLMDeliver = 0`（是否物流下发）
+* `IsDeliverySource = 0`（是否发货来源）
+* `IsDstRDDelivery = 0`（是否二次配送）
+* `SelfDistributionVoucherDisabled = 0`（自提状态）
+* `IsStockRequestAutoTransfer = 0`（要货转单）
+* `DriverCount = 0`（司机计数）
+* `IsDistributionBlueGenRed = 0`（蓝字配送生成红字）
+
+---
+
+### 四、 针对性补全建议（直接对齐两份文件）
+
+为使脚本构建的数据与这份能生“应收账款”的线上文件达到绝对一致，请在 [`app/domain.py`](file:///g:/pythonProject/hisToyy/tplus_sales_import/app/domain.py#L275) 中做以下两处补齐：
+
+#### 1. 表头补全折让与发票税额（消除算式 NULL 异常）
+```python
+# app/domain.py b
+
+=== LINE 312: USER_EXPLICIT / USER_INPUT ===
+<USER_REQUEST>
+分析这几个字段线上数据和脚本的区别
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-10-21T23:27:19+08:00.
+
+The user has uploaded 4 image(s):
+- C:/Users/Administrator/.gemini/antigravity/brain/ca8011df-834b-4688-b31b-de8b13a582df/.user_uploaded/media_1792596381200_40f86692.png
+- C:/Users/Administrator/.gemini/antigravity/brain/ca8011df-834b-4688-b31b-de8b13a582df/.user_uploaded/media_1792596393673_ac19c99a.png
+- C:/Users/Administrator/.gemini/antigravity/brain/ca8011df-834b-4688-b31b-de8b13a582df/.user_uploaded/media_1792596406510_4d2b86ce.png
+- C:/Users/Administrator/.gemini/antigravity/brain/ca8011df-834b-4688-b31b-de8b13a582df/.user_uploaded/media_1792596416759_626305a1.png
+You can embed these images in an artifact if you need the USER to review them.
+</ADDITIONAL_METADATA>
+
+=== LINE 321: MODEL / PLANNER_RESPONSE ===
+您截图中的这 4 个字段（**线上为 `0`，脚本入库为 `NULL`**），全部属于畅捷通 T+ 的 **【物流配送与车次调度】** 业务模块字段。
+
+深度分析如下：
+
+---
+
+### 一、 4 个字段的具体业务含义
+
+| 截图字段名 | 字段类型 | 线上数据值 | 脚本入库值 | 业务含义与用途 |
+| :--- | :--- | :--- | :--- | :--- |
+| **`IsDeliverySource`** | `int` | **`0`** | **`NULL`** | **是否配送来源单据**（0-否，1-是）。线上为 0 表示普通销货开单，不是从配送任务池流转来的。 |
+| **`SelfDistributionVoucherDisabled`** | `bit` | **`0`** | **`NULL`** | **自提单据是否禁用**（0-正常未禁用，1-禁用）。用于门店自提业务流转控制。 |
+| **`DriverCount`** | `int` | **`0`** | **`NULL`** | **随车配送司机人数**（初始为 0）。物流派车调度时分配的司机数量。 |
+| **`IsDistributionBlueGenRed`** | `bit` | **`0`** | **`NULL`** | **配送单蓝字生成红字标记**（0-否，1-是）。用于配送退货冲销流程。 |
+
+---
+
+### 二、 为什么线上是 `0`，而脚本写入是 `NULL`？
+
+1. **数据库底层无 DEFAULT 约束**：
+   * 经核查 SQL Server 表结构，这 4 个字段在 `dbo.SA_SaleDelivery` 表定义中均为 `is_nullable = 1`（允许为 NULL），且**均未配置数据库级别的 `DEFAULT ((0))` 默认约束**；
+2. **前台交互 vs 脚本绕过**：
+   * **线上界面制单**：在 T+ 客户端手工保存销货单时，前端 UI 交互模型会默认给这些配送控件填入初始值 `0`；
+   * **脚本直接 INSERT**：脚本此前未在 payload 字典中显式加入这 4 个字段，SQL Server 在未指定列且无默认约束时，物理存储直接落为了 **`NULL`**。
+
+---
+
+### 三、 业务与财务影响评估
+
+* **对财务凭证与存货核算**：**无直接影响**。这 4 个字段纯粹属于物流配送、车次调度模块的扩展标记，不参与销货单价、金额、税额核算，也不影响“单据生凭证”的应收/收入科目判定。
+* **对物流模块排查**：若企业启用了 T+ 的【物流配送】或【车次调度】功能，若字段为 `NULL`，在某些调度列表或自提过滤视图中可能触发空值异常，保持为 `0` 能确保数据结构更加纯净规范。
+
+---
+
+### 四、 快速对齐建议
+
+若希望脚本生成的数据与线上完全一致，只需在 [`app/domain.py`](file:///g:/pythonProject/hisToyy/tplus_sales_import/app/domain.py#L275) 的 `build_payload()` 表头字典中直接加入这 4 项即可：
+
+```python
+# 对齐线上物流配送 0 值标记
+IsDeliverySource=0,
+SelfDistributionVoucherDisabled=0,
+DriverCount=0,
+IsDistributionBlueGenRed=0,
+```
+
+=== LINE 322: USER_EXPLICIT / USER_INPUT ===
+<USER_REQUEST>
+表体哪个会影响
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-10-21T23:31:37+08:00.
+
+The user has uploaded 4 image(s):
+- C:/Users/Administrator/.gemini/antigravity/brain/ca8011df-834b-4688-b31b-de8b13a582df/.user_uploaded/media_1792596601638_01ef7e62.png
+- C:/Users/Administrator/.gemini/antigravity/brain/ca8011df-834b-4688-b31b-de8b13a582df/.user_uploaded/media_1792596636871_ae87947c.png
+- C:/Users/Administrator/.gemini/antigravity/brain/ca8011df-834b-4688-b31b-de8b13a582df/.user_uploaded/media_1792596656257_f511e6c4.png
+- C:/Users/Administrator/.gemini/antigravity/brain/ca8011df-834b-4688-b31b-de8b13a582df/.user_uploaded/media_1792596665349_4dc11709.png
+You can embed these images in an artifact if you need the USER to review them.
+</ADDITIONAL_METADATA>
+
+=== LINE 323: MODEL / PLANNER_RESPONSE ===
+在您截图中展示的 4 组表体字段中，按其对**业务流转**和**生成会计凭证**的影响程度，深度分析如下：
+
+---
+
+### 一、 核心影响字段（直接影响凭证走向）：第 1 组 `ExecutableQuantity`（可执行数量）
+
+> 截图 1：`ExecutableQuantity`（线上为 `0.00`，脚本为 `NULL`）
+> *注：与其紧密配对的还有 `saleOutQuantity`（出库数量，线上为 `1.00`，脚本为 `NULL`）*
+
+#### 为什么这个字段最致命？
+* **字段含义**：
+  * `saleOutQuantity` = 实际已出库数量；
+  * `ExecutableQuantity` = 剩余可执行数量（公式：$\text{可执行数量} = \text{销售数量} - \text{出库数量}$）。
+* **业务定性差异**：
+  * **线上文件**（出库量=1，可执行量=0）：代表**“货物已完全出库发运”**，商品所有权与风险已转移，在商业会计上属于**正式确认为【应收账款】**的法定阶段；
+  * **脚本当前**（两项均为 NULL）：系统判定该行明细**“尚未发货出库”**。在 T+ 的财税逻辑中，**未发货的销货业务属于预定/预售性质**，系统生凭证时会自动归入 **【预收账款】** 暂挂，直到发生实际出库后才做结转。
+* **结论**：**这是导致生凭证走成“预收账款”的最大表体嫌疑字段！**
+
+---
+
+### 二、 次要影响字段（影响成本结转分录）：第 2 组 `costPrice` 与 `costAmount`
+
+> 截图 2：`costPrice = 22.12`，`costAmount = 22.12`（线上有值，脚本为 `NULL`）
+
+#### 影响分析：
+* **对凭证的影响**：
+  * 若 T+ 的销货单凭证模板配置了**“销货同时结转成本”**（即生成：`借：主营业务成本 贷：库存商品`）：
+    * 线上单据有成本，能正常生成这笔借贷平衡的成本结转分录；
+    * 脚本单据成本为 `NULL`，凭证无法结转成本，或者可能触发“无成本单据异常”拦截；
+* **对往来科目的影响**：不直接决定借方是“应收”还是“预收”，但决定了整张凭证是否完整。
+
+---
+
+### 三、 纯统计参考字段（完全不影响凭证）：第 3 组与第 4 组
+
+> 截图 3：`LatestCost = 22.12159...`（最新成本）
+> 截图 4：`SingleInvGrossProfit`（单品毛利）、`GrossProfit`（毛利）、`GrossProfitRate`（毛利率）
+
+#### 影响分析：
+* **完全不影响**：这 4 个字段纯粹属于 T+ 的**后台统计与分析报表衍生值**（由销售单价与存货进价相减得出）；
+* 它们仅供【销售毛利分析表】、【经营分析报表】在前端界面展示，**绝对不参与任何凭证分录的生成与借贷方判断**。
+
+---
+
+### 四、 针对表体的立竿见影修正
+
+只要在 [`app/domain.py`](file:///g:/pythonProject/hisToyy/tplus_sales_import/app/domain.py#L292-L305) 构建明细表（`details`）时，补上这组出库与执行状态，即可彻底消除“未发货导致预收”的状态差异：
+
+```python
+# 在 build_payload() 的明细字典中补充：
+saleOutQuantity=p["quantity"],      # 对齐线上：已出库数量 = 销售数量 (1.0)
+ExecutableQuantity=Decimal(0),       # 对齐线上：可执行数量 = 0.0 (已出库完毕)
+```
+
+=== LINE 324: USER_EXPLICIT / USER_INPUT ===
+<USER_REQUEST>
+给我个sql 设置这两个值
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-10-21T23:32:33+08:00.
+</ADDITIONAL_METADATA>
+
+=== LINE 325: MODEL / PLANNER_RESPONSE ===
+为您提供以下 SQL 语句，分为**单张单据测试**与**批量全表更新**两种方式，您可按需使用：
+
+---
+
+### 一、 单张单据精准测试（推荐先拿一张测试）
+
+针对您当前正在测试生凭证的某张销货单，通过单据编号（例如 `SA2026101205243`）或外部单号精确更新其明细行：
+
+```sql
+UPDATE b
+SET 
+    b.saleOutQuantity = b.quantity,    -- 已出库数量 = 本单销售数量
+    b.ExecutableQuantity = 0           -- 可执行数量 = 0（代表已全部出库）
+FROM dbo.SA_SaleDelivery_b b
+JOIN dbo.SA_SaleDelivery h ON h.ID = b.idSaleDeliveryDTO
+WHERE h.code = 'SA2026101205243';       -- 替换为您要测试的销货单号
+```
+
+---
+
+### 二、 批量全量修复（针对所有未出库的新导入单据）
+
+将所有新导入且出库量为空（`NULL`）的明细行，一次性全部更新为“已出库”状态：
+
+```sql
+UPDATE dbo.SA_SaleDelivery_b
+SET 
+    saleOutQuantity = quantity,        -- 已出库数量 = 销售数量
+    ExecutableQuantity = 0             -- 可执行数量置为 0
+WHERE saleOutQuantity IS NULL 
+   OR ExecutableQuantity IS NULL;
+```
+
+---
+
+### 三、 验证执行结果的核查 SQL
+
+执行更新后，可用以下语句核查是否已全部更新完毕：
+
+```sql
+SELECT 
+    COUNT(*) AS 明细总行数,
+    SUM(CASE WHEN saleOutQuantity = quantity THEN 1 ELSE 0 END) AS 已完全出库行数,
+    SUM(CASE WHEN ExecutableQuantity = 0 THEN 1 ELSE 0 END)     AS 可执行量为0行数,
+    SUM(CASE WHEN saleOutQuantity IS NULL THEN 1 ELSE 0 END)    AS 仍为NULL行数
+FROM dbo.SA_SaleDelivery_b;
+```
+
+> **操作提示**：
+> 执行完 SQL 后，请在 T+ 客户端**关闭并重新打开【单据生凭证】**界面，重新勾选该单据生成凭证，观察借方科目是否已成功转为 **【应收账款】**。
+
+=== LINE 326: USER_EXPLICIT / USER_INPUT ===
+<USER_REQUEST>
+Header_Code	code	isNoModify	quantity	quantity2	unitExchangeRate	baseQuantity	subQuantity	compositionQuantity	origPrice	price	basePrice	discountRate	origDiscountPrice	discountPrice	baseDiscountPrice	taxRate	origTaxPrice	taxPrice	baseTaxPrice	origDiscountAmount	discountAmount	origTax	tax	origTaxAmount	taxAmount	origDiscount	discount	costPrice	costAmount	receiveVoucherCode	saleOrderCode	batch	adjustAmount	isPresent	counteractQuntity	counteractQuntity2	returnQuntity	returnQuntity2	saleoutquantity2	saleOutQuantity	invoiceQuantity2	invoiceQuantity	settleAmount	origSettleAmount	origExpenseAmount	expenseAmount	inventoryLocation	sourceVoucherCode	taxFlag	isManualCost	inventoryBarCode	partnerInventoryCode	OrigTS	updatedBy	freeItem0	freeItem1	freeItem2	freeItem3	freeItem4	freeItem5	freeItem6	freeItem7	freeItem8	freeItem9	priuserdefnvc1	priuserdefdecm1	priuserdefnvc2	priuserdefdecm2	priuserdefnvc3	priuserdefdecm3	priuserdefnvc4	priuserdefdecm4	pubuserdefnvc1	pubuserdefdecm1	pubuserdefnvc2	pubuserdefdecm2	pubuserdefnvc3	pubuserdefdecm3	pubuserdefnvc4	pubuserdefdecm4	partnerInventoryName	virtualBaseQuantity	virtualBaseAmount	sentBaseQuantityAssociated	sentBaseAmountAssociated	backSentAmount	backSentQuantity	associatedDocIDs	Retailprice	DistributionQuantity	DistributionQuantity2	BoxNumber	OrigInvoiceTaxAmount	PriceStrategyTypeName	PriceStrategySchemeIds	PriceStrategySchemeNames	PromotionVoucherCodes	PromotionVoucherIds	IsMemberIntegral	IsPromotionPresent	PromotionPresentVoucherCode	PromotionSingleVoucherCode	PromotionPresentGroupID	PromotionSingleGroupID	SuperSourceVoucherTypeCode	DetailMemo	ID	idinventory	idproject	idbaseunit	idsubunit	idunit	idunit2	idwarehouse	isCancel	isSaleOut	CashbackWay	PriceStrategyTypeId	PromotionPresentTypeID	PromotionSingleTypeID	docid	PromotionPresentVoucherID	PromotionSingleVoucherID	sourceVoucherId	idSaleDeliveryDTO	sourceVoucherDetailId	saleOrderId	saleOrderDetailId	idsourcevouchertype	receiveVoucherId	receiveVoucherDetailId	expiryDat
+

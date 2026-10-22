@@ -5,7 +5,7 @@ import threading
 import pytest
 from PyQt5.QtWidgets import QApplication
 
-from app.database import DocumentError, SqlRepository, SystemFailure, bind_value
+from app.database import DocumentError, PreflightError, SqlRepository, SystemFailure, bind_value
 from app.domain import key, validate_rows, build_payload
 from app.gui import ImportWindow, RowModel
 from test_import import cache, config, source_row
@@ -101,7 +101,64 @@ def documents():
     return docs
 
 
-@pytest.mark.parametrize("field", [None, "voucherState", "makerid", "auditorid", "agencyid", "isCarriedForwardOut", "voucherdate", "pubuserdefnvc1", "detail_pubuserdefnvc1", "detail_pubuserdefnvc2"])
+@pytest.mark.parametrize("identifier", [281, 7, 428])
+@pytest.mark.parametrize("problem", [None, "missing", "duplicate", "wrong_group", "deleted", "unknown_state"])
+def test_preflight_rejects_invalid_fixed_invoice_and_receive_enums(identifier, problem):
+    repo = SqlRepository(config(), connector=lambda *args: None)
+    checked = []
+
+    def query(sql, *params):
+        if "sys.columns" in sql:
+            return [dict(name="ID", type_name="int", is_identity=True, is_nullable=False),
+                    dict(name="idSaleDeliveryDTO", type_name="int", is_identity=False,
+                         is_computed=False, is_nullable=True)]
+        if "eap_EnumItem" in sql:
+            enum_id = params[0]
+            checked.append(enum_id)
+            record = dict(ID=enum_id, idEnum={281: 56, 7: 41, 428: 16}[enum_id], IsDeleted=0)
+            if enum_id == identifier:
+                if problem == "missing":
+                    return []
+                if problem == "duplicate":
+                    return [record, dict(record)]
+                if problem == "wrong_group":
+                    record["idEnum"] = 999
+                if problem in ("deleted", "unknown_state"):
+                    record["IsDeleted"] = 1 if problem == "deleted" else None
+            return [record]
+        if "sys.triggers" in sql:
+            return []
+        if "EAP_User" in sql:
+            return [dict(isStoped=0)]
+        return [dict(disabled=0)]
+
+    repo.query = query
+    if problem:
+        with pytest.raises(PreflightError, match={281: "invoiceType", 7: "reciveType", 428: "isCancel"}[identifier]):
+            repo.preflight({}, {})
+    else:
+        repo.preflight({}, {})
+    assert checked == [281, 7, 428]
+
+
+ZERO_HEADER_FLAGS = ("isCounteractDelivery", "isPriceTrace", "isBeforeSystemInuse",
+                     "iscarriedforwardin", "ismodifiedcode", "PrintCount",
+                     "IsSeparateByWareHouse", "IsAutoWarehouse", "SendInfoSource",
+                     "IsReadOnly", "IsDigElectronicInvoice", "IsOnlinePay")
+ZERO_DETAIL_FLAGS = ("isPresent", "isManualCost", "IsMemberIntegral", "IsPromotionPresent",
+                     "DiscountPriceChange", "TaxPriceChange")
+
+
+@pytest.mark.parametrize("field", [
+    None, "isNoArapBookkeeping", "origprereceiveamount", "PreReceiveAmount",
+    "origSettleAmount", "settleAmount", "AuditedTime", "createdtime", "invoiceType",
+    "reciveType", "SaleInvoiceMedia", "DistributionMode", "saleInvoiceID", "LogisticsStatus",
+    "isCancel", "voucherState", "makerid", "auditorid", "agencyid", "isCarriedForwardOut",
+    "voucherdate", "pubuserdefnvc1", "detail_pubuserdefnvc1", "detail_pubuserdefnvc2",
+    "OrigInvoiceTaxAmount", "Allowances", "origAllowances", "thisBalanceIntegral",
+    "detail_saleOutQuantity",
+    *ZERO_HEADER_FLAGS, *("detail_" + name for name in ZERO_DETAIL_FLAGS),
+])
 def test_header_verification_covers_all_configured_business_fields(field):
     doc = documents()[0]
     header, details = build_payload(doc)
@@ -109,9 +166,15 @@ def test_header_verification_covers_all_configured_business_fields(field):
     stored_header["ID"] = 42
     if field and not field.startswith("detail_"):
         stored_header[field] = datetime(2001, 1, 1) if field == "voucherdate" else 999
+        if field in ("isNoArapBookkeeping", "origprereceiveamount", "PreReceiveAmount", "origSettleAmount", "settleAmount",
+                     "OrigInvoiceTaxAmount", "Allowances", "origAllowances", "thisBalanceIntegral"):
+            stored_header[field] = None
+        if field in ZERO_HEADER_FLAGS:
+            stored_header[field] = None
     stored_details = [dict(row, idSaleDeliveryDTO=42) for row in details]
     if field and field.startswith("detail_"):
-        stored_details[0][field[len("detail_"):]] = "WRONG-SOURCE"
+        detail_field = field[len("detail_"):]
+        stored_details[0][detail_field] = None if detail_field in ZERO_DETAIL_FLAGS or detail_field == "saleOutQuantity" else "WRONG-SOURCE"
     repo = SqlRepository(config(), connector=lambda *args: None)
 
     def query(sql, *params):
