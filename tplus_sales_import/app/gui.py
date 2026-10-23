@@ -257,9 +257,10 @@ class ImportWindow(QMainWindow):
         self.folder_button = QPushButton("打开输出目录")
         self.restore_button = QPushButton("恢复任务结果")
         self.undo_button = QPushButton("撤销本次导入")
+        self.online_token_button = QPushButton("在线获取 Token")
         for index, button in enumerate((self.test_button, self.choose_button, self.import_button, self.stop_button,
                                         self.retry_button, self.save_button, self.folder_button, self.restore_button,
-                                        self.undo_button)):
+                                        self.undo_button, self.online_token_button)):
             toolbar.addWidget(button, index // 4, index % 4)
         layout.addLayout(toolbar)
         self.import_gate_label = QLabel()
@@ -309,11 +310,18 @@ class ImportWindow(QMainWindow):
         self.folder_button.clicked.connect(self.open_output)
         self.restore_button.clicked.connect(self.restore_result)
         self.undo_button.clicked.connect(self.start_undo)
+        self.online_token_button.clicked.connect(self.open_online_token)
         self.search.textChanged.connect(self.apply_filter)
         self.status.currentTextChanged.connect(self.apply_filter)
         self.reload_config()
         self.update_buttons()
         self.apply_initial_geometry()
+
+    def open_online_token(self):
+        from .online_token import OnlineTokenDialog
+        dialog = OnlineTokenDialog(self)
+        dialog.exec_()
+        dialog.deleteLater()
 
     def apply_initial_geometry(self):
         screen = QApplication.screenAt(QCursor.pos()) or QApplication.primaryScreen()
@@ -342,6 +350,7 @@ class ImportWindow(QMainWindow):
 
     def update_buttons(self):
         busy = self.worker is not None
+        self.online_token_button.setEnabled(not busy)
         self.test_button.setEnabled(not busy)
         self.choose_button.setEnabled(not busy)
         can_import = not busy and bool(self.model.rows)
