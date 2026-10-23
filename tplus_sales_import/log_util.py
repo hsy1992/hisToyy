@@ -38,7 +38,8 @@ class SafeFormatter(logging.Formatter):
     def format(self, record):
         if not hasattr(record, "task_id"):
             record.task_id = "-"
-        return redact(super().format(record))
+        text = super().format(record)
+        return text if getattr(record, "unmasked", False) else redact(text)
 
 
 class DailyFileHandler(logging.Handler):

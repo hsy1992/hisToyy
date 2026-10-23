@@ -10,7 +10,8 @@ import sys
 import venv
 
 PACKAGES = ("pyinstaller", "pyinstaller-hooks-contrib", "altgraph", "pefile", "pywin32-ctypes",
-            "setuptools", "packaging", "PyQt5", "PyQt5-sip", "xlrd", "openpyxl", "et-xmlfile", "pyodbc")
+            "setuptools", "packaging", "PyQt5", "PyQt5-sip", "xlrd", "openpyxl", "et-xmlfile", "pyodbc",
+            "cryptography", "cffi", "pycparser")
 
 
 def main():

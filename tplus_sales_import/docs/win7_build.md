@@ -125,3 +125,12 @@ $env:PYTHONPATH = $null
 - 发布包：`releases/TplusSalesImport_Win7_x64_20261021_230419.zip`，39.07MB、159个文件。
 - SHA-256：`1b7f5579f2c1947041bd6b024a906c415e05e505acbe96d22815155807c4db9d`。
 - 构建证据：`.validation/latest_win7_release.json`及`.validation/win7_build_20261021_230419/`。Win7实机尚待验收。
+
+
+## 2026-10-23 Authorization 签名构建
+
+本轮增加 OpenAPI v2 的 PS256 签名。构建环境新增 cryptography 3.4.8、cffi 1.17.1、pycparser 2.23，版本已写入 requirements-win7-build.txt；源码通用依赖清单也已加入 cryptography。
+
+使用 Python 3.8.10 x64 独立环境完成打包，源代码测试247项通过、1项跳过。构建后的 EXE 在清除 Python/Anaconda 搜索路径后离线自检退出码0，authorization_signing=true，数据库连接/写入均为0。74个PE文件未发现 api-ms-win-core-path-l1-1-0.dll 普通或延迟导入。以上为本机验证，尚未进行本轮 Win7 实机验收。
+
+产物为 dist/TplusSalesImport/TplusSalesImport.exe，config.ini 与 cjet_pri.pem 同在 EXE 旁，私钥不放在 _internal；重新打包保留现有配置及配套私钥。此次本地目录按用户要求包含实际配置及私钥，不应作为无凭据公共示例包发布。

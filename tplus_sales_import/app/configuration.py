@@ -21,12 +21,26 @@ class TPlusApiConfig:
     app_key: str = ""
     app_secret: str = field(default="", repr=False)
     enabled: bool = False
+    org_id: str = ""
+    pem_path: str = field(default_factory=lambda: str(application_dir() / "cjet_pri.pem"))
 
     def __post_init__(self):
         if self.password:
             register_secret(self.password)
         if self.app_secret:
             register_secret(self.app_secret)
+
+
+@dataclass(frozen=True)
+class LoginConfig:
+    url: str = ""
+    user_name: str = ""
+    password: str = field(default="", repr=False)
+    acc_num: str = ""
+    api: TPlusApiConfig = field(default_factory=TPlusApiConfig)
+
+    def __post_init__(self):
+        register_secret(self.password)
 
 
 @dataclass(frozen=True)
@@ -38,6 +52,7 @@ class DatabaseConfig:
     password: str = field(repr=False)
     driver: str = "SQL Server Native Client 10.0"
     api: TPlusApiConfig = field(default_factory=TPlusApiConfig)
+    login: LoginConfig = field(default_factory=LoginConfig)
 
     def __post_init__(self):
         register_secret(self.password)
@@ -88,19 +103,32 @@ class DatabaseConfig:
         api_config = TPlusApiConfig()
         if parser.has_section("tplus_api"):
             api_sec = parser["tplus_api"]
+            pem_path = Path(api_sec.get("pem_path", "cjet_pri.pem").strip().strip('"\'') or "cjet_pri.pem")
+            if not pem_path.is_absolute():
+                pem_path = Path(path).resolve().parent / pem_path
             api_config = TPlusApiConfig(
                 url=api_sec.get("url", "http://192.168.1.15:7777").strip(),
                 account=api_sec.get("account", "999").strip(),
                 user=api_sec.get("user", "范立志").strip(),
                 password=api_sec.get("password", "").strip(),
-                app_key=api_sec.get("app_key", "").strip(),
-                app_secret=api_sec.get("app_secret", "").strip(),
+                app_key=api_sec.get("app_key", api_sec.get("appkey", "")).strip(),
+                app_secret=api_sec.get("app_secret", api_sec.get("appsecret", "")).strip(),
                 enabled=api_sec.getboolean("enabled", True),
+                org_id=api_sec.get("org_id", api_sec.get("orgid", "")).strip().strip('"\''),
+                pem_path=str(pem_path),
             )
+        login = LoginConfig()
+        if parser.has_section("login"):
+            sec = parser["login"]
+            login = LoginConfig(url=sec.get("url", "").strip(),
+                                user_name=sec.get("userName", "").strip(),
+                                password=sec.get("password", "").strip(),
+                                acc_num=sec.get("accNum", "").strip(),
+                                api=api_config)
         return cls(section["ip"].strip(), port, section["database"].strip(),
                    section["user"].strip(), section["password"],
                    section.get("driver", "SQL Server Native Client 10.0").strip(),
-                   api_config)
+                   api_config, login)
 
     @staticmethod
     def quote(value):

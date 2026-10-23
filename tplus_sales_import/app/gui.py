@@ -19,6 +19,7 @@ from .database import CommitUnknown, PreflightError, SqlRepository
 from .engine import ImportEngine
 from .files import TaskJournal, export_report, read_xls
 from .undo import UndoSession
+from .login import LoginClient
 
 
 class UndoConfirmDialog(QDialog):
@@ -116,13 +117,14 @@ class TaskWorker(QThread):
     failed = pyqtSignal(str)
 
     def __init__(self, action, config=None, source=None, rows=None, columns=None, runtime=None, report_args=None,
-                 undo_session=None):
+                 undo_session=None, access_token=None):
         super().__init__()
         self.action, self.config, self.source = action, config, source
         self.rows, self.columns, self.runtime = rows, columns, runtime
         self.stop = threading.Event()
         self.report_args = report_args
         self.undo_session = undo_session
+        self.access_token = access_token
 
     def run(self):
         started = time.perf_counter()
@@ -130,22 +132,14 @@ class TaskWorker(QThread):
         try:
             if self.action == "load":
                 result = read_xls(self.source, self.stop, self.progress.emit)
-            elif self.action == "test":
+            elif self.action == "login":
                 repository = SqlRepository(self.config)
                 try:
                     db_name = repository.open()
                 finally:
                     repository.close()
-                api_cfg = getattr(self.config, "api", None)
-                if api_cfg and api_cfg.enabled:
-                    from .tplus_api import TPlusApiClient
-                    client = TPlusApiClient(api_cfg)
-                    ok, token_msg = client.get_token()
-                    if not ok:
-                        raise PreflightError(f"数据库连接成功（{db_name}），但 T+ API 认证查询失败：{token_msg}")
-                    result = f"{db_name}，T+ API认证通过"
-                else:
-                    result = db_name
+                token = LoginClient().authenticate(self.config.login)
+                result = dict(database=db_name, access_token=token)
             elif self.action == "export":
                 result = str(export_report(**self.report_args))
             elif self.action in ("undo_prepare", "undo_delete"):
@@ -181,8 +175,13 @@ class TaskWorker(QThread):
                         logger.error("撤销已提交，但结果保存失败 %s", diagnostics(exc))
                         result["message"] += "；结果保存失败，请重试导出，数据库删除已完成"
             else:
+                if not self.access_token:
+                    raise PreflightError("请先登录成功后再导入数据")
+                from .tplus_api import TPlusApiClient
+                client = TPlusApiClient(self.config.api)
+                client.token = self.access_token
                 engine = ImportEngine(self.config, self.source, self.rows, self.columns,
-                                      self.runtime, self.stop, self.progress.emit)
+                                      self.runtime, self.stop, self.progress.emit, api_client=client)
                 self.task_id = engine.task_id
                 result = engine.run()
             logger.info("后台操作结束 action=%s elapsed_seconds=%.3f", self.action, time.perf_counter() - started)
@@ -229,6 +228,7 @@ class ImportWindow(QMainWindow):
         self.config_path = Path(config_path) if config_path else application_dir() / "config.ini"
         self.runtime = application_dir() / "runtime"
         self.config, self.tested, self.source = None, None, None
+        self.access_token = None
         self.worker, self.result = None, None
         self.undo_session, self.pending_undo = None, None
         self.closing = False
@@ -241,14 +241,14 @@ class ImportWindow(QMainWindow):
         self.setCentralWidget(scroll)
         self.config_label = QLabel()
         self.config_label.setWordWrap(True)
-        config_path_label = QLabel("配置文件（请手动修改后重新测试）：" + str(self.config_path))
+        config_path_label = QLabel("配置文件（请手动修改后重新登录）：" + str(self.config_path))
         config_path_label.setWordWrap(True)
         layout.addWidget(config_path_label)
         layout.addWidget(self.config_label)
-        self.connection_label = QLabel("连接状态：未测试（可选）；导入时自动连接账套")
+        self.connection_label = QLabel("登录状态：未登录，请先登录")
         layout.addWidget(self.connection_label)
         toolbar = QGridLayout()
-        self.test_button = QPushButton("测试连接 / 重新读取配置")
+        self.test_button = QPushButton("登录 / 重新读取配置")
         self.choose_button = QPushButton("选择XLS文件")
         self.import_button = QPushButton("导入全部数据")
         self.stop_button = QPushButton("停止")
@@ -262,6 +262,7 @@ class ImportWindow(QMainWindow):
                                         self.retry_button, self.save_button, self.folder_button, self.restore_button,
                                         self.undo_button, self.online_token_button)):
             toolbar.addWidget(button, index // 4, index % 4)
+        self.online_token_button.hide()
         layout.addLayout(toolbar)
         self.import_gate_label = QLabel()
         self.import_gate_label.setWordWrap(True)
@@ -295,13 +296,13 @@ class ImportWindow(QMainWindow):
         layout.addWidget(self.table)
         self.summary_label = QLabel("尚无数据")
         self.summary_label.setWordWrap(True)
-        self.phase_label = QLabel("请选择XLS文件，加载后即可导入；测试连接为可选操作")
+        self.phase_label = QLabel("请先登录，再选择XLS文件并导入")
         self.phase_label.setWordWrap(True)
         layout.addWidget(self.summary_label)
         layout.addWidget(self.phase_label)
         self.progress = QProgressBar()
         layout.addWidget(self.progress)
-        self.test_button.clicked.connect(self.test_connection)
+        self.test_button.clicked.connect(self.login)
         self.choose_button.clicked.connect(self.choose_file)
         self.import_button.clicked.connect(self.start_import)
         self.stop_button.clicked.connect(self.request_stop)
@@ -344,6 +345,7 @@ class ImportWindow(QMainWindow):
         except (ValueError, OSError) as exc:
             logger.warning("配置加载失败 file=%s %s", self.config_path, diagnostics(exc))
             self.config, self.tested = None, None
+            self.access_token = None
             detail = str(exc) if isinstance(exc, ValueError) else "无法读取配置文件，请检查权限"
             self.config_label.setText("配置文件无效：" + detail)
             return False
@@ -352,15 +354,18 @@ class ImportWindow(QMainWindow):
         busy = self.worker is not None
         self.online_token_button.setEnabled(not busy)
         self.test_button.setEnabled(not busy)
-        self.choose_button.setEnabled(not busy)
-        can_import = not busy and bool(self.model.rows)
+        self.choose_button.setEnabled(not busy and self.tested == self.config and bool(self.access_token))
+        self.choose_button.setToolTip("选择XLS文件" if self.choose_button.isEnabled() else "请先登录成功，并等待当前任务结束")
+        can_import = not busy and bool(self.model.rows) and self.tested == self.config and bool(self.access_token)
         self.import_button.setEnabled(can_import)
         if busy:
             reason = "正在执行任务，请等待结束后再导入"
+        elif self.tested != self.config or not self.access_token:
+            reason = "请先登录成功（数据库连接和Token认证均须通过）"
         elif not self.model.rows:
             reason = "请先选择并成功加载XLS文件"
         else:
-            reason = f"可以导入：已加载{len(self.model.rows)}行；点击后自动读取配置、连接账套并校验"
+            reason = f"可以导入：已加载{len(self.model.rows)}行；登录已通过，点击开始导入"
         self.import_gate_label.setText("导入状态：" + reason)
         self.import_button.setToolTip(reason)
         state = (can_import, reason)
@@ -409,32 +414,37 @@ class ImportWindow(QMainWindow):
     def on_error(self, message):
         if self.undo_session is not None and self.undo_session.state == "unknown" and self.result:
             self.result.update(message=message, report="")
-        if self.worker is not None and self.worker.action == "test":
-            self.tested = None
-            self.connection_label.setText("连接状态：测试失败；可检查配置后重新测试或直接发起导入")
+        if self.worker is not None and self.worker.action == "login":
+            self.tested, self.access_token = None, None
+            self.connection_label.setText("登录状态：登录失败，请检查配置后重新登录")
         self.phase_label.setText(message)
         self.progress.setRange(0, 1)
         self.progress.setValue(0)
         if not self.closing:
             QMessageBox.warning(self, "任务未完成", message)
 
-    def test_connection(self):
-        self.tested = None
-        self.connection_label.setText("连接状态：正在测试（测试结果不影响文件加载后的导入按钮）")
+    def login(self):
+        if self.worker is not None:
+            return
+        self.tested, self.access_token = None, None
+        self.connection_label.setText("登录状态：正在验证数据库和Token接口…")
         if not self.reload_config():
-            self.connection_label.setText("连接状态：配置无效，请修改配置文件")
+            self.connection_label.setText("登录状态：配置无效，请修改配置文件")
             self.update_buttons()
             return
         config = self.config
-        def complete(actual):
-            self.tested = config
-            self.connection_label.setText("连接成功：" + actual + "（可选测试）")
-            self.phase_label.setText("连接成功，实际目标账套：" + actual)
+        def complete(result):
+            self.tested, self.access_token = config, result["access_token"]
+            self.connection_label.setText("登录成功：" + result["database"] + "（数据库和Token认证均通过）")
+            self.phase_label.setText("登录成功，请选择文件并导入数据")
             self.progress.setRange(0, 1)
             self.progress.setValue(1)
-        self.start_worker(TaskWorker("test", config=config), complete)
+        self.start_worker(TaskWorker("login", config=config), complete)
 
     def choose_file(self):
+        if self.worker is not None or self.tested != self.config or not self.access_token:
+            self.update_buttons()
+            return
         source, _ = QFileDialog.getOpenFileName(self, "选择销货单源文件", str(application_dir()), "Excel 97-2003 (*.xls)")
         if not source:
             return
@@ -453,24 +463,34 @@ class ImportWindow(QMainWindow):
         if self.worker is not None or not self.model.rows:
             self.update_buttons()
             return
+        if self.tested != self.config or not self.access_token:
+            self.phase_label.setText("请先登录成功后再导入数据")
+            self.update_buttons()
+            return
         try:
             current = DatabaseConfig.load(self.config_path)
         except (ValueError, OSError) as exc:
-            self.tested = None
+            self.tested, self.access_token = None, None
             self.reload_config()
             self.connection_label.setText("连接状态：配置无效，未开始导入")
             self.update_buttons()
             self.on_error(str(exc) if isinstance(exc, ValueError) else "无法读取配置文件，请检查权限")
             return
         if current != self.tested:
-            self.tested = None
+            self.tested, self.access_token = None, None
+            self.config = current
+            self.config_label.setText(current.display())
+            self.connection_label.setText("登录状态：配置已变更，请重新登录")
+            self.update_buttons()
+            return
         self.config = current
         self.config_label.setText(current.display())
-        self.connection_label.setText("连接状态：导入任务将自动连接 " + current.database)
+        self.connection_label.setText("登录状态：已登录，导入目标账套 " + current.database)
         self.result = None
         self.clear_undo()
         self.start_worker(TaskWorker("import", config=current, source=self.source, rows=self.model.rows,
-                                     columns=self.model.source_columns, runtime=self.runtime), self.import_complete)
+                                     columns=self.model.source_columns, runtime=self.runtime,
+                                     access_token=self.access_token), self.import_complete)
 
     def import_complete(self, result):
         self.result = result

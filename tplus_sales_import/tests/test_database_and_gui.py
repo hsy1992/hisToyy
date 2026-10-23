@@ -286,14 +286,16 @@ def test_window_is_read_only_and_does_not_connect_on_launch(qapp, tmp_path, monk
     assert "private-value" not in window.config_label.text()
     window.model.set_rows([source_row()], list(source_row().values))
     window.tested = window.config
+    window.access_token = "test-token"
     window.update_buttons()
     assert window.import_button.isEnabled()
     ini.write_text(ini.read_text(encoding="utf-8").replace("test_db", "changed_db"), encoding="utf-8")
     started = []
     monkeypatch.setattr(window, "start_worker", lambda worker, callback: started.append(worker))
     window.start_import()
-    assert len(started) == 1 and started[0].action == "import"
-    assert started[0].config.database == "changed_db"
+    assert not started
+    assert not window.import_button.isEnabled()
+    assert window.access_token is None
     assert window.worker is None and window.tested is None
     assert "changed_db" in window.config_label.text()
     window.close()
@@ -345,18 +347,21 @@ def test_review_bad_ini_does_not_prevent_window_or_reload(qapp, tmp_path):
     window.close()
 
 
-def test_import_gate_requires_loaded_file_only(qapp, tmp_path):
+def test_import_gate_requires_login_and_loaded_file(qapp, tmp_path):
     path = tmp_path / "config.ini"
     path.write_text("[sqlserver]\nip=localhost\nport=1433\ndatabase=test_db\nuser=test\npassword=test-value\n", encoding="utf-8")
     window = ImportWindow(path)
     window.model.set_rows([source_row()], list(source_row().values))
     window.update_buttons()
-    assert window.import_button.isEnabled()
+    assert not window.import_button.isEnabled()
+    assert not window.choose_button.isEnabled()
     assert window.tested is None
-    assert "可以导入" in window.import_gate_label.text()
+    assert "请先登录" in window.import_gate_label.text()
     window.tested = window.config
+    window.access_token = "test-token"
     window.update_buttons()
     assert window.import_button.isEnabled()
+    assert window.choose_button.isEnabled()
     assert "可以导入" in window.import_gate_label.text()
     window.close()
 
@@ -372,6 +377,7 @@ def test_async_test_then_file_load_enables_import(qapp, tmp_path, monkeypatch):
         def open(self): return self.config.database
         def close(self): pass
     monkeypatch.setattr(gui, "SqlRepository", Repository)
+    monkeypatch.setattr(gui.LoginClient, "authenticate", lambda self, config: "test-token")
     row = source_row()
     monkeypatch.setattr(gui, "read_xls", lambda *args: ([row], list(row.values)))
     monkeypatch.setattr(gui.QFileDialog, "getOpenFileName", lambda *args: ("fixture.xls", ""))
@@ -382,27 +388,77 @@ def test_async_test_then_file_load_enables_import(qapp, tmp_path, monkeypatch):
             qapp.processEvents()
             QTest.qWait(5)
         assert window.worker is None
-    window.test_connection()
+    window.login()
     wait_for_completion()
     window.choose_file()
     wait_for_completion()
     assert window.import_button.isEnabled()
-    assert "连接成功" in window.connection_label.text()
+    assert "登录成功" in window.connection_label.text()
     assert "可以导入" in window.import_gate_label.text()
     window.close()
 
 
-def test_import_without_connection_test_creates_automatic_connect_task(qapp, tmp_path, monkeypatch):
+def test_import_without_login_does_not_create_task(qapp, tmp_path, monkeypatch):
     path = tmp_path / "config.ini"
     path.write_text("[sqlserver]\nip=localhost\nport=1433\ndatabase=test_db\nuser=test\npassword=test-value\n", encoding="utf-8")
     window = ImportWindow(path)
     window.source = "source.xls"
     window.model.set_rows([source_row()], list(source_row().values))
     window.update_buttons()
-    assert window.tested is None and window.import_button.isEnabled()
+    assert window.tested is None and not window.import_button.isEnabled()
     tasks = []
     monkeypatch.setattr(window, "start_worker", lambda worker, callback: tasks.append(worker))
     window.start_import()
-    assert len(tasks) == 1 and tasks[0].action == "import"
-    assert tasks[0].config.database == "test_db"
+    assert not tasks
+    window.close()
+
+
+def test_failed_relogin_clears_previous_session(qapp, tmp_path, monkeypatch):
+    from types import SimpleNamespace
+    import app.gui as gui
+    path = tmp_path / "config.ini"
+    path.write_text("[sqlserver]\nip=localhost\nport=1433\ndatabase=test_db\nuser=test\npassword=test-value\n", encoding="utf-8")
+    window = ImportWindow(path)
+    window.model.set_rows([source_row()], list(source_row().values))
+    window.tested, window.access_token = window.config, "previous-token"
+    window.update_buttons()
+    assert window.import_button.isEnabled()
+    monkeypatch.setattr(gui.QMessageBox, "warning", lambda *args: None)
+    tasks = []
+    monkeypatch.setattr(window, "start_worker", lambda worker, callback: tasks.append(worker))
+    window.login()
+    assert window.tested is None and window.access_token is None
+    window.worker = SimpleNamespace(action="login")
+    window.on_error("认证失败")
+    window.worker = None
+    window.update_buttons()
+    assert not window.import_button.isEnabled()
+    assert not window.choose_button.isEnabled()
+    assert "登录失败" in window.connection_label.text()
+    window.close()
+
+
+def test_choose_file_requires_login_and_idle_state(qapp, tmp_path, monkeypatch):
+    from types import SimpleNamespace
+    import app.gui as gui
+    from unittest.mock import Mock
+    path = tmp_path / "config.ini"
+    path.write_text("[sqlserver]\nip=localhost\nport=1433\ndatabase=test_db\nuser=test\npassword=test-value\n", encoding="utf-8")
+    window = ImportWindow(path)
+    picker = Mock(return_value=("", ""))
+    monkeypatch.setattr(gui.QFileDialog, "getOpenFileName", picker)
+    assert not window.choose_button.isEnabled()
+    window.choose_file()
+    picker.assert_not_called()
+    window.tested, window.access_token = window.config, "login-token"
+    window.update_buttons()
+    assert window.choose_button.isEnabled()
+    window.choose_file()
+    picker.assert_called_once()
+    window.worker = SimpleNamespace(action="login")
+    window.update_buttons()
+    assert not window.choose_button.isEnabled()
+    window.choose_file()
+    picker.assert_called_once()
+    window.worker = None
     window.close()

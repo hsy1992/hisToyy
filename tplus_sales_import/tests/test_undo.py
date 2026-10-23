@@ -216,6 +216,7 @@ def test_undo_button_is_session_only_and_disabled_while_busy_or_after_close(qapp
 def test_selecting_new_file_invalidates_receipt_even_if_loading_fails(qapp, tmp_path, monkeypatch):
     import app.gui as gui
     window = window_with_receipt(tmp_path)
+    window.tested, window.access_token = window.config, "login-token"
     monkeypatch.setattr(gui.QFileDialog, "getOpenFileName", lambda *args: ("new.xls", ""))
     tasks = []
     monkeypatch.setattr(window, "start_worker", lambda worker, callback: tasks.append(worker))

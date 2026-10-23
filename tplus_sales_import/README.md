@@ -1,5 +1,7 @@
 # T+ 销货单导入（独立程序）
 
+当前使用配置参数签名模式：`app/authorization.py` 中 `USE_SAMPLE_AUTHORIZATION = False`。登录和审核均读取 `[tplus_api]` 的 app_key、app_secret、org_id、pem_path，每次重新生成 Authorization；审核加入本次登录返回的 access_token。临时样例模式已关闭。
+
 新程序、测试、配置、打包及运行数据均放在本目录；未改原HIS/凭证程序。
 
 ## 启动
@@ -9,13 +11,22 @@
 
 手动修改程序旁的 `config.ini`，配置 `[sqlserver]` 中 `ip`、`port`、`database`、`user`、`password`；`driver`可指定已安装ODBC驱动。SERVER由ip和port组合，DATABASE使用database，UID使用user，PWD使用password。提供的配置不包含密码，请填入实际值。不要把实际config.ini提交到版本库。
 
-主页面只读显示服务器、用户和目标账套，密码隐藏。点击“测试连接/重新读取配置”后，测试实际目标数据库；数据库切换不再读取原程序另一份build_db/test_db。测试连接为可选操作；点击导入会重新读取配置并自动连接，运行中的任务保持启动时的配置快照。
+主页面只读显示服务器、用户和目标账套，密码隐藏。点击“登录 / 重新读取配置”，先读取程序旁的 config.ini，再连接目标数据库并获取 Token；两项均通过才算登录成功。配置发生变更或重新登录失败后，必须重新登录才能导入。运行中的任务使用启动时的配置快照。
+
+在 `[login]` 中配置 `url`、`userName`、`password`、`accNum`，登录请求体仍为 POST multipart/form-data，唯一字段 `_args` 的值为包含这三个登录参数的 JSON；密码按当前配置原值发送。响应须为 `result: true` 且包含非空字符串 `access_token`；`sid` 允许为空。Token 仅保存在内存中供导入复用。
+
+Authorization 改为每次请求前自动生成，不再使用 `[login] Authorization` 固定值，也不添加 Bearer。应用参数取自 `[tplus_api]` 的 `app_key`、`app_secret`、`org_id`、`pem_path`。`org_id` 为空表示账套模式；云企业模式填写组织 ID。签名原文为按 appkey、orgid、appsecret 顺序排列的紧凑 JSON，UTF-8 后取小写 MD5；JWT 使用 PS256（PSS 盐长度32），`exp` 按本地 T+ SDK 写入当前 Unix 毫秒时间加30000，最后外层 appKey/authInfo/orgId JSON 使用普通 Base64。按已验签的成功请求样例，获取 Token 的 JWT 使用 sub=tester；审核业务的 JWT 使用 sub=chanjet，并额外加入登录返回的 access_token。appKey、appSecret 和 orgId 仍从配置读取，不写死样例参数。应用密钥不再放入明文 Header、URL 查询或业务请求体。
+
+将 `cjet_pri.pem` 放在本程序根目录，与 `config.ini` 同目录，配置 `pem_path = cjet_pri.pem`。相对路径始终基于配置文件所在目录解析，不受启动时的工作目录影响。打包后这两个文件与 EXE 同目录，私钥不放进 `_internal`。缺少应用参数、私钥不存在或格式无效时，登录在发送请求前失败。私钥和实际配置不提交版本库。
+
+按当前排查要求，登录和审核日志输出完整请求头、参数及响应。登录日志包含 password、Authorization、响应 access_token；审核日志包含完整 Authorization 和 _args 表单参数，不再替换为星号。API 日志会绕过自动脱敏过滤，日志文件含可用凭据。日志位于程序旁 `logs/appYYYY-MM-DD.log`。
 
 ## 操作
 
-1. 按需测试目标账套连接，可跳过此步。
+1. 点击登录，确认数据库连接和 Token 认证均通过。
+   未登录、登录失败或任务执行中，“选择XLS文件”按钮不可点击。
 2. 选择与10.12A出.xls列结构一致的真正XLS；支持单文件的多个工作表，在表格查看全部源明细。预览只读；筛选不改变“导入全部数据”的范围。
-3. 文件加载后即可点击导入，无需先测试连接：后台自动读取配置、连接账套、缓存档案、校验并标记问题，再按主表ExternalCode中的源用友单号去重。已存在整单跳过，即使新文件同号内容变化也不更新旧单。
+3. 登录成功且文件加载后才可点击导入：后台核对配置与登录时一致、连接账套、缓存档案、校验并标记问题，再按主表ExternalCode中的源用友单号去重。已存在整单跳过，即使新文件同号内容变化也不更新旧单。
 4. 正常完整单据批量提交。一个表头和所有明细同事务，数据错误拆分定位坏单，其他正常单据继续。
 5. 任务结束自动在源XLS同文件夹保存异常结果XLSX（含汇总、失败及未处理、重复跳过、成功但有说明）。全部失败和停止也输出。全部成功无说明时仍保留汇总文件。
 6. 停止按钮等待当前批次提交或回滚，保留已提交，余下未处理；不强杀线程，不等于撤销全部导入。关闭运行中的窗口使用同样停止流程。
@@ -70,7 +81,7 @@ python -m pytest tests -q
 
 EXE自检：`TplusSalesImport.exe --self-test 输出目录`，只创建示例界面、示例结果表及JSON验证记录，不连接数据库。自检文件是示例，不能作为真实导入结果。
 
-构建结果及剩余联调范围见BUILD_STATUS.md。发布版config.ini首次创建自无密码示例；重新打包保留已有发布目录中的config.ini、logs及runtime。请勿在修改配置时启动导入。
+构建结果及剩余联调范围见BUILD_STATUS.md。发布版 config.ini 首次复制本地 config.ini（不存在时使用示例）；重新打包保留已有发布目录中的配置、cjet_pri.pem、logs 及 runtime，缺失的登录节和签名配置键从本地配置补入，pem_path 统一为 cjet_pri.pem。首次打包必须先放好本地私钥；已有发布目录的私钥优先保留，与其应用配置保持配套。发布目录含本地配置凭据，请妥善保管。请勿在修改配置时启动导入。
 
 
 ## 运行日志
@@ -84,7 +95,7 @@ EXE自检：`TplusSalesImport.exe --self-test 输出目录`，只创建示例界
 
 项目IDE当前使用E:/Python38/python.exe，终端默认python可能指向另一个环境。依赖必须安装到实际运行解释器；2026-10-17已在E:/Python38离线补装xlrd 2.0.1，并成功读取真实源XLS。后续缺依赖时，界面及日志会显示模块名与实际解释器路径。不要仅在另一个环境执行pip后认为IDE环境已同步。
 
-导入按钮仅要求文件成功加载且当前没有其他任务运行；界面单独显示导入就绪条件与可选连接测试状态。配置有语法错误时按钮仍可点击，但会提示先修正配置，不会开始写入。
+导入按钮要求登录成功、文件成功加载且当前没有其他任务运行。未登录、登录失败或配置变更均会阻止导入；配置变更后点击导入会清除登录状态并提示重新登录。
 
 连接诊断：每次测试连接或开始导入连接前，日志打印当前进程位数及pyodbc可见的全部ODBC驱动；配置驱动不在列表中则额外提示核对驱动名称和位数。该列表不触发数据库查询，也不会自动替换用户配置的驱动。
 
@@ -113,3 +124,6 @@ EXE自检：`TplusSalesImport.exe --self-test 输出目录`，只创建示例界
 确认后按本次回收的主键ID定位，同一事务先删SA_SaleDelivery_b再删SA_SaleDelivery；校验已配置业务字段和确认前后的整行摘要（含明细ID及数据库版本字段），不一致则拒绝删除。启用的触发器或级联外键会阻止撤销，普通外键约束失败则整笔回滚，不额外删除其他业务表。成功后状态改为“已撤销”，保存任务结果并重新导出。提交/回滚结果不明则标记“撤销待确认”并禁用，需人工核实，不自动重复删除。
 
 撤销资格仅保存在内存；选择另一个XLS（含重新选择同一文件）、开始新导入、恢复任务结果或关闭应用都会清除资格。取消选择文件不清除；恢复历史任务结果不会恢复删除权限。撤销始终使用本次导入时的连接配置；不更新重复跳过的数据，不重置自增主键或修改已分配编号。
+
+
+审核接口为 `POST /tplus/api/v2/SaleDeliveryOpenApi/Audit`，按 `application/x-www-form-urlencoded; charset=utf-8` 发送唯一表单字段 `_args`，其值为业务 JSON `{"param":{"voucherCode":"实际SA单据编号"}}`，不传表头 ID，不添加异步 type 参数。每次审核单独生成包含 access_token 的业务签名 Authorization；签名原文的 orgid 与外层 orgId 均取 `[tplus_api] org_id`，不清空配置值。请求头设置 Authorization 和与表单对应的 Content-Type，User-Agent、Accept 保持注释。HTTP 库仍会生成 Host、Content-Length 等协议头。

@@ -2,6 +2,36 @@
 from pathlib import Path
 import json
 import os
+import tempfile
+
+
+def check_authorization(folder):
+    """Exercise bundled crypto using a disposable key and synthetic credentials."""
+    import base64
+    from cryptography.hazmat.primitives import hashes, serialization
+    from cryptography.hazmat.primitives.asymmetric import padding, rsa
+    from .authorization import create_authorization
+    from .configuration import TPlusApiConfig
+    key = rsa.generate_private_key(public_exponent=65537, key_size=1024)
+    with tempfile.TemporaryDirectory(prefix="signing-", dir=str(folder)) as directory:
+        pem = Path(directory) / "cjet_pri.pem"
+        pem.write_bytes(key.private_bytes(serialization.Encoding.PEM,
+                                         serialization.PrivateFormat.TraditionalOpenSSL,
+                                         serialization.NoEncryption()))
+        config = TPlusApiConfig(app_key="offline-app", app_secret="offline-secret", pem_path=str(pem))
+        for token in (None, "offline-token"):
+            value = create_authorization(config, token, use_sample=False)
+            envelope = json.loads(base64.b64decode(value))
+            header, payload, signature = envelope["authInfo"].split(".")
+            decode = lambda part: base64.urlsafe_b64decode(part + "=" * (-len(part) % 4))
+            key.public_key().verify(decode(signature), (header + "." + payload).encode("ascii"),
+                                    padding.PSS(mgf=padding.MGF1(hashes.SHA256()), salt_length=32),
+                                    hashes.SHA256())
+            claims = json.loads(decode(payload))
+            assert claims["sub"] == ("chanjet" if token else "tester")
+            if token:
+                assert claims["access_token"] == token
+    return True
 
 
 def run(folder):
@@ -43,6 +73,7 @@ def run(folder):
     workbook.close()
     assert money_parts("-67.995", Decimal("0.13")) == (Decimal("-67.995"), Decimal("-60.17"), Decimal("-7.825"))
     result = dict(passed=True, database_connections=0, database_writes=0, xlrd=xlrd.__version__,
+                  authorization_signing=check_authorization(folder),
                   report=str(report), screenshot=str(screenshot), odbc_driver_count=len(pyodbc.drivers()))
     (folder / "smoke_result.json").write_text(json.dumps(result, indent=2), encoding="utf-8")
     return result

@@ -1,0 +1,59 @@
+{
+  "info": {
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "name": "抓包请求 - GetRealNameTPlusToken",
+    "description": "根据 Untitled.chlsj 整理。原始抓包只包含请求头，未包含 116 字节请求体。请在 Body 中补充实际表单字段后发送。Authorization 按抓包原样传递，不加 Bearer 前缀。"
+  },
+  "variable": [
+    {
+      "type": "string",
+      "value": "http://biaoguanyy.gnway.vip:42506",
+      "key": "base_url"
+    },
+    {
+      "type": "string",
+      "value": "eyJhcHBLZXkiOiJjMTg5MDAwMC05OWQ1LTQ0YzctYTNhZi01YTY5NzU5ZjY0NTYiLCJhdXRoSW5mbyI6ImV5SmhiR2NpT2lKUVV6STFOaUlzSW5SNWNDSTZJa3BYVkNKOS5leUp6ZFdJaU9pSjBaWE4wWlhJaUxDSmxlSEFpT2pFM09USTNOVEkzTnprNE9UZ3VORE0yTlN3aVpHRjBZWE1pT2lJMVlqZzBZMlZqTmpZMFkySTNPV001TVRabU9Ea3dZV1l4T0RWa01qZGhPU0o5LnIxVkJNRHEyaHBmc0VnbmRKUmd3LThXaExkazNvV0stSjUycm9YMlVhOEFSVXN3LXRFaWYtYlZxRWNSWHdNLXItY05oZUxwOTU0bGZ3ZnRhRDBZMUVQel9QV3V2cFRJdHZmMjhFcDhtMEhjOXZOLTVhX3o4Tm5qeVI3UVFwSXJJaVloRjdERUtpNVMtNDhDUnZfUi13VjQtTElzOWh3SWlIQ3ZTaHJRMEVXRSIsIm9yZ0lkIjoiIn0=",
+      "key": "authorization"
+    }
+  ],
+  "item": [
+    {
+      "response": [],
+      "name": "GetRealNameTPlusToken（需补充请求体）",
+      "request": {
+        "header": [
+          {
+            "type": "text",
+            "value": "{{authorization}}",
+            "key": "Authorization"
+          },
+          {
+            "type": "text",
+            "value": "application/json, application/xml, text/json, text/x-json, text/javascript, text/xml",
+            "key": "Accept"
+          },
+          {
+            "type": "text",
+            "value": "RestSharp/100.0.0.0",
+            "key": "User-Agent"
+          },
+          {
+            "type": "text",
+            "value": "application/x-www-form-urlencoded;charset=utf-8",
+            "key": "Content-Type"
+          }
+        ],
+        "description": "请求体缺失：抓包记录 body 大小为 116 字节，但没有导出正文。Body 使用 x-www-form-urlencoded，请补充原请求中的实际键值。Host、Content-Length、Accept-Encoding 由 Postman 自动生成。未发送此请求。",
+        "method": "POST",
+        "url": "{{base_url}}/tplus/api/v2/collaborationapp/GetRealNameTPlusToken?IsFree=1",
+        "body": {
+          "urlencoded": [],
+          "mode": "urlencoded"
+        },
+        "auth": {
+          "type": "noauth"
+        }
+      }
+    }
+  ]
+}

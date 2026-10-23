@@ -17,6 +17,16 @@ def test_log_formatter_masks_passwords_connection_strings_and_tracebacks():
     assert "[task=-]" in text and "******" in text
 
 
+def test_api_unmasked_logs_preserve_registered_secrets():
+    secret = "api-debug-secret"
+    register_secret(secret)
+    record = logging.LogRecord("test", logging.INFO, __file__, 1,
+                               "Authorization=%s password=%s", (secret, secret), None)
+    record.unmasked = True
+    text = SafeFormatter("[task=%(task_id)s] %(message)s").format(record)
+    assert text == "[task=-] Authorization=api-debug-secret password=api-debug-secret"
+
+
 def test_exception_diagnostics_preserve_codes_but_not_driver_values():
     try:
         raise Exception("08S01", "connection password=must-not-appear (207)")

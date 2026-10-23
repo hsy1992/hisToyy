@@ -2,6 +2,8 @@
 # A fresh environment on another machine must be rebuilt and validated.
 altgraph==0.17.5
 charset-normalizer==3.4.9
+cffi==1.17.1
+cryptography==3.4.8
 et_xmlfile==2.0.0
 importlib_metadata==8.5.0
 lxml==6.1.1
@@ -11,6 +13,7 @@ pefile==2024.8.26
 pyinstaller==6.17.0
 pyinstaller-hooks-contrib==2025.11
 pyodbc==5.2.0
+pycparser==2.23
 PyQt5==5.15.11
 PyQt5-Qt5==5.15.2
 PyQt5_sip==12.15.0

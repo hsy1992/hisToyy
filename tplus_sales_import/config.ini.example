@@ -1,4 +1,4 @@
-; SQL Server connection; edit manually, then click Test Connection.
+; SQL Server connection; edit manually, then click Login.
 [sqlserver]
 ip = 127.0.0.1
 port = 1433
@@ -14,6 +14,18 @@ url = http://192.168.1.51:7777
 account = 300216
 user = 18249513776
 password =
-app_key = 8f442ec3-713e-4133-b64c-5d2d828c5426
-app_secret = jjy3uh
+app_key =
+app_secret =
+; Leave org_id empty for account mode; set it for cloud organization mode.
+org_id =
+; Relative to config.ini, including in the packaged application.
+pem_path = cjet_pri.pem
 enabled = true
+
+; Login requires both database connection and token authentication.
+[login]
+url = http://biaoguanyy.gnway.vip:42506/tplus/api/v2/collaborationapp/GetRealNameTPlusToken?IsFree=1
+userName =
+password =
+accNum = 300216
+; Authorization is generated from [tplus_api]; no fixed value is needed.

@@ -16,3 +16,7 @@ lib/instantclient_11_21/
 __pycache__/
 *.py[cod]
 .pytest_cache/
+
+# Local T+ signing keys; distributed separately beside config.ini.
+**/cjet_pri.pem
+/tplus_sales_import/app/_authorization_samples.py
