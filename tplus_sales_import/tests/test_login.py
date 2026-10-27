@@ -74,7 +74,7 @@ def test_login_rejects_invalid_json_and_missing_config(signed_api):
 
 
 @pytest.mark.parametrize("db_ok,token_ok", [(True, True), (False, True), (True, False)])
-def test_login_worker_requires_both_checks_and_closes_database(monkeypatch, db_ok, token_ok, signed_api):
+def test_login_worker_only_checks_database_and_closes_connection(monkeypatch, db_ok, token_ok, signed_api):
     import app.gui as gui
     repo = Mock()
     repo.open.side_effect = None if db_ok else ValueError("数据库失败")
@@ -88,10 +88,12 @@ def test_login_worker_requires_both_checks_and_closes_database(monkeypatch, db_o
     worker.completed.connect(completed.append)
     worker.failed.connect(failed.append)
     worker.run()
-    assert bool(completed) == (db_ok and token_ok)
+    assert bool(completed) == db_ok
+    if completed:
+        assert completed[0] == dict(database="test-db", access_token=None)
     assert bool(failed) != bool(completed)
     repo.close.assert_called_once()
-    assert auth.call_count == int(db_ok)
+    auth.assert_not_called()
 
 
 def test_config_and_build_include_separate_login_fields(tmp_path, signed_api):

@@ -166,14 +166,15 @@ def test_amount_based_net_unit_price_and_confirmed_business_flags(quantity, gros
     assert header["isCancel"] == 428
     assert header["isNoArapBookkeeping"] == 0
     assert "isNoArapBookkeeping" not in detail
-    assert header["AuditedTime"] is None
+    assert all(field not in header for field in ("auditor", "auditorid", "auditeddate", "AuditedTime"))
+    assert header["voucherState"] == 181
     for field in ("origprereceiveamount", "PreReceiveAmount", "origSettleAmount", "settleAmount",
                   "OrigInvoiceTaxAmount", "Allowances", "origAllowances", "thisBalanceIntegral"):
         assert type(header[field]) is Decimal and header[field] == Decimal(0)
         assert field not in detail
     assert header["isAutoGenerateInvoice"] == 0
     for payload in (header, detail):
-        assert payload["DataSource"] == 2497 and payload["isSaleOut"] == 0
+        assert payload["DataSource"] == 2497 and payload["isSaleOut"] == 305
     assert header["origTaxAmount"] == detail["origDiscountAmount"] + detail["origTax"]
 
 
@@ -204,8 +205,8 @@ def test_header_ignores_source_operator_without_changing_fixed_users(operator):
     assert doc.ready
     header, details = build_payload(doc)
     assert header["pubuserdefnvc1"] == ""
-    assert header["maker"] == header["agency"] == "范立志" and header["auditor"] == ""
-    assert header["makerid"] == header["agencyid"] == 51 and header["auditorid"] is None
+    assert header["maker"] == header["agency"] == "范立志" and "auditor" not in header
+    assert header["makerid"] == header["agencyid"] == 51 and "auditorid" not in header
     assert details[0]["pubuserdefnvc1"] == row.voucher
 
 
@@ -229,7 +230,7 @@ def test_zero_return_base_unit_project_null_and_quantity_text():
     assert header["idproject"] is None and details[0]["idproject"] is None
     assert details[0]["quantity"] == 0 and details[0]["compositionQuantity"] == "0盒"
     assert details[0]["origTaxAmount"] == Decimal("-0.019")
-    assert header["auditeddate"] is None
+    assert "auditeddate" not in header
     assert header["isAutoGenerateSaleOut"] == header["IsAutoSaleOut"] == 1
     assert header["saleInvoiceID"] == 281 and "docid" not in header
     assert decimal_text(Decimal("10.0000")) == "10"

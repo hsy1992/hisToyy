@@ -4,7 +4,7 @@ import threading
 import pytest
 
 from app.configuration import DatabaseConfig
-from app.database import SqlRepository
+from app.database import DocumentError, SqlRepository
 from app.domain import build_payload, build_arap_payloads, key, validate_rows
 from app.undo import UndoSession
 from test_import import cache, config, source_row
@@ -12,7 +12,7 @@ from test_database_and_gui import TransactionRepository, documents
 from test_undo import UndoRepository, session
 
 
-def test_build_arap_payloads_matches_online_contract():
+def test_build_arap_payloads_keeps_links_and_uses_unaudited_flags():
     doc = documents()[0]
     header, details = build_payload(doc)
     header_id = 1581123
@@ -38,8 +38,8 @@ def test_build_arap_payloads_matches_online_contract():
     # 核心标志与法定枚举
     assert rec["flag"] == -1
     assert rec["isArFlag"] == 1
-    assert rec["auditFlag"] == 1
-    assert rec["auditBussinessFlag"] == 1
+    assert rec["auditFlag"] == 0
+    assert rec["auditBussinessFlag"] == 0
     assert rec["BookFlag"] == 2212
     assert rec["bussinessFlag"] == "0"
     assert rec["idarapvouchertype"] == 104
@@ -55,7 +55,6 @@ def test_build_arap_payloads_matches_online_contract():
     assert rec["detailPriuserdefnvc2"] == doc.source
 
 
-@pytest.mark.skip(reason="ARAP_Detail 导入已暂时注释，后续由 T+ API 审核自动生成")
 def test_write_batch_inserts_arap_detail():
     repo = TransactionRepository()
     mapping = repo.write_batch(documents())
@@ -68,9 +67,28 @@ def test_write_batch_inserts_arap_detail():
     arap_records = repo.received[2][1]
     assert len(arap_records) == 2
     assert {r["voucherID"] for r in arap_records} == {100, 101}
+    assert {r["voucherDetailID"] for r in arap_records} == {200, 201}
+    assert all(r["auditFlag"] == r["auditBussinessFlag"] == 0 for r in arap_records)
+    assert all(h["voucherState"] == 181 for h in repo.received[0][1])
+    assert repo.connection.commits == 1 and repo.connection.rollbacks == 0
     assert {r["detailtype"] for r in arap_records} == {"inventory"}
     assert {r["flag"] for r in arap_records} == {-1}
     assert {r["idarapvouchertype"] for r in arap_records} == {104}
+
+
+def test_arap_insert_failure_rolls_back_entire_batch():
+    class FailingRepository(TransactionRepository):
+        def bulk_insert(self, cursor, table, records, output=False, output_cols=None):
+            if table == "ARAP_Detail":
+                raise DocumentError("ARAP insert failed")
+            return super().bulk_insert(cursor, table, records, output, output_cols)
+
+    repo = FailingRepository()
+    with pytest.raises(DocumentError, match="ARAP insert failed"):
+        repo.write_batch(documents())
+    assert repo.connection.commits == 0
+    assert repo.connection.rollbacks == 1
+    assert repo.connection.autocommit is True
 
 
 def test_undo_deletes_arap_detail_in_transaction():

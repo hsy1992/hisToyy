@@ -268,8 +268,9 @@ def build_payload(document):
                   # --- 原直接审核字段（已注释保留）：---
                   # auditor="范立志", auditorid=51, voucherState=189,
                   # ------------------------------------
-                  # --- 现改为未审核状态（待 API 审批触发）：---
-                  auditor="", auditorid=None, voucherState=181,
+                  # 未审核单据不插入审核人和审核时间字段。
+                  # auditor="", auditorid=None,
+                  voucherState=181,
                   agency="范立志", agencyid=51, isCarriedForwardOut=0,
                   idcurrency=4, idmarketingOrgan=1, iddepartment=None, idclerk=None, idrdstyle=24,
                   isAutoGenerateSaleOut=1, IsAutoSaleOut=1, isAutoGenerateInvoice=0,
@@ -284,9 +285,10 @@ def build_payload(document):
                   # isSaleOut=15,
                   # auditeddate=first["date"], AuditedTime=now,
                   # ----------------------------------------
-                  DataSource=2497, isSaleOut=0,
-                  voucherdate=first["date"], madedate=first["date"], auditeddate=None,
-                  createdtime=now, AuditedTime=None, updated=now, exchangeRate=Decimal(1),
+                  DataSource=2497, isSaleOut=305,  # 未出库枚举ID，非布尔值。
+                  # auditeddate=None, AuditedTime=None,
+                  voucherdate=first["date"], madedate=first["date"],
+                  createdtime=now, updated=now, exchangeRate=Decimal(1),
                   discountRate=Decimal(1), discountAmount=Decimal(0), discountsAndAllowances=None,
                   origprereceiveamount=Decimal(0), PreReceiveAmount=Decimal(0),
                   origSettleAmount=Decimal(0), settleAmount=Decimal(0),
@@ -316,7 +318,7 @@ def build_payload(document):
                             saleOutQuantity=Decimal(0),
                             compositionQuantity=decimal_text(p["quantity"]) + str(p["unit"]["name"]),
                             discountRate=Decimal(1), taxRate=p["rate"],
-                            taxFlag=1, isModifiedPrice=1, DataSource=2497, isSaleOut=0,
+                            taxFlag=1, isModifiedPrice=1, DataSource=2497, isSaleOut=305,
                             RefundDifferenceFlag=51185,
                             isPresent=0, isManualCost=0, IsMemberIntegral=0,
                             IsPromotionPresent=0, DiscountPriceChange=0, TaxPriceChange=0,
@@ -377,8 +379,9 @@ def build_arap_payloads(document, header_id, detail_id_map, now=None):
             origInAllowances=Decimal(0),
             isArFlag=1,
             flag=-1,
-            auditFlag=1,
-            auditBussinessFlag=1,
+            # 与销货单未审核状态一致，不标记为已审核。
+            auditFlag=0,
+            auditBussinessFlag=0,
             BookFlag=2212,
             bussinessFlag="0",
             DataSource=2497,

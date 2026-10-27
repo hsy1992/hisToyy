@@ -147,7 +147,7 @@ def test_audit_uses_token_in_signed_jwt(signed_api, code, message, success):
     assert len(calls) == 2 and calls[0] != calls[1]
 
 
-def test_taskworker_login_action_checks_token_auth(monkeypatch):
+def test_taskworker_login_action_skips_token_auth(monkeypatch):
     import app.gui as gui
     from app.database import PreflightError, SqlRepository
     from app.configuration import DatabaseConfig, TPlusApiConfig
@@ -156,7 +156,7 @@ def test_taskworker_login_action_checks_token_auth(monkeypatch):
     monkeypatch.setattr(SqlRepository, "open", lambda self: "UFDATA_999_TEST")
     monkeypatch.setattr(SqlRepository, "close", lambda self: None)
 
-    # 1. API 认证失败情况
+    # API authentication is bypassed during the database-only test workflow.
     api_fail = TPlusApiConfig(password="", enabled=True)
     cfg_fail = DatabaseConfig("localhost", 1433, "UFDATA_999_TEST", "sa", "test-db-secret-long", api=api_fail)
     worker = gui.TaskWorker("login", config=cfg_fail)
@@ -165,10 +165,12 @@ def test_taskworker_login_action_checks_token_auth(monkeypatch):
     monkeypatch.setattr(gui.LoginClient, "authenticate", failed_auth)
 
     failed_msgs = []
+    completed = []
     worker.failed.connect(lambda msg: failed_msgs.append(msg))
+    worker.completed.connect(completed.append)
     worker.run()
-    assert len(failed_msgs) == 1
-    assert "Token 接口认证未通过" in failed_msgs[0]
+    assert failed_msgs == []
+    assert completed == [dict(database="UFDATA_999_TEST", access_token=None)]
 
     # 2. API 认证成功情况
     api_succ = TPlusApiConfig(password="pass", enabled=True)
@@ -180,4 +182,4 @@ def test_taskworker_login_action_checks_token_auth(monkeypatch):
     worker2.completed.connect(lambda res: completed_results.append(res))
     worker2.run()
     assert len(completed_results) == 1
-    assert completed_results[0] == dict(database="UFDATA_999_TEST", access_token="mock-token")
+    assert completed_results[0] == dict(database="UFDATA_999_TEST", access_token=None)

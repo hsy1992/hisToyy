@@ -59,9 +59,10 @@ class ImportEngine:
         self.task_id = datetime.now().strftime("%Y%m%d_%H%M%S") + "_" + uuid.uuid4().hex[:8]
         self.journal = TaskJournal(runtime_dir, self.task_id, source, config.database)
         self.factory, self.batch_limit = repository_factory, batch_limit
-        if api_client is None:
-            from .tplus_api import TPlusApiClient
-            api_client = TPlusApiClient(getattr(config, "api", None) or getattr(config, "tplus_api", None))
+        # 测试期间不创建 API 客户端；保留参数以便恢复审批逻辑。
+        # if api_client is None:
+        #     from .tplus_api import TPlusApiClient
+        #     api_client = TPlusApiClient(getattr(config, "api", None) or getattr(config, "tplus_api", None))
         self.api_client = api_client
         self.repository = None
         self.message = ""
@@ -131,21 +132,22 @@ class ImportEngine:
                                 for row in doc.rows:
                                     row.status = "未处理"
                                     row.reasons.append(self.message)
-                        elif eligible and getattr(getattr(self.config, "api", None), "enabled", True):
-                            # 前置获取 Token，若获取失败则直接阻断，不进行数据库插入
-                            self.progress("获取 T+ 接口授权", 0, 0)
-                            token_ok, token_msg = self.api_client.get_token()
-                            if not token_ok:
-                                self.log.error("T+ API认证失败，直接阻断写入 reason=%s", token_msg)
-                                self.message = "T+ API认证失败，未写入数据库：" + token_msg
-                                for doc in eligible:
-                                    for row in doc.rows:
-                                        row.status = "未处理"
-                                        row.reasons.append(self.message)
-                            else:
-                                eligible = self.allocate_codes(eligible)
-                                self.checkpoint("已校验及去重")
-                                self.write_documents(eligible)
+                        # 测试期间跳过导入前的 Token 校验，直接写入数据库。
+                        # elif eligible and getattr(getattr(self.config, "api", None), "enabled", True):
+                        #     # 前置获取 Token，若获取失败则直接阻断，不进行数据库插入
+                        #     self.progress("获取 T+ 接口授权", 0, 0)
+                        #     token_ok, token_msg = self.api_client.get_token()
+                        #     if not token_ok:
+                        #         self.log.error("T+ API认证失败，直接阻断写入 reason=%s", token_msg)
+                        #         self.message = "T+ API认证失败，未写入数据库：" + token_msg
+                        #         for doc in eligible:
+                        #             for row in doc.rows:
+                        #                 row.status = "未处理"
+                        #                 row.reasons.append(self.message)
+                        #     else:
+                        #         eligible = self.allocate_codes(eligible)
+                        #         self.checkpoint("已校验及去重")
+                        #         self.write_documents(eligible)
                         else:
                             eligible = self.allocate_codes(eligible)
                             self.checkpoint("已校验及去重")
@@ -301,8 +303,9 @@ class ImportEngine:
                 row.status, row.header_id = "导入成功", mapping[key(doc.source)]
         self.log.info("批次提交成功 batch=%d documents=%d rows=%d elapsed_seconds=%.3f", batch_id, len(batch), sum(len(doc.rows) for doc in batch), time.perf_counter() - batch_started)
         self.checkpoint("本批提交成功")
-        if getattr(getattr(self.config, "api", None), "enabled", True):
-            self.approve_batch(batch, mapping)
+        # 测试期间只插入数据，不调用审批，也不执行审批失败清理。
+        # if getattr(getattr(self.config, "api", None), "enabled", True):
+        #     self.approve_batch(batch, mapping)
 
     def recover_batch(self, batch):
         self.log.warning("开始核实断线提交结果 documents=%d", len(batch))

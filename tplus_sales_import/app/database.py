@@ -313,19 +313,18 @@ class SqlRepository:
                 for item in items:
                     item["idSaleDeliveryDTO"] = identifier
                 details.extend(items)
-            # 暂时注释掉 ARAP_Detail 导入，仅保留 SA_SaleDelivery 和 SA_SaleDelivery_b 导入
-            self.bulk_insert(cursor, "SA_SaleDelivery_b", details)
-            # detail_returned = self.bulk_insert(cursor, "SA_SaleDelivery_b", details,
-            #                                    output_cols=["idSaleDeliveryDTO", "code", "ID"])
-            # detail_mapping = {(dto_id, item_code): detail_id for dto_id, item_code, detail_id in detail_returned}
-            # if len(detail_mapping) != len(details):
-            #     raise SystemFailure("批量明细ID回收数量不一致")
-            # arap_records = []
-            # now = datetime.now()
-            # for doc in documents:
-            #     identifier = mapping[key(doc.source)][0]
-            #     arap_records.extend(build_arap_payloads(doc, identifier, detail_mapping, now=now))
-            # self.bulk_insert(cursor, "ARAP_Detail", arap_records)
+            # 同一事务内写入销货单主明细及未审核应收明细。
+            detail_returned = self.bulk_insert(cursor, "SA_SaleDelivery_b", details,
+                                              output_cols=["idSaleDeliveryDTO", "code", "ID"])
+            detail_mapping = {(dto_id, item_code): detail_id for dto_id, item_code, detail_id in detail_returned}
+            if len(detail_mapping) != len(details):
+                raise SystemFailure("批量明细ID回收数量不一致")
+            arap_records = []
+            now = datetime.now()
+            for doc in documents:
+                identifier = mapping[key(doc.source)][0]
+                arap_records.extend(build_arap_payloads(doc, identifier, detail_mapping, now=now))
+            self.bulk_insert(cursor, "ARAP_Detail", arap_records)
             if not self.verify_batch(documents, mapping):
                 raise SystemFailure("主明细逐单对账失败，整批回滚")
             committing = True
@@ -355,9 +354,8 @@ class SqlRepository:
         expected = {mapping[key(doc.source)][0]: build_payload(doc) for doc in documents}
         header_columns = [name for name in next(iter(expected.values()))[0]
                           if name not in ("createdtime", "updated", "AuditedTime")]
-        # Rebuilding payloads uses a new wall-clock time. Compare stored timestamps
-        # to each other so SQL datetime rounding and commit recovery remain valid.
-        header_read_columns = header_columns + ["createdtime", "AuditedTime"]
+        # 审核字段不再插入或回查，只校验实际创建时间有效。
+        header_read_columns = header_columns + ["createdtime"]
         columns = [name for name in next(iter(expected.values()))[1][0] if name not in ("createdtime", "updated")]
         detail_groups, heads, arap_counts = defaultdict(list), {}, defaultdict(int)
         for block in chunks(list(expected), 1000):
@@ -370,11 +368,11 @@ class SqlRepository:
                                       " FROM dbo.SA_SaleDelivery WHERE ID IN (" + marks + ")", *block)
             for record in head_records:
                 heads[record.pop("ID")] = record
-            # arap_records = self.query("SELECT ID,voucherID FROM dbo.ARAP_Detail WHERE voucherID IN (" + marks + ")", *block)
-            # for record in arap_records:
-            #     vid = record.get("voucherID") or record.get("voucherid")
-            #     if vid is not None:
-            #         arap_counts[vid] += 1
+            arap_records = self.query("SELECT ID,voucherID FROM dbo.ARAP_Detail WHERE voucherID IN (" + marks + ")", *block)
+            for record in arap_records:
+                vid = record.get("voucherID") or record.get("voucherid")
+                if vid is not None:
+                    arap_counts[vid] += 1
         for identifier, (header, details) in expected.items():
             records = detail_groups[identifier]
             if len(records) != len(details):
@@ -393,11 +391,11 @@ class SqlRepository:
             # if head["createdtime"] is None or head["AuditedTime"] != head["createdtime"]:
             #     return False
             # -----------------------------------------------
-            # 现待审核草稿状态：createdtime 必须为有效时间，AuditedTime 应为 None
-            if not isinstance(head["createdtime"], (datetime, date)) or head["AuditedTime"] is not None:
+            # 审核时间由数据库默认值处理，不再参与本次插入的核对。
+            if not isinstance(head["createdtime"], (datetime, date)):
                 return False
-            # if arap_counts.get(identifier, 0) != len(details):
-            #     return False
+            if arap_counts.get(identifier, 0) != len(details):
+                return False
         return True
 
     def verify_document(self, document, identifier):

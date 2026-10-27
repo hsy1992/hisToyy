@@ -153,12 +153,12 @@ ZERO_DETAIL_FLAGS = ("isPresent", "isManualCost", "IsMemberIntegral", "IsPromoti
 
 @pytest.mark.parametrize("field", [
     None, "isNoArapBookkeeping", "origprereceiveamount", "PreReceiveAmount",
-    "origSettleAmount", "settleAmount", "AuditedTime", "createdtime", "invoiceType",
+    "origSettleAmount", "settleAmount", "createdtime", "invoiceType",
     "reciveType", "SaleInvoiceMedia", "DistributionMode", "saleInvoiceID", "LogisticsStatus",
-    "isCancel", "voucherState", "makerid", "auditorid", "agencyid", "isCarriedForwardOut",
+    "isCancel", "voucherState", "makerid", "agencyid", "isCarriedForwardOut",
     "voucherdate", "pubuserdefnvc1", "detail_pubuserdefnvc1", "detail_pubuserdefnvc2",
     "OrigInvoiceTaxAmount", "Allowances", "origAllowances", "thisBalanceIntegral",
-    "detail_saleOutQuantity",
+    "detail_saleOutQuantity", "arap_missing", "arap_extra",
     *ZERO_HEADER_FLAGS, *("detail_" + name for name in ZERO_DETAIL_FLAGS),
 ])
 def test_header_verification_covers_all_configured_business_fields(field):
@@ -166,7 +166,7 @@ def test_header_verification_covers_all_configured_business_fields(field):
     header, details = build_payload(doc)
     stored_header = {name: bind_value(value) for name, value in header.items()}
     stored_header["ID"] = 42
-    if field and not field.startswith("detail_"):
+    if field and not field.startswith(("detail_", "arap_")):
         stored_header[field] = datetime(2001, 1, 1) if field == "voucherdate" else 999
         if field in ("isNoArapBookkeeping", "origprereceiveamount", "PreReceiveAmount", "origSettleAmount", "settleAmount",
                      "OrigInvoiceTaxAmount", "Allowances", "origAllowances", "thisBalanceIntegral"):
@@ -180,6 +180,10 @@ def test_header_verification_covers_all_configured_business_fields(field):
     repo = SqlRepository(config(), connector=lambda *args: None)
 
     stored_arap = [dict(ID=4200 + n, voucherID=42) for n in range(len(details))]
+    if field == "arap_missing":
+        stored_arap.pop()
+    elif field == "arap_extra":
+        stored_arap.append(dict(ID=9999, voucherID=42))
 
     def query(sql, *params):
         selected = [name.strip("[]") for name in sql.split(" FROM ")[0][len("SELECT "):].split(",")]
